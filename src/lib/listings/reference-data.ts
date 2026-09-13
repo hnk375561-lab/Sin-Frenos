@@ -109,6 +109,48 @@ export async function getConditionQuestions(
 }
 
 /**
+ * Preguntas dinámicas resueltas directo desde un `conditionId` (sección
+ * 4.6 y paso 3 del wizard) — variante de `getConditionQuestions` para
+ * cuando el caller solo tiene el id de la condición elegida en el paso 1,
+ * no el `question_set_id` (que es un detalle interno de la relación, no
+ * algo que el wizard deba andar propagando entre pasos).
+ *
+ * Usa el embed de PostgREST sobre el FK real
+ * `vehicle_conditions.question_set_id -> condition_question_sets.id`
+ * (002_align_schema_to_master_doc.sql) en vez de dos queries separadas.
+ * `[]` es la respuesta normal para condiciones con `question_set_id =
+ * 'qs_ninguna'` (ej. 'nuevo'/'usado') — es la señal que le dice al paso 3
+ * que debe saltearse, no un error.
+ */
+export async function getConditionQuestionsForCondition(
+  conditionId: VehicleConditionId
+): Promise<ConditionQuestion[]> {
+  const { data, error } = await supabase
+    .from('vehicle_conditions')
+    .select('question_set_id, condition_question_sets(questions)')
+    .eq('id', conditionId)
+    .maybeSingle()
+
+  if (error || !data) {
+    console.error('[reference-data] getConditionQuestionsForCondition:', error?.message)
+    return []
+  }
+
+  // El embed de PostgREST devuelve un objeto único acá porque
+  // question_set_id -> condition_question_sets.id es una FK a PK (1:1),
+  // pero el tipo del cliente lo modela como posible array — se normaliza
+  // por las dudas según cómo responda la versión de supabase-js instalada.
+  const embedded = data.condition_question_sets as
+    | { questions: ConditionQuestion[] }
+    | { questions: ConditionQuestion[] }[]
+    | null
+
+  if (!embedded) return []
+  const questionSet = Array.isArray(embedded) ? embedded[0] : embedded
+  return questionSet?.questions ?? []
+}
+
+/**
  * `locations` (sección 4.3), agrupadas por provincia para alimentar los
  * selects encadenados del paso 5 (provincia -> ciudad) sin que el
  * componente tenga que hacer el agrupamiento cada vez que cambia la
