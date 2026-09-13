@@ -43,8 +43,12 @@ export function StepCategoryCondition({ draft, onChange, onNext }: StepCategoryC
 
   useEffect(() => {
     let active = true
-    setLoading(true)
 
+    // Sin `setLoading(true)` acá: este efecto corre una sola vez al montar
+    // (deps `[]`), así que el `useState(true)` inicial de `loading` ya
+    // cubre el estado antes de que resuelva el fetch — repetirlo acá era
+    // un setState sincrónico redundante dentro del efecto, justo lo que
+    // marca `react-hooks/set-state-in-effect`.
     Promise.all([getVehicleCategories(), getVehicleConditions()]).then(([cats, conds]) => {
       if (!active) return
       setCategories(cats)

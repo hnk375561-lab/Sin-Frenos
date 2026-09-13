@@ -33,16 +33,31 @@ export function StepIdentification({ draft, onChange, onNext, onBack }: StepIden
   const [suggestions, setSuggestions] = useState<VehicleModelOption[]>([])
   const [searching, setSearching] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [trackedQuery, setTrackedQuery] = useState(debouncedQuery)
+
+  // Reacciona a un `debouncedQuery` nuevo DURANTE el render (patrón
+  // "Adjusting state when a prop changes" de la guía oficial de React),
+  // no dentro de un useEffect: evita el "cascading render" de
+  // `react-hooks/set-state-in-effect`. Acá se decide sincrónicamente si
+  // hace falta buscar o no — el efecto de abajo solo dispara el fetch en
+  // sí, nunca decide el estado de "buscando".
+  if (debouncedQuery !== trackedQuery) {
+    setTrackedQuery(debouncedQuery)
+    if (debouncedQuery.trim().length < 2) {
+      setSuggestions([])
+      setSearching(false)
+    } else {
+      setSearching(true)
+    }
+  }
 
   useEffect(() => {
     let active = true
 
-    if (debouncedQuery.trim().length < 2) {
-      setSuggestions([])
-      return
-    }
+    // Nada que buscar (ya resuelto arriba, durante el render) — el efecto
+    // no tiene ningún setState que ejecutar en este caso.
+    if (debouncedQuery.trim().length < 2) return
 
-    setSearching(true)
     searchVehicleModels(debouncedQuery).then((results) => {
       if (!active) return
       setSuggestions(results)

@@ -41,19 +41,33 @@ export function ConditionForm({
 }: ConditionFormProps) {
   const [questions, setQuestions] = useState<ConditionQuestion[]>([])
   const [loading, setLoading] = useState(true)
+  const [trackedConditionId, setTrackedConditionId] = useState(conditionId)
+
+  // Reseteo de `loading`/`questions` cuando cambia `conditionId`, hecho
+  // DURANTE el render (patrón "Adjusting state when a prop changes" de la
+  // guía oficial de React: https://react.dev/learn/you-might-not-need-an-effect),
+  // no dentro de un useEffect — evita el "cascading render" que marca
+  // `react-hooks/set-state-in-effect` y que antes disparaba `setLoading(true)`
+  // sincrónicamente en el cuerpo del efecto.
+  if (conditionId !== trackedConditionId) {
+    setTrackedConditionId(conditionId)
+    setLoading(true)
+    setQuestions([])
+  }
 
   useEffect(() => {
     let active = true
-    setLoading(true)
 
-    if (!conditionId) {
-      setQuestions([])
-      setLoading(false)
-      onQuestionsResolved?.([])
-      return
-    }
+    // El caso "sin condición" se unifica como una promesa ya resuelta en
+    // vez de un branch sincrónico con su propio setState — así TODOS los
+    // setState de este efecto quedan dentro del callback de un `.then()`
+    // (asincrónico de verdad, no solo en apariencia), que es exactamente
+    // lo que pide `react-hooks/set-state-in-effect`.
+    const request = conditionId
+      ? getConditionQuestionsForCondition(conditionId)
+      : Promise.resolve<ConditionQuestion[]>([])
 
-    getConditionQuestionsForCondition(conditionId).then((result) => {
+    request.then((result) => {
       if (!active) return
       setQuestions(result)
       setLoading(false)

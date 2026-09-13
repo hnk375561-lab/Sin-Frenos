@@ -45,12 +45,25 @@ export function StepLocation({ draft, onChange, onNext, onBack }: StepLocationPr
   // (ej. el vendedor volvió del paso 6 y vuelve a pasar por acá), hay que
   // reconstruir de qué provincia era, para que el segundo <select> se
   // pueble correctamente sin que el vendedor tenga que elegir todo de
-  // nuevo.
-  useEffect(() => {
-    if (!draft.locationId || locations.length === 0) return
-    const current = locations.find((location) => location.id === draft.locationId)
-    if (current) setSelectedProvincia(current.provincia)
-  }, [draft.locationId, locations])
+  // nuevo. Se recalcula tanto si cambia `draft.locationId` como si
+  // `locations` recién termina de cargar (por eso se trackean los dos).
+  //
+  // Hecho DURANTE el render (patrón "Adjusting state when a prop
+  // changes" de la guía oficial de React), no en un useEffect — evita el
+  // "cascading render" que marca `react-hooks/set-state-in-effect`.
+  const [trackedLocationId, setTrackedLocationId] = useState(draft.locationId)
+  const hasLocations = locations.length > 0
+  const [trackedHasLocations, setTrackedHasLocations] = useState(hasLocations)
+
+  if (draft.locationId !== trackedLocationId || hasLocations !== trackedHasLocations) {
+    setTrackedLocationId(draft.locationId)
+    setTrackedHasLocations(hasLocations)
+
+    if (draft.locationId && hasLocations) {
+      const current = locations.find((location) => location.id === draft.locationId)
+      if (current) setSelectedProvincia(current.provincia)
+    }
+  }
 
   const grouped = useMemo(() => groupLocationsByProvincia(locations), [locations])
   const provincias = useMemo(() => Array.from(grouped.keys()).sort(), [grouped])
