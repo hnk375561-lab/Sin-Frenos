@@ -241,19 +241,42 @@ export function Header() {
               </svg>
             </span>
           ) : user ? (
-            <button
-              type="button"
-              onClick={() => signOut()}
-              aria-label={`Cerrar sesión (${user.email})`}
-              title={`Sesión iniciada como ${user.email} — click para cerrar sesión`}
-              className={iconBtnClass}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21a8 8 0 0 0-16 0" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-archive-green" aria-hidden="true" />
-            </button>
+            <>
+              {/*
+                Cierre de Fase 4 (documento maestro, sección 16 "NUEVOS":
+                `src/app/mis-publicaciones/**`): antes de esto no había
+                ningún link, en ningún lugar del sitio, hacia
+                `/mis-publicaciones` — la única forma de llegar era
+                escribiendo la URL a mano. Solo se muestra con sesión
+                iniciada, mismo criterio que el resto de este bloque.
+              */}
+              <Link
+                href="/mis-publicaciones"
+                aria-label="Mis publicaciones"
+                title="Mis publicaciones"
+                className={iconBtnClass}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 4h16v4H4z" />
+                  <path d="M4 12h16v8H4z" />
+                  <path d="M9 16h6" />
+                </svg>
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => signOut()}
+                aria-label={`Cerrar sesión (${user.email})`}
+                title={`Sesión iniciada como ${user.email} — click para cerrar sesión`}
+                className={iconBtnClass}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21a8 8 0 0 0-16 0" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-archive-green" aria-hidden="true" />
+              </button>
+            </>
           ) : (
             <Link href="/ingresar" aria-label="Ingresar" title="Ingresar" className={iconBtnClass}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
