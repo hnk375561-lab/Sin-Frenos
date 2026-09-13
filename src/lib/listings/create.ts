@@ -44,6 +44,15 @@ const MIN_PHOTOS = 1
 export interface CreateListingResult {
   success: boolean
   listingId?: string
+  /**
+   * Status real con el que quedó el listing (`computeInitialStatus`,
+   * sección 6 paso 8). Se devuelve para que el paso 8 del wizard
+   * (`StepPreview.tsx`) pueda mostrar el mensaje correcto sin tener que
+   * reimplementar la lógica de "primera publicación de la cuenta" del
+   * lado del componente — este módulo es la única fuente de verdad de esa
+   * decisión.
+   */
+  status?: 'pending_review' | 'published'
   /** Errores de validación, en lenguaje para mostrar directo en la UI. */
   errors?: string[]
 }
@@ -112,7 +121,7 @@ function isLikelyUrl(value: string): boolean {
  * de reputación/flags más fino que esto. Cuando exista, este es el único
  * lugar que hay que tocar.
  */
-async function computeInitialStatus(sellerId: string): Promise<'draft' | 'pending_review' | 'published'> {
+async function computeInitialStatus(sellerId: string): Promise<'pending_review' | 'published'> {
   const { count, error } = await supabase
     .from('listings')
     .select('id', { count: 'exact', head: true })
@@ -227,11 +236,25 @@ export async function createListing(
 
   const listingId = listingRow.id as string
 
+  interface MediaRow {
+    listing_id: string
+    url: string
+    position: number
+    is_cover: boolean
+    media_type: 'image' | 'video'
+  }
+
   try {
     // Fotos, en orden — la portada (`isCover`) puede no ser la primera
     // del array si el vendedor reordenó en el paso 6, así que se sube
     // cada una en su posición declarada, no por índice de array.
-    const mediaRows = await Promise.all(
+    //
+    // Tipado explícito acá (`MediaRow[]`): sin esto, TypeScript infiere el
+    // tipo del array a partir del primer literal (`media_type: 'image'`)
+    // y después rechaza el `.push(...)` del video más abajo por no ser
+    // asignable a ese tipo más angosto — un array con fotos Y video es
+    // válido en runtime, el tipo tiene que reflejarlo desde el arranque.
+    const mediaRows: MediaRow[] = await Promise.all(
       draft.photos.map(async (photo) => {
         const url = await uploadPhoto(photo, userId, listingId)
         return {
@@ -270,5 +293,5 @@ export async function createListing(
     }
   }
 
-  return { success: true, listingId }
+  return { success: true, listingId, status }
 }
