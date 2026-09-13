@@ -263,6 +263,26 @@ export function Header() {
                 </svg>
               </Link>
 
+              {/*
+                Fase 6 (documento maestro, sección 14: "Contacto y
+                favoritos reales"): sin este link, un mensaje enviado vía
+                `ContactButton` quedaría persistido pero invisible — no
+                había, en ningún lugar del sitio, forma de llegar a
+                `/mensajes` salvo escribiendo la URL a mano. Mismo
+                criterio que el link a `/mis-publicaciones` de arriba.
+              */}
+              <Link
+                href="/mensajes"
+                aria-label="Mensajes"
+                title="Mensajes"
+                className={iconBtnClass}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 4h16v16H4z" />
+                  <path d="m4 6 8 7 8-7" />
+                </svg>
+              </Link>
+
               <button
                 type="button"
                 onClick={() => signOut()}

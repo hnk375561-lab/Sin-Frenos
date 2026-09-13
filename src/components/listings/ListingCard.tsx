@@ -24,6 +24,7 @@
 import Link from 'next/link'
 import type { ConditionSeverity } from '@/lib/listings/types'
 import { severityBadgeBaseClass, severityBadgeClasses } from '@/components/listings/publicar/formStyles'
+import { FavoriteButton } from '@/components/listings/FavoriteButton'
 
 export interface ListingCardData {
   id: string
@@ -67,7 +68,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
       prefetch={false}
       className="flex h-full flex-col overflow-hidden rounded-lg border border-edge bg-surface-card transition duration-200 hover:bg-surface-card-hover"
     >
-      <div className="aspect-[4/3] w-full shrink-0 overflow-hidden bg-surface-alt">
+      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-surface-alt">
         {listing.coverUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- URL dinámica de Supabase Storage, fuera de dominios conocidos por next/image (mismo criterio que mis-publicaciones/page.tsx)
           <img
@@ -81,6 +82,11 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             Sin foto
           </div>
         )}
+        {/* Fase 6: favorito real por listing (useListingFavorites), separado
+            de la wishlist del catálogo técnico — ver FavoriteButton.tsx.
+            preventDefault/stopPropagation adentro del componente evitan que
+            el click navegue: esta card entera es un <Link>. */}
+        <FavoriteButton listingId={listing.id} className="absolute right-2 top-2" />
       </div>
 
       <div className="flex flex-1 flex-col gap-1 p-3 sm:p-4">

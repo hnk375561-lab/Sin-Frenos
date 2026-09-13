@@ -4,6 +4,8 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
+import { ContactButton } from '@/components/listings/ContactButton';
+import { FavoriteButton } from '@/components/listings/FavoriteButton';
 
 type Listing = {
   id: string;
@@ -28,6 +30,9 @@ type Listing = {
   // catálogo (brand/model/version tipeados libres por el vendedor) igual
   // debe poder existir con esto en null (criterio de aceptación de Fase 3).
   vehicle_model_slug: string | null;
+  // Fase 6: necesario para ContactButton (a quién le llega la conversación)
+  // y para no ofrecerle a un vendedor el botón de contactarse a sí mismo.
+  seller_id: string;
 };
 
 type VehicleModel = {
@@ -125,13 +130,20 @@ function ListingContent() {
 
   return (
     <div style={{ padding: 32, maxWidth: 800, margin: '0 auto', fontFamily: 'sans-serif' }}>
-      {cover && (
-        <img
-          src={cover.url}
-          alt={listing.title}
-          style={{ width: '100%', maxHeight: 400, objectFit: 'cover', borderRadius: 8 }}
-        />
-      )}
+      <div style={{ position: 'relative' }}>
+        {cover && (
+          <img
+            src={cover.url}
+            alt={listing.title}
+            style={{ width: '100%', maxHeight: 400, objectFit: 'cover', borderRadius: 8 }}
+          />
+        )}
+        {/* Fase 6: favorito real (useListingFavorites), posicionado sobre
+            la foto de portada igual que en ListingCard. */}
+        <div style={{ position: 'absolute', top: 12, right: 12 }}>
+          <FavoriteButton listingId={listing.id} size={20} />
+        </div>
+      </div>
 
       <h1 style={{ marginTop: 24 }}>{listing.title}</h1>
 
@@ -148,6 +160,14 @@ function ListingContent() {
         {conditionLabel && (
           <span style={{ fontWeight: 600, color: '#c0392b' }}>{conditionLabel}</span>
         )}
+      </div>
+
+      {/* Fase 6: contacto real (conversations/conversation_messages), en
+          vez de dejar la ficha sin ninguna forma de escribirle al
+          vendedor — ver ContactButton.tsx para el detalle de qué hace y
+          qué NO hace todavía (notificación por email). */}
+      <div style={{ marginBottom: 16 }}>
+        <ContactButton listingId={listing.id} sellerId={listing.seller_id} listingTitle={listing.title} />
       </div>
 
       {vehicleModel && (
