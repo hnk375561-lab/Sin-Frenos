@@ -1,5 +1,16 @@
 -- ============================================================================
 -- FASE 7 (COMPLETA) — MODERACIÓN Y CONFIANZA (13/09/2026)
+-- VERSIÓN CORREGIDA (14/09/2026) — fixes aplicados directo en el archivo
+-- original del repo, en vez de como parche posterior:
+--   Bug 2: WHEN 'flagged_duplicate' OR 'flagged_suspicious' THEN
+--          -> sintaxis inválida en CASE simple de PL/pgSQL, corregido a
+--             WHEN 'flagged_duplicate', 'flagged_suspicious' THEN (con coma)
+--   Bug 3: COMMENT '...' inline en definición de columna dentro de
+--          CREATE TABLE (sintaxis MySQL, inválida en Postgres)
+--          -> movido a COMMENT ON COLUMN separado, después del CREATE TABLE
+--   Bug 4: columna "limit" en RETURNS TABLE de check_rate_limit_new_seller
+--          -> "limit" es palabra reservada en Postgres, renombrada a
+--             "max_allowed"
 -- ============================================================================
 --
 -- Implementa la cola de moderación completa: reportes de listings,
@@ -44,11 +55,6 @@ COMMENT ON COLUMN profiles.trust_score IS
 -- 2. LISTINGS — actualizar CHECK constraint para status
 -- ============================================================================
 
--- Primero, actualizar el constraint de status para incluir 'flagged'
--- (Nota: esto solo funciona si el constraint actual se puede borrar;
--- si es muy restrictivo, este paso puede skippearse y hacerse en otra
--- migración separada. Aquí se intenta de forma segura.)
-
 ALTER TABLE listings
   DROP CONSTRAINT IF EXISTS listings_status_check;
 
@@ -63,8 +69,7 @@ ALTER TABLE listings
 CREATE TABLE IF NOT EXISTS listing_reports (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   listing_id uuid NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
-  reporter_id uuid REFERENCES auth.users(id) ON DELETE SET NULL
-    COMMENT 'NULL = reporte anónimo',
+  reporter_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   reason text NOT NULL CHECK (reason IN (
     'precio_absurdo',
     'fotos_robadas',
@@ -83,6 +88,8 @@ CREATE TABLE IF NOT EXISTS listing_reports (
   UNIQUE(listing_id, reporter_id)  -- un reporte por vendedor/listing
 );
 
+COMMENT ON COLUMN listing_reports.reporter_id IS 'NULL = reporte anónimo';
+
 CREATE INDEX IF NOT EXISTS idx_listing_reports_listing_id ON listing_reports(listing_id);
 CREATE INDEX IF NOT EXISTS idx_listing_reports_status ON listing_reports(status);
 CREATE INDEX IF NOT EXISTS idx_listing_reports_created_at ON listing_reports(created_at DESC);
@@ -99,8 +106,7 @@ COMMENT ON TABLE listing_reports IS
 CREATE TABLE IF NOT EXISTS moderation_actions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   listing_id uuid NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
-  moderator_id uuid REFERENCES auth.users(id) ON DELETE SET NULL
-    COMMENT 'NULL = acción automática (auto-aprobación, detección de duplicado)',
+  moderator_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   action text NOT NULL CHECK (action IN (
     'approved',
     'rejected',
@@ -115,6 +121,9 @@ CREATE TABLE IF NOT EXISTS moderation_actions (
   UNIQUE(listing_id, action)  -- una acción del tipo por listing
                                -- (re-aprobar es otra acción, no reemplaza)
 );
+
+COMMENT ON COLUMN moderation_actions.moderator_id IS
+  'NULL = acción automática (auto-aprobación, detección de duplicado)';
 
 CREATE INDEX IF NOT EXISTS idx_moderation_actions_listing_id
   ON moderation_actions(listing_id);
@@ -428,7 +437,7 @@ CREATE OR REPLACE FUNCTION check_rate_limit_new_seller(
 RETURNS TABLE (
   is_within_limit boolean,
   current_count int,
-  limit int
+  max_allowed int
 ) AS $$
 DECLARE
   v_count int;
@@ -443,7 +452,7 @@ BEGIN
   RETURN QUERY SELECT
     (v_count < p_max_listings) as within_limit,
     v_count as cnt,
-    p_max_listings as lim;
+    p_max_listings as max_allowed;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -469,7 +478,7 @@ BEGIN
       UPDATE listings SET status = 'paused' WHERE id = NEW.listing_id;
     WHEN 'removed' THEN
       UPDATE listings SET status = 'removed' WHERE id = NEW.listing_id;
-    WHEN 'flagged_duplicate' OR 'flagged_suspicious' THEN
+    WHEN 'flagged_duplicate', 'flagged_suspicious' THEN
       UPDATE listings SET status = 'flagged' WHERE id = NEW.listing_id;
   END CASE;
   RETURN NEW;
@@ -487,7 +496,7 @@ COMMENT ON FUNCTION update_listing_status_after_action IS
   'listing según la acción (approved -> published, paused -> paused, etc).';
 
 -- ============================================================================
--- FIN DE LA MIGRACIÓN 008
+-- FIN DE LA MIGRACIÓN 008 (CORREGIDA)
 -- ============================================================================
 -- Verificación manual post-migración (SQL Editor de Supabase):
 --
