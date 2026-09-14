@@ -1,0 +1,50 @@
+name: Sync vehicle models (AutoFicha -> Supabase)
+
+# Corre `scripts/sync-vehicle-models.mjs`: sincroniza los 250 JSON de
+# src/content/vehiculos/ (AutoFicha) contra la tabla `vehicle_models` en
+# Supabase, para que los listings del marketplace puedan linkearse a la
+# ficha técnica completa via `vehicle_model_slug`.
+#
+# Se corre a mano cuando cambia el catálogo de vehículos (se agregan,
+# renombran o borran fichas) — no hace falta correrlo en cada deploy.
+#
+# Mismos requisitos que seed-listings.yml (ya cargados):
+#   - Variable: NEXT_PUBLIC_SUPABASE_URL
+#   - Secret:   SUPABASE_SERVICE_ROLE_KEY
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Verificar que los secrets necesarios estén cargados
+        run: |
+          if [ -z "${{ vars.NEXT_PUBLIC_SUPABASE_URL }}" ]; then
+            echo "❌ Falta la Variable NEXT_PUBLIC_SUPABASE_URL."
+            exit 1
+          fi
+          if [ -z "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+            echo "❌ Falta el Secret SUPABASE_SERVICE_ROLE_KEY."
+            exit 1
+          fi
+          echo "✅ Variables y secrets necesarios presentes."
+
+      - name: Sincronizar vehicle_models
+        run: npm run sync:vehicle-models
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
