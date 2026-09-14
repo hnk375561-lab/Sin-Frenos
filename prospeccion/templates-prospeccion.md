@@ -12,7 +12,7 @@ pensados para copiar/pegar, no para reescribir cada vez.
 Hola [Nombre de contacto o "equipo de Nombre del negocio"],
 
 Mi nombre es [Tu nombre] y estoy detrás de Sin Frenos
-(gta-6-codex.vercel.app), un catálogo de fichas técnicas de autos y motos
+(hnk375561-lab.github.io/Sin-Frenos), un catálogo de fichas técnicas de autos y motos
 pensado para gente de Concepción del Uruguay y la región que está
 comparando antes de comprar.
 
@@ -89,7 +89,7 @@ Saludos,
 
 ## WHATSAPP — Versión directa (más informal, para primer contacto)
 
-Hola [Nombre]! Soy [Tu nombre], armo Sin Frenos (gta-6-codex.vercel.app),
+Hola [Nombre]! Soy [Tu nombre], armo Sin Frenos (hnk375561-lab.github.io/Sin-Frenos),
 un sitio de fichas técnicas de autos para gente de la zona que está
 por comprar. Te escribo porque me gustaría sumar a [Nombre del negocio]
 como uno de los lugares recomendados del sitio para [rubro]. ¿Tenés 5

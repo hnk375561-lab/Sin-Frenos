@@ -15,4 +15,4 @@ export const SITE_TAGLINE = 'Fichas técnicas y comparador de autos y motos'
 // que no sirve la app real. Todo canonical/og:url/og:image de fichas de
 // vehículo heredaba ese mismatch. El dominio real de producción (Vercel)
 // es el que declara el propio README del repo.
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gta-6-codex.vercel.app'
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://hnk375561-lab.github.io/Sin-Frenos'
