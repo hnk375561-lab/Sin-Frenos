@@ -25,12 +25,26 @@ export const ModerationActionLabels: Record<ModerationActionTypeValue, string> =
 
 /**
  * Schemas Zod para moderation_actions
+ *
+ * FIX (corroboración de Fase 7, 13/09/2026): las dos líneas `z.enum(...)`
+ * de abajo casteaban `Object.values(ModerationActionType)` a
+ * `[string, ...string[]]`. Ese cast ensancha cada literal ('approved',
+ * 'rejected', etc.) a `string` genérico ANTES de que Zod lo vea, así que
+ * `z.enum` termina infiriendo su tipo de salida como `string` en vez de
+ * la unión literal real — el `.action` de todo lo que pasa por
+ * `ModerationActionSchema.parse(...)` quedaba tipado `string`, no
+ * `ModerationActionTypeValue`. Recién se notó al conectar `@/types/
+ * supabase.ts` (que si tipa `action` como la unión estricta): indexar
+ * `ModerationActionLabels[action.action]` y asignar `parsed.action` a un
+ * campo de `Database['public']['Tables']['moderation_actions']['Insert']`
+ * fallaban en `tsc`. Se castea al tipo de unión real en vez de a
+ * `string` — mismo array en runtime, tipo correcto en compile time.
  */
 export const ModerationActionSchema = z.object({
   id: z.string().uuid(),
   listing_id: z.string().uuid(),
   moderator_id: z.string().uuid().nullable(),
-  action: z.enum(Object.values(ModerationActionType) as [string, ...string[]]),
+  action: z.enum(Object.values(ModerationActionType) as [ModerationActionTypeValue, ...ModerationActionTypeValue[]]),
   reason: z.string().max(500).nullable(),
   created_at: z.string().datetime(),
 })
@@ -42,7 +56,7 @@ export type ModerationAction = z.infer<typeof ModerationActionSchema>
  */
 export const CreateModerationActionSchema = z.object({
   listing_id: z.string().uuid('ID de listing inválido'),
-  action: z.enum(Object.values(ModerationActionType) as [string, ...string[]],
+  action: z.enum(Object.values(ModerationActionType) as [ModerationActionTypeValue, ...ModerationActionTypeValue[]],
     { message: 'Acción de moderación inválida' }),
   reason: z.string().max(500, 'Máximo 500 caracteres').optional(),
 })
