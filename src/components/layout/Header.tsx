@@ -22,8 +22,22 @@ import { CommandPalette } from '@/components/search/CommandPalette'
  * un ítem de navegación persistente que no lleva a nada real rompe la
  * confianza del usuario en el primer click que lo prueba. Volver a
  * agregarlo acá solo cuando /mapa tenga contenido real que mostrar.
+ *
+ * NOTA (pivote "marketplace-first", sept. 2026): `/listings` ("Comprar")
+ * se agrega ACÁ, primero en el orden — hasta esta actualización el
+ * header entero no tenía ningún link a `/listings` ni a `/publicar`
+ * salvo, con sesión iniciada, el ícono de "Mis publicaciones" (que ni
+ * siquiera lleva a la grilla pública, sino a las publicaciones propias).
+ * Para cualquier visitante nuevo sin cuenta, el 100% de la navegación
+ * principal era catálogo — exactamente el problema de jerarquía que el
+ * home ya resolvió (`MarketplaceHeroStrip`/`ArchiveHero`) pero el header
+ * global, que se ve en TODAS las páginas, seguía sin reflejar. El botón
+ * "Publicar" (la acción de conversión real) NO va acá — es un CTA
+ * propio, destacado, más abajo en este archivo, para que no compita
+ * visualmente con estos links de texto.
  */
 const NAV_LINKS = [
+  { href: '/listings', label: 'Comprar' },
   { href: `/${EntityType.VEHICLE}`, label: 'Vehículos' },
   { href: `/${EntityType.MANUFACTURER}`, label: 'Fabricantes' },
   { href: `/${EntityType.GUIDE}`, label: 'Guías' },
@@ -168,6 +182,40 @@ export function Header() {
 
         {/* Búsqueda y menú móvil */}
         <div className="flex items-center gap-2">
+          {/*
+            CTA "Publicar" — la acción de conversión real del marketplace
+            (traspaso "marketplace-first", sept. 2026). Deliberadamente
+            NO es un link de texto más dentro de `NAV_LINKS`: es un botón
+            con relleno de color, mismo tratamiento visual que el CTA del
+            hero (`ArchiveHero.tsx`, "Publicar mi vehículo →") y del
+            cierre de la home — para que sea inconfundible en TODAS las
+            páginas del sitio, no solo en el home. Siempre visible (sin
+            `hidden md:flex`): en mobile se prioriza sobre el label de
+            texto completo con un botón más compacto (solo el ícono +
+            texto corto), no se oculta detrás del menú hamburguesa.
+          */}
+          <Link
+            href="/publicar"
+            prefetch={false}
+            className="cta-shine flex items-center gap-1.5 whitespace-nowrap rounded bg-oxide-red px-3 py-2 font-mono text-xs uppercase tracking-[0.1em] text-white transition-colors hover:bg-ink sm:px-4"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="flex-shrink-0"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span className="hidden sm:inline">Publicar</span>
+          </Link>
+
           {/*
             NOTA (auditoría UX, hallazgo [3.1]): antes esto era un
             `<Link href="/buscar">` — click → navegar a una página nueva →
