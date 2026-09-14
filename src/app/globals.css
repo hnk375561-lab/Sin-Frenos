@@ -647,3 +647,121 @@ a:not(.no-style) {
     font-size: 16px !important;
   }
 }
+
+/* === MARKETPLACE / SHOWROOM SYSTEM ===
+   The public home uses a distinct product surface from the technical catalog:
+   dark showroom for discovery, warm coral for action, and cool neutral space
+   for comparison. The classes below are intentionally scoped so existing
+   catalog, detail, and publishing routes keep their established tokens. */
+.marketplace-page {
+  --marketplace-ink: #13202a;
+  --marketplace-muted: #62717a;
+  --marketplace-coral: #ff6b47;
+  --marketplace-coral-soft: #ff9b82;
+  --marketplace-night: #10171c;
+  color: var(--marketplace-ink);
+}
+.marketplace-hero {
+  background-color: var(--marketplace-night);
+  background-image:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0, transparent 38%),
+    radial-gradient(circle at 80% 15%, rgba(255, 107, 71, 0.16), transparent 30%),
+    radial-gradient(circle at 10% 100%, rgba(69, 112, 130, 0.18), transparent 34%);
+}
+.marketplace-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, black, transparent 76%);
+}
+.marketplace-hero-showcase {
+  background: #1a252b;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
+}
+.marketplace-hero-empty {
+  background: radial-gradient(circle at 50% 30%, #2b3b43 0, #10171c 65%);
+}
+.marketplace-search-panel {
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.18);
+}
+.marketplace-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.19em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+.marketplace-button {
+  display: inline-flex;
+  min-height: 2.9rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border-radius: 9999px;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: background-color 180ms var(--ease-premium), border-color 180ms var(--ease-premium), color 180ms var(--ease-premium), transform 180ms var(--ease-premium);
+}
+.marketplace-button:active {
+  transform: scale(0.98);
+}
+.marketplace-button-primary {
+  background: var(--marketplace-coral);
+  color: var(--marketplace-night);
+}
+.marketplace-button-primary:hover {
+  background: var(--marketplace-coral-soft);
+}
+.marketplace-button-ghost {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.82);
+}
+.marketplace-button-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+.marketplace-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e35e3d;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: color 180ms var(--ease-premium), gap 180ms var(--ease-premium);
+}
+.marketplace-text-link:hover {
+  color: #bd4225;
+  gap: 0.75rem;
+}
+.commercial-vehicle-card {
+  box-shadow: 0 12px 32px rgba(16, 31, 38, 0.12);
+  transition: transform 220ms var(--ease-premium), box-shadow 220ms var(--ease-premium);
+}
+.commercial-vehicle-card:hover {
+  box-shadow: 0 20px 42px rgba(16, 31, 38, 0.2);
+  transform: translateY(-3px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .commercial-vehicle-card,
+  .marketplace-button,
+  .marketplace-text-link {
+    transition: none;
+  }
+  .commercial-vehicle-card:hover,
+  .marketplace-button:active {
+    transform: none;
+  }
+}
+@media (max-width: 640px) {
+  .marketplace-hero::after {
+    background-size: 52px 52px;
+  }
+}

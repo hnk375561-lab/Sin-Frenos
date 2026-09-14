@@ -29,7 +29,7 @@ export function Footer() {
               <h3 className="font-display text-lg font-semibold text-paper">{SITE_NAME}</h3>
             </div>
             <p className="max-w-xs text-sm leading-relaxed text-neutral-500">
-              Fichas técnicas de autos y motos con specs reales, comparador lado a lado y fuente por cada dato.
+              Buscá, compará y publicá vehículos. Fichas técnicas con fuentes y herramientas para decidir mejor.
             </p>
             <NewsletterSignupForm className="mt-6 max-w-xs" trackingSource="footer" />
             <SupportButton className="mt-4" />
@@ -37,7 +37,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="eyebrow mb-4 text-xs font-semibold uppercase text-oxide-red">Categorías</h3>
+            <h3 className="eyebrow mb-4 text-xs font-semibold uppercase text-oxide-red">Explorar</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link

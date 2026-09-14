@@ -20,37 +20,37 @@
 
 export const formStyles = {
   /** Contenedor de cada paso del wizard — mismo card que SellVehicleLeadForm. */
-  stepCard: 'rounded-lg border border-edge bg-surface-card p-4 sm:p-6',
+  stepCard: 'rounded-2xl border border-[#dce5e9] bg-white p-4 sm:p-6',
 
-  stepTitle: 'mb-1 text-lg font-semibold text-neutral-900',
-  stepDescription: 'mb-4 text-sm text-neutral-600',
+  stepTitle: 'mb-1 text-lg font-semibold tracking-[-0.02em] text-[#13202a]',
+  stepDescription: 'mb-4 text-sm text-[#62717a]',
 
   fieldGroup: 'space-y-2',
-  label: 'block text-sm font-medium text-neutral-900',
-  helperText: 'text-xs text-neutral-500',
+  label: 'block text-sm font-semibold text-[#13202a]',
+  helperText: 'text-xs text-[#71808a]',
   errorText: 'text-xs font-medium text-red-500',
 
   /** Base de <input>/<select>/<textarea> — calcada de SellVehicleLeadForm. */
   input:
-    'w-full rounded-md border border-edge bg-surface-input px-3 py-2 text-sm transition duration-200 focus:border-auto-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent',
+    'w-full rounded-xl border border-[#dce5e9] bg-white px-3.5 py-2.5 text-sm text-[#13202a] transition duration-200 focus:border-[#ff6b47] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6b47]/20',
 
   /** Mismo input, con el borde en rojo cuando el campo tiene un error de validación. */
   inputError:
     'w-full rounded-md border border-red-400 bg-surface-input px-3 py-2 text-sm transition duration-200 focus:border-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400',
 
   select:
-    'w-full rounded-md border border-edge bg-surface-input px-3 py-2 text-sm transition duration-200 focus:border-auto-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent disabled:cursor-not-allowed disabled:opacity-50',
+    'w-full rounded-xl border border-[#dce5e9] bg-white px-3.5 py-2.5 text-sm text-[#13202a] transition duration-200 focus:border-[#ff6b47] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6b47]/20 disabled:cursor-not-allowed disabled:opacity-50',
 
   textarea:
-    'w-full rounded-md border border-edge bg-surface-input px-3 py-2 text-sm transition duration-200 focus:border-auto-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent',
+    'w-full rounded-xl border border-[#dce5e9] bg-white px-3.5 py-2.5 text-sm text-[#13202a] transition duration-200 focus:border-[#ff6b47] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6b47]/20',
 
   /** Botón principal ("Siguiente", "Publicar") — calcado del submit de SellVehicleLeadForm. */
   primaryButton:
-    'rounded-md bg-auto-accent px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-auto-accent-strong active:scale-[0.99] active:bg-auto-accent-strong disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent focus-visible:ring-offset-2',
+    'rounded-full bg-[#ff6b47] px-5 py-2.5 text-sm font-semibold text-[#10171c] transition duration-200 hover:bg-[#ff8b6d] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6b47] focus-visible:ring-offset-2',
 
   /** Botón secundario ("Volver", "Omitir") — mismo tamaño/radio que el primario, sin relleno. */
   secondaryButton:
-    'rounded-md border border-edge bg-transparent px-4 py-2 text-sm font-semibold text-neutral-700 transition duration-200 hover:bg-surface-card-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent focus-visible:ring-offset-2',
+    'rounded-full border border-[#cbd7dc] bg-white px-5 py-2.5 text-sm font-semibold text-[#40505a] transition duration-200 hover:border-[#9aaab2] hover:bg-[#f4f6f7] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6b47] focus-visible:ring-offset-2',
 
   /** Barra de navegación inferior común a los 8 pasos (Volver / Siguiente). */
   navRow: 'mt-6 flex items-center justify-between gap-3',

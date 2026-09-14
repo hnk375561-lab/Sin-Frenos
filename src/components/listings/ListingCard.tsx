@@ -66,19 +66,19 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
     <Link
       href={`/listings/ver?id=${listing.id}`}
       prefetch={false}
-      className="flex h-full flex-col overflow-hidden rounded-lg border border-edge bg-surface-card transition duration-200 hover:bg-surface-card-hover"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#dce5e9] bg-white shadow-[0_8px_24px_rgba(24,42,52,0.06)] transition duration-200 hover:-translate-y-1 hover:border-[#ff9b82] hover:shadow-[0_18px_36px_rgba(24,42,52,0.12)] motion-reduce:transition-none motion-reduce:hover:transform-none"
     >
-      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-surface-alt">
+      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-[#e8eef0]">
         {listing.coverUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- URL dinámica de Supabase Storage, fuera de dominios conocidos por next/image (mismo criterio que mis-publicaciones/page.tsx)
           <img
             src={listing.coverUrl}
             alt={listing.title}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
             loading="lazy"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
+          <div className="flex h-full w-full items-center justify-center text-xs text-[#71808a]">
             Sin foto
           </div>
         )}
@@ -89,23 +89,23 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
         <FavoriteButton listingId={listing.id} className="absolute right-2 top-2" />
       </div>
 
-      <div className="flex flex-1 flex-col gap-1 p-3 sm:p-4">
+      <div className="flex flex-1 flex-col gap-1 p-4 sm:p-5">
         <span
           className={`${severityBadgeBaseClass} ${severityBadgeClasses[listing.conditionSeverity]} w-fit`}
         >
           {listing.conditionLabel}
         </span>
 
-        <p className="mt-1 line-clamp-2 text-sm font-semibold text-neutral-900">{listing.title}</p>
+        <p className="mt-1 line-clamp-2 text-base font-semibold tracking-[-0.02em] text-[#13202a]">{listing.title}</p>
 
-        {subtitle && <p className="truncate text-xs text-neutral-500">{subtitle}</p>}
+        {subtitle && <p className="truncate text-xs text-[#71808a]">{subtitle}</p>}
 
-        <p className="mt-auto pt-2 text-base font-bold text-neutral-900">
+        <p className="mt-auto pt-3 text-base font-bold text-[#e35e3d]">
           {formatPrice(listing.priceAmount, listing.priceCurrency, listing.priceType)}
         </p>
 
         {meta.length > 0 && (
-          <p className="truncate text-xs text-neutral-500">{meta.join(' · ')}</p>
+          <p className="truncate text-xs text-[#71808a]">{meta.join(' · ')}</p>
         )}
       </div>
     </Link>

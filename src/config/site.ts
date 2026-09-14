@@ -8,7 +8,7 @@
  */
 export const SITE_NAME = 'Sin Frenos'
 
-export const SITE_TAGLINE = 'Fichas técnicas y comparador de autos y motos'
+export const SITE_TAGLINE = 'Marketplace automotor y Comparador de Autos'
 
 // P2-10 (auditoría UX, sept 2026): el fallback apuntaba a
 // 'https://hnk375561-lab.github.io/Sin-Frenos' (GitHub Pages), un dominio

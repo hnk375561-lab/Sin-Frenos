@@ -2,10 +2,10 @@ import { Entity, EntityType } from '@/types'
 import type { MediaAsset } from '@/types/media'
 import { Metadata } from 'next'
 import { ENTITY_TYPE_LABELS } from './entity-labels'
-import { SITE_NAME, SITE_URL } from '@/config/site'
+import { SITE_NAME, SITE_TAGLINE, SITE_URL } from '@/config/site'
 
 const SITE_DESCRIPTION =
-  'Fichas técnicas y comparador de autos y motos, con specs reales del fabricante — encontrá y compará precio, motor y prestaciones antes de comprar.'
+  'Marketplace de vehículos para buscar, comparar y publicar autos, motos y más. Fichas técnicas con fuentes y herramientas para decidir mejor.'
 
 /**
  * Tipo de Schema.org más específico por EntityType, para JSON-LD con mejor
@@ -168,7 +168,7 @@ export function generateHomepageMetadata(): Metadata {
   const image = `${SITE_URL}/og-image.png`
 
   return {
-    title: `${SITE_NAME} | Fichas Técnicas y Comparador de Autos`,
+    title: `${SITE_NAME} | ${SITE_TAGLINE}`,
     description: SITE_DESCRIPTION,
     metadataBase: new URL(SITE_URL),
     alternates: {

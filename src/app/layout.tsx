@@ -56,20 +56,20 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: `${SITE_NAME} | ${SITE_TAGLINE}`,
   description:
-    'Fichas técnicas de autos y motos con specs reales por fabricante, comparador lado a lado y buscador. Datos con fuente primaria.',
-  keywords: ['autos', 'motos', 'fichas técnicas', 'comparador de autos', 'specs', 'precio autos'],
+    'Marketplace de vehículos para buscar, comparar y publicar autos, motos y más. Fichas técnicas con fuentes y herramientas para decidir mejor.',
+  keywords: ['marketplace de vehículos', 'autos', 'motos', 'fichas técnicas', 'comparador de autos', 'publicar vehículo'],
   openGraph: {
     type: 'website',
     locale: 'es_ES',
     url: SITE_URL,
     siteName: SITE_NAME,
     title: `${SITE_NAME} | ${SITE_TAGLINE}`,
-    description: 'Fichas técnicas de autos y motos con specs reales, comparador lado a lado y buscador.',
+    description: 'Buscá, compará y publicá vehículos. Fichas técnicas con fuentes y herramientas para decidir mejor.',
   },
   twitter: {
     card: 'summary_large_image',
     title: SITE_NAME,
-    description: 'Fichas técnicas de autos y motos con specs reales, comparador lado a lado y buscador.',
+    description: 'Buscá, compará y publicá vehículos. Fichas técnicas con fuentes y herramientas para decidir mejor.',
   },
   robots: {
     index: true,
@@ -179,16 +179,12 @@ export default async function RootLayout({
         <PageTransitionBridge />
         <div id="page-content" className="relative z-10 flex min-h-dvh flex-1 flex-col">
           <Header />
-          {/* REDISEÑO 180° (sept 2026): la home dejó de ser un viewport
-              pineado de 0-scroll-de-página (`HideOnHome` existía para
-              que `TrendingBar`/`Footer` no le robaran alto real a ese
-              panel — ver `HideOnHome.tsx`) y pasó a un documento de
-              scroll normal como el resto del sitio, así que ambos
-              vuelven a renderizarse en `/` igual que en cualquier otra
-              ruta. `HideOnHome` no se borra (queda sin uso) por si
-              alguna futura sección de la home vuelve a necesitar un
-              layout de viewport fijo. */}
-          <TrendingBar />
+          {/* La home ya tiene búsqueda y descubrimiento propios; la franja de
+              tendencias queda disponible en las rutas internas sin competir
+              con el primer pantallazo comercial. */}
+          <HideOnHome>
+            <TrendingBar />
+          </HideOnHome>
           <main id="main-content" className="flex-1">
             {children}
           </main>

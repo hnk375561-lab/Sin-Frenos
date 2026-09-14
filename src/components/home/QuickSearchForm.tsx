@@ -87,11 +87,11 @@ export function QuickSearchForm({ examples = DEFAULT_EXAMPLES }: QuickSearchForm
       onSubmit={handleSubmit}
       action="/buscar"
       method="get"
-      className="relative mx-auto w-full max-w-xl"
+      className="relative mx-auto w-full max-w-none"
       role="search"
     >
       <svg
-        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
+        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#71808a]"
         width="16"
         height="16"
         viewBox="0 0 24 24"
@@ -113,7 +113,7 @@ export function QuickSearchForm({ examples = DEFAULT_EXAMPLES }: QuickSearchForm
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
         aria-label={`Búsqueda rápida en ${SITE_NAME}. Atajo: tecla oblicua`}
-        className="w-full rounded-sm border border-border bg-surface-input py-3.5 pl-11 pr-24 text-sm text-ink shadow-sm placeholder:text-ink/40 transition focus:border-oxide-red focus:outline-none focus:ring-2 focus:ring-oxide-red/10 sm:text-base"
+        className="w-full rounded-xl border border-white/10 bg-white py-3.5 pl-11 pr-24 text-sm text-[#13202a] shadow-sm placeholder:text-[#71808a] transition focus:border-[#ff8b6d] focus:outline-none focus:ring-2 focus:ring-[#ff8b6d]/25 sm:text-base"
       />
       {/* Indicador del atajo de teclado: se oculta solo mientras el input
           tiene contenido o foco (empty-values / has-[:focus]), y en mobile
@@ -122,13 +122,13 @@ export function QuickSearchForm({ examples = DEFAULT_EXAMPLES }: QuickSearchForm
           en momentos distintos. */}
       <kbd
         aria-hidden="true"
-        className="hero-search-kbd-hint pointer-events-none absolute right-20 top-1/2 hidden -translate-y-1/2 items-center rounded-sm border border-border px-1.5 py-1 font-mono text-xs text-ink/40 sm:flex"
+        className="pointer-events-none absolute right-20 top-1/2 hidden -translate-y-1/2 items-center rounded-md border border-[#dce5e9] bg-[#f4f6f7] px-1.5 py-1 font-mono text-xs text-[#71808a] sm:flex"
       >
         /
       </kbd>
       <button
         type="submit"
-        className="cta-shine absolute right-2 top-1/2 -translate-y-1/2 rounded-sm bg-oxide-red px-3.5 py-2 text-xs font-semibold uppercase tracking-wide text-white transition-[background-color,transform] duration-200 ease-out hover:bg-oxide-red/85 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxide-red focus-visible:ring-offset-2 sm:text-sm"
+        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#ff6b47] px-3.5 py-2 text-xs font-semibold text-[#10171c] transition-[background-color,transform] duration-200 ease-out hover:bg-[#ff8b6d] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8b6d] focus-visible:ring-offset-2 sm:text-sm"
       >
         Buscar
       </button>

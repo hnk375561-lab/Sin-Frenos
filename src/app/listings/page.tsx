@@ -44,8 +44,6 @@ import type {
 import { Filters } from '@/components/listings/Filters'
 import { ListingCard, type ListingCardData } from '@/components/listings/ListingCard'
 import { formStyles } from '@/components/listings/publicar/formStyles'
-
-const primaryButtonClass = formStyles.primaryButton
 const secondaryButtonClass = formStyles.secondaryButton
 
 /** Deriva los filtros estructurados de `searchListings` a partir de los
@@ -218,70 +216,73 @@ function ListingsContent() {
   const locationsByProvincia = groupLocationsByProvincia(locations)
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold text-neutral-900">Vehículos publicados</h1>
-          {!resultsLoading && total != null && (
-            <p className="text-sm text-neutral-500">
-              {total} {total === 1 ? 'publicación encontrada' : 'publicaciones encontradas'}
-            </p>
+    <main className="min-h-[70vh] bg-[#f4f6f7] pb-20">
+      <section className="bg-[#10171c] py-12 text-white sm:py-16">
+        <div className="container-max">
+          <p className="marketplace-eyebrow text-[#ff9b82]">Marketplace Sin Frenos</p>
+          <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <h1 className="max-w-2xl text-4xl font-semibold tracking-[-0.05em] text-white sm:text-5xl">Encontrá el vehículo que estás buscando.</h1>
+              <p className="mt-4 max-w-xl text-base leading-relaxed text-white/60">Filtrá por categoría, condición, ubicación y presupuesto. Las búsquedas quedan en la URL para que puedas compartirlas.</p>
+            </div>
+            <Link href="/publicar" className="marketplace-button marketplace-button-primary">
+              Publicar un vehículo <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <div className="container-max -mt-5">
+        <div className="rounded-3xl border border-[#dce5e9] bg-white p-4 shadow-[0_16px_40px_rgba(24,42,52,0.08)] sm:p-6">
+          {referenceLoading ? (
+            <p className="text-sm text-[#62717a]">Preparando filtros…</p>
+          ) : (
+            <Filters
+              categories={enabledCategories}
+              conditions={conditions}
+              locationsByProvincia={locationsByProvincia}
+            />
           )}
         </div>
-        <Link href="/publicar" className={primaryButtonClass}>
-          Publicar un vehículo
-        </Link>
-      </div>
 
-      <div className="mt-6">
-        {referenceLoading ? (
-          <p className="text-sm text-neutral-500">Cargando filtros…</p>
-        ) : (
-          <Filters
-            categories={enabledCategories}
-            conditions={conditions}
-            locationsByProvincia={locationsByProvincia}
-          />
-        )}
-      </div>
+        {error && <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">No pudimos actualizar la búsqueda: {error}</p>}
 
-      {error && <p className="mt-4 text-xs font-medium text-red-500">{error}</p>}
-
-      <div className="mt-6">
-        {resultsLoading ? (
-          <p className="text-sm text-neutral-500">Buscando publicaciones…</p>
-        ) : cards.length === 0 ? (
-          <div className={formStyles.stepCard}>
-            <p className="text-sm text-neutral-600">
-              No encontramos publicaciones con estos filtros. Probá ampliar la búsqueda o{' '}
-              <Link href="/listings" className="font-semibold text-auto-accent">
-                ver todas las publicaciones
-              </Link>
-              .
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {cards.map((card) => (
-                <ListingCard key={card.id} listing={card} />
-              ))}
+        <div className="mt-10">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="marketplace-eyebrow text-[#e35e3d]">Resultados</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[#13202a]">
+                {resultsLoading ? 'Buscando publicaciones…' : total != null ? `${total.toLocaleString('es-AR')} ${total === 1 ? 'publicación' : 'publicaciones'}` : 'Publicaciones'}
+              </h2>
             </div>
+            <p className="text-sm text-[#71808a]">Contacto directo con el vendedor</p>
+          </div>
 
-            {hasMore && (
-              <div className="mt-6 flex justify-center">
-                <button
-                  type="button"
-                  onClick={loadMore}
-                  disabled={loadingMore}
-                  className={secondaryButtonClass}
-                >
-                  {loadingMore ? 'Cargando…' : 'Cargar más'}
-                </button>
+          {resultsLoading ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, index) => <div key={index} className="aspect-[4/5] animate-pulse rounded-2xl bg-[#e6ecef]" />)}
+            </div>
+          ) : cards.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-[#cbd7dc] bg-white px-6 py-16 text-center">
+              <p className="text-lg font-semibold text-[#13202a]">Todavía no encontramos publicaciones con esos filtros.</p>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-[#62717a]">Probá ampliar la búsqueda o sé el primero en publicar un vehículo para empezar a mover el marketplace.</p>
+              <Link href="/publicar" className="marketplace-button marketplace-button-primary mt-6">Publicar mi vehículo <span aria-hidden="true">↗</span></Link>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+                {cards.map((card) => <ListingCard key={card.id} listing={card} />)}
               </div>
-            )}
-          </>
-        )}
+              {hasMore && (
+                <div className="mt-8 flex justify-center">
+                  <button type="button" onClick={loadMore} disabled={loadingMore} className={secondaryButtonClass}>
+                    {loadingMore ? 'Cargando…' : 'Cargar más publicaciones'}
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </main>
   )
@@ -291,8 +292,8 @@ export default function ListingsPage() {
   return (
     <Suspense
       fallback={
-        <main className="mx-auto max-w-5xl px-4 py-10">
-          <p className="text-sm text-neutral-500">Cargando…</p>
+        <main className="min-h-[70vh] bg-[#f4f6f7] px-4 py-16">
+          <div className="mx-auto max-w-5xl animate-pulse rounded-3xl bg-white p-8 text-sm text-[#71808a]">Preparando el marketplace…</div>
         </main>
       }
     >
