@@ -1,103 +1,156 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase/client'
-import { useAuth } from '@/lib/hooks/useAuth'
-import { ModerationDashboard } from '@/components/admin/ModerationDashboard'
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { supabase } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/hooks/useAuth';
+import { SITE_URL } from '@/config/site';
 
-/**
- * Página de moderación — solo accesible para admins.
- *
- * Verificar is_admin = true en profiles antes de renderizar.
- *
- * HALLAZGO (14/09/2026, ver también HOTFIX-lint-ci.md): esta página era
- * originalmente un Server Component async que creaba su propio cliente
- * Supabase con `createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!,
- * process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)`. Dos problemas reales:
- *
- * 1. Build roto: el sitio es `output: 'export'` (estático puro, sin
- *    servidor — ver next.config.js). Sin NEXT_PUBLIC_SUPABASE_URL /
- *    NEXT_PUBLIC_SUPABASE_ANON_KEY configuradas como Repository Variable
- *    en GitHub Actions, el `!` (aserción no-nula) sobre un `undefined`
- *    tira "supabaseUrl is required" AL PRERENDERIZAR esta página en build
- *    time, y `next build` aborta el export entero — ninguna otra página
- *    del sitio llega a publicarse por este error en una sola ruta admin.
- * 2. Lógica sin sentido para un export estático: aun si el build no
- *    rompiera, un chequeo de auth en un Server Component de un sitio
- *    100% estático corre UNA SOLA VEZ, en build time — no por cada
- *    visitante. El resultado (redirect o no) queda horneado en el HTML
- *    publicado para siempre, sin importar quién entre después.
- *
- * Solución: mismo patrón ya usado en `/ingresar` (ver
- * src/app/ingresar/page.tsx) y en `ModerationDashboard` — client
- * component que usa el cliente Supabase compartido
- * (`@/lib/supabase/client`, que nunca tira aunque falten las env vars,
- * ver comentario ahí) y corre la verificación en el navegador de cada
- * visitante. La seguridad REAL sigue viviendo en RLS (ver
- * supabase/migrations/); este chequeo es de "suavidad UX", igual que
- * antes.
- */
-export default function ModerationPage() {
-  const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
-  const [checkingAdmin, setCheckingAdmin] = useState(true)
-  const [isAdmin, setIsAdmin] = useState(false)
+export default function IngresarPage() {
+  const { user, loading } = useAuth();
+  const [email, setEmail] = useState('');
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // Arranca en true si la URL trae `?code=` o `?error=` (venimos del
+  // magic link) para no mostrar el formulario en flash mientras se
+  // resuelve el canje de sesión más abajo.
+  const [resolvingRedirect, setResolvingRedirect] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.has('code') || params.has('error') || params.has('error_description');
+  });
 
+  // `createBrowserClient` (@supabase/ssr) usa flowType 'implicit' (ver
+  // src/lib/supabase/client.ts) precisamente por lo que pasaba antes acá:
+  // con PKCE (el default de la librería) el magic link vuelve con
+  // `?code=...` en el query string, y canjear ese code requiere el
+  // "code_verifier" que quedó guardado en el localStorage del MISMO
+  // navegador/perfil que pidió el link. Si el usuario abre el mail desde
+  // otra app/navegador (lo normal: Gmail dispara el navegador por
+  // defecto del sistema, no necesariamente el mismo que usaste para
+  // pedir el acceso), ese navegador no tiene el verifier → el canje
+  // falla, y como es un sitio `output: 'export'` (estático, sin
+  // servidor ni ruta `/auth/callback`), no había ningún lado donde
+  // recuperarse de eso: el usuario quedaba en `/ingresar/?code=...` para
+  // siempre, sin sesión y sin ningún error visible.
+  //
+  // Con flujo implícito el magic link no lleva `?code=`, trae el token
+  // directo en el fragment de la URL (`#access_token=...`) y el cliente
+  // lo procesa solo al iniciar (`detectSessionInUrl`, true por
+  // defecto) — no depende de nada guardado localmente, así que funciona
+  // sin importar en qué navegador se abra. Este bloque de canje de
+  // `?code=` queda como red de seguridad por si llega un link viejo
+  // (emitido antes de este cambio) o si el proyecto vuelve a pkce más
+  // adelante.
+  //
+  // Supabase también puede volver con `?error=...&error_description=...`
+  // en vez de `?code=...` (ej.: link vencido o ya usado) — ese caso se
+  // muestra como error en vez de intentar canjear nada.
+  //
+  // NOTA (fix lint react-hooks/set-state-in-effect): antes acá había un
+  // `setResolvingRedirect(true)` justo al entrar al efecto. Se sacó
+  // porque es redundante — el useState de arriba ya inicializa
+  // `resolvingRedirect` en `true` leyendo la misma URL (`code`/`error`/
+  // `error_description`) en el mismo mount, antes de que este efecto
+  // corra. Llamar setState sincrónicamente ahí no cambiaba nada (el
+  // estado ya era `true`) y disparaba el warning de renders en cascada.
   useEffect(() => {
-    if (authLoading) return
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get('code');
+    const redirectError = url.searchParams.get('error_description') || url.searchParams.get('error');
 
-    if (!user) {
-      router.replace('/ingresar')
-      return
+    if (!code && !redirectError) return;
+
+    const cleanUrl = () => {
+      url.searchParams.delete('code');
+      url.searchParams.delete('error');
+      url.searchParams.delete('error_code');
+      url.searchParams.delete('error_description');
+      window.history.replaceState({}, '', url.toString());
+    };
+
+    if (redirectError) {
+      setError(decodeURIComponent(redirectError.replace(/\+/g, ' ')));
+      cleanUrl();
+      setResolvingRedirect(false);
+      return;
     }
 
-    let active = true
-
-    async function checkAdmin() {
-      try {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', user!.id)
-          .single()
-
-        if (!active) return
-        if (!profile?.is_admin) {
-          router.replace('/')
-          return
+    supabase.auth
+      .exchangeCodeForSession(code!)
+      .then(({ error: exchangeError }) => {
+        if (exchangeError) {
+          setError(exchangeError.message);
         }
-        setIsAdmin(true)
-        setCheckingAdmin(false)
-      } catch {
-        // Supabase inalcanzable u otro error de red: no dejamos a un
-        // no-admin pasar por defecto, mandamos al inicio igual que si
-        // is_admin diera false.
-        if (!active) return
-        router.replace('/')
-      }
+        cleanUrl();
+        setResolvingRedirect(false);
+      })
+      .catch((exchangeError: Error) => {
+        // Sin este catch, si la promesa se rechaza en vez de resolver
+        // con { error } (ej.: no hay code_verifier en este navegador),
+        // el .then() de arriba nunca corre — la URL se queda con
+        // `?code=...` para siempre y la página trabada en "Confirmando
+        // el acceso..." sin ningún mensaje visible.
+        setError(exchangeError?.message ?? 'No se pudo confirmar el acceso.');
+        cleanUrl();
+        setResolvingRedirect(false);
+      });
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${SITE_URL}/ingresar/` },
+    });
+    if (error) {
+      setError(error.message);
+    } else {
+      setSent(true);
     }
+  };
 
-    checkAdmin()
-
-    return () => {
-      active = false
-    }
-  }, [authLoading, user, router])
-
-  if (authLoading || checkingAdmin || !isAdmin) {
+  if (resolvingRedirect) {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <div style={{ padding: 32 }}>
-          <p>Verificando acceso...</p>
-        </div>
-      </main>
-    )
+      <div style={{ padding: 32, maxWidth: 400, margin: '0 auto' }}>
+        <h1>Ingresar</h1>
+        <p>Confirmando el acceso...</p>
+      </div>
+    );
+  }
+
+  if (!loading && user) {
+    return (
+      <div style={{ padding: 32, maxWidth: 400, margin: '0 auto' }}>
+        <h1>Ingresar</h1>
+        <p>Ya iniciaste sesión como {user.email}.</p>
+        <p>
+          <Link href="/">Volver al inicio</Link>
+        </p>
+      </div>
+    );
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <ModerationDashboard />
-    </main>
-  )
+    <div style={{ padding: 32, maxWidth: 400, margin: '0 auto' }}>
+      <h1>Ingresar</h1>
+      {sent ? (
+        <p>Te mandamos un link a {email}. Abrilo para entrar.</p>
+      ) : (
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            required
+            placeholder="tu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ display: 'block', width: '100%', padding: 8, marginBottom: 12 }}
+          />
+          <button type="submit">Enviar link de acceso</button>
+          {error && <p style={{ color: '#c0392b' }}>{error}</p>}
+        </form>
+      )}
+    </div>
+  );
 }
