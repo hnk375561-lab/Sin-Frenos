@@ -33,6 +33,7 @@ import { MonetizationCtaGroup } from '@/components/monetization/MonetizationCtaG
 import { LeadQuoteForm } from '@/components/monetization/LeadQuoteForm'
 import { SellVehicleLeadForm } from '@/components/monetization/SellVehicleLeadForm'
 import { SponsoredListingBanner } from '@/components/monetization/SponsoredListingBanner'
+import { ModelListingsPanel } from '@/components/listings/ModelListingsPanel'
 import { AccessoriesAffiliateWidget } from '@/components/monetization/AccessoriesAffiliateWidget'
 import { NativeAdUnit } from '@/components/monetization/NativeAdUnit'
 import { getSponsorshipForVehicle } from '@/lib/sponsorships'
@@ -536,6 +537,21 @@ export default async function EntityPage({ params }: PageProps) {
                     <SimilarVehiclesPanel items={similarVehicles} />
                   </CardBody>
                 </Card>
+              </Reveal>
+            )}
+
+            {/* Marketplace: publicaciones reales de este modelo (sección 8
+                del documento maestro — conecta el catálogo técnico con
+                `listings`). Va ANTES de toda la fila de monetización de
+                abajo (AdUnit, afiliados, leads): a diferencia de esos
+                canales, este es el único que hoy le da al marketplace
+                nuevo una fuente de tráfico propia — enterrarlo bajo 5
+                bloques de ads lo dejaría invisible en la práctica. No
+                requiere condicional acá: el propio componente decide no
+                renderizar nada si no hay publicaciones para este modelo. */}
+            {type === EntityType.VEHICLE && (
+              <Reveal direction="right" delay={190}>
+                <ModelListingsPanel vehicleModelSlug={entity.slug} vehicleName={entity.title} />
               </Reveal>
             )}
 

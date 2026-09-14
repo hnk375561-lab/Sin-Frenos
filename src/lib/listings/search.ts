@@ -125,6 +125,49 @@ export async function searchListings(
   return { rows, hasMore, total: count ?? null }
 }
 
+export interface VehicleModelListingsResult {
+  rows: ListingRow[]
+  /** Total de publicados para este modelo (puede ser mayor a `rows.length`
+   *  si se pidió un `limit` menor — ver `hasMore` para saber si conviene
+   *  mostrar el link "Ver todas"). */
+  total: number
+}
+
+/**
+ * Publicaciones reales para un modelo técnico puntual — el conector entre
+ * el catálogo (`/vehiculos/[slug]`, con SEO/tráfico propio) y el
+ * marketplace (`listings`), que hasta ahora vivían sin ningún link entre
+ * sí (sección 8 del documento maestro, "activación del CTA en fichas
+ * técnicas"). `vehicleModelSlug` es `entity.slug` del catálogo — mismo
+ * valor que graba `StepIdentification` en `listings.vehicle_model_slug`
+ * cuando el vendedor elige un modelo existente del catálogo al publicar
+ * (`005_listings_vehicle_model_fields.sql`).
+ *
+ * Ordenado por publicación más reciente primero, mismo criterio que
+ * `searchListings`. Solo `status = 'published'` — no es una medida de
+ * seguridad (RLS ya lo garantiza), es intención explícita de la query.
+ */
+export async function getListingsForVehicleModel(
+  vehicleModelSlug: string,
+  limit = 3
+): Promise<VehicleModelListingsResult> {
+  const { data, error, count } = await supabase
+    .from('listings')
+    .select('*', { count: 'exact' })
+    .eq('status', 'published')
+    .eq('vehicle_model_slug', vehicleModelSlug)
+    .order('published_at', { ascending: false, nullsFirst: false })
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (error || !data) {
+    console.error('[search] getListingsForVehicleModel:', error?.message)
+    return { rows: [], total: 0 }
+  }
+
+  return { rows: data as ListingRow[], total: count ?? data.length }
+}
+
 /**
  * Foto de portada de cada listing en un solo query (evita 1 request por
  * card) — mismo criterio de "no leer fila por fila" que ya usa
