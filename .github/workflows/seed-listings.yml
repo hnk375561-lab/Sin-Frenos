@@ -1,0 +1,85 @@
+name: Seed listings de demostración
+
+# Corre `scripts/seed-listings-fase3.mjs` (ya existente en el repo, no se
+# reescribe: 16 listings de autos y motos cubriendo casi toda la
+# taxonomía de `vehicle_conditions`, con 3 vendedores demo) SIN necesidad
+# de terminal local ni de tener Supabase-CLI instalado en ningún lado.
+# Se dispara a mano desde la pestaña Actions → este workflow → "Run
+# workflow" — un solo clic, nada se toca desde afuera de GitHub.
+#
+# Por qué como GitHub Action y no corriéndolo directo: el runner de
+# GitHub Actions tiene salida a internet completa (incluye
+# *.supabase.co), a diferencia de un entorno con egress restringido a
+# unos pocos dominios (ver documentación de red de cada entorno que edite
+# este repo). Corriendo acá el resultado es el mismo que si alguien lo
+# tipeara a mano en su compu, pero sin que nadie tenga que hacerlo.
+#
+# Requiere 2 valores cargados UNA sola vez en:
+# Settings → Secrets and variables → Actions
+#   - Variable ya existente (pestaña "Variables"): NEXT_PUBLIC_SUPABASE_URL
+#     (la misma que ya usa deploy-pages.yml para el build — no hay que
+#     cargarla de nuevo si ya está).
+#   - Secret NUEVO (pestaña "Secrets"): SUPABASE_SERVICE_ROLE_KEY
+#     (Supabase Dashboard → tu proyecto → Settings → API Keys →
+#     "service_role" — NO es la misma que la "anon" que ya está cargada,
+#     esta es la privada, con permiso de saltear RLS; por eso va como
+#     Secret y nunca como Variable ni se expone en el HTML del sitio).
+
+on:
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: 'Qué hacer'
+        required: true
+        default: 'seed'
+        type: choice
+        options:
+          - seed
+          - cleanup
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          # Mismo Node 22 que el job `quality-gate` de deploy-pages.yml
+          # (ver el comentario ahí) — el script de seed no corre tests,
+          # pero usa `@supabase/supabase-js`, que ya está en
+          # package-lock.json con esa base de Node.
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Verificar que los secrets necesarios estén cargados
+        run: |
+          if [ -z "${{ vars.NEXT_PUBLIC_SUPABASE_URL }}" ]; then
+            echo "❌ Falta la Variable NEXT_PUBLIC_SUPABASE_URL (Settings → Secrets and variables → Actions → Variables)."
+            exit 1
+          fi
+          if [ -z "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+            echo "❌ Falta el Secret SUPABASE_SERVICE_ROLE_KEY (Settings → Secrets and variables → Actions → Secrets)."
+            echo "   Se consigue en el Dashboard de Supabase → tu proyecto → Settings → API Keys → 'service_role'."
+            exit 1
+          fi
+          echo "✅ Variables y secrets necesarios presentes."
+
+      - name: Seed de listings de demostración
+        if: ${{ inputs.modo == 'seed' }}
+        run: npm run seed:listings-fase3
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Limpiar listings de demostración
+        if: ${{ inputs.modo == 'cleanup' }}
+        run: npm run seed:listings-fase3:cleanup
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
