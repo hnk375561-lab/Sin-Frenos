@@ -1,5 +1,12 @@
 -- ============================================================================
 -- FASE 1 — SCHEMA INICIAL (12/09/2026)
+-- VERSIÓN CORREGIDA (14/09/2026) — fixes de columnas faltantes aplicados
+-- directamente acá, en vez de como parche posterior, para que instalar
+-- 001->009 de cero en un proyecto nuevo no se rompa:
+--   Bug 1: profiles.avatar_url no existía, 003/004 la referencian
+--          (se agrega acá; 009 sigue siendo seguro de correr, es idempotente)
+--   Bug 5: listings.published_at no existía, scripts/seed-listings-fase3.mjs
+--          la necesita para insertar listings publicados
 -- ============================================================================
 --
 -- Define la estructura base de tablas para todo el marketplace:
@@ -26,6 +33,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   
   -- Datos públicos del perfil
   display_name TEXT,
+  avatar_url TEXT,
   email_verified BOOLEAN DEFAULT FALSE,
   
   -- Tipo de usuario: 'individual' (vendedor privado) o 'dealer' (concesionaria)
@@ -53,6 +61,10 @@ CREATE TABLE IF NOT EXISTS profiles (
   -- Metadata (JSON para datos futuros sin migrar)
   metadata JSONB DEFAULT '{}'
 );
+
+COMMENT ON COLUMN profiles.avatar_url IS
+  'URL pública de la foto de perfil (Supabase Storage). Usada por public_profiles '
+  '(003/004) y public_seller_profiles. NULL = sin foto, frontend muestra fallback.';
 
 CREATE INDEX IF NOT EXISTS idx_profiles_created_at ON profiles(created_at);
 CREATE INDEX IF NOT EXISTS idx_profiles_user_type ON profiles(user_type);
@@ -151,6 +163,10 @@ CREATE TABLE IF NOT EXISTS listings (
     'sold',        -- Vendido
     'removed'      -- Removido por vendedor o moderación
   )),
+
+  -- Timestamp de cuándo pasó a 'published' (NULL si nunca se publicó).
+  -- Usado por scripts de seed y por futura lógica de ordenamiento/freshness.
+  published_at TIMESTAMP WITH TIME ZONE,
   
   -- Moderación
   is_flagged BOOLEAN DEFAULT FALSE,
@@ -191,6 +207,7 @@ CREATE TRIGGER on_listings_updated
 -- ============================================================================
 -- Almacena referencias a imágenes en Supabase Storage (no los binarios).
 -- Las imágenes reales se suben a Storage vía client-side.
+-- NOTA: esta tabla se renombra a `listing_media` en 002_align_schema_to_master_doc.sql.
 
 CREATE TABLE IF NOT EXISTS listing_images (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
