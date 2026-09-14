@@ -1,0 +1,28 @@
+name: Supabase Keepalive
+
+on:
+  schedule:
+    # Corre todos los días a las 09:00 UTC (06:00 hora Argentina)
+    - cron: "0 9 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping a la tabla listings (lectura pública)
+        run: |
+          HTTP_STATUS=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            "${{ vars.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/listings?select=id&limit=1" \
+            -H "apikey: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}")
+
+          echo "HTTP status: $HTTP_STATUS"
+          cat /tmp/response.json
+
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "OK: Supabase respondió correctamente."
+          else
+            echo "ERROR: Supabase respondió con status $HTTP_STATUS"
+            exit 1
+          fi
