@@ -14,6 +14,7 @@
 
 import { useState, type FormEvent } from 'react'
 import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { startConversationWithMessage } from '@/lib/conversations'
 import { formStyles } from '@/components/listings/publicar/formStyles'
@@ -28,6 +29,13 @@ export function ContactButton({
   listingTitle: string
 }) {
   const { user, loading } = useAuth()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  // Reconstruye la URL actual (`/listings/ver?id=...`) para que, al
+  // volver del magic link, `/ingresar` mande de nuevo a esta misma
+  // ficha en vez de a la home — el visitante no tiene por qué buscar
+  // otra vez la publicación que quería contactar.
+  const currentUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState(`Hola, me interesa "${listingTitle}". ¿Sigue disponible?`)
   const [sending, setSending] = useState(false)
@@ -46,7 +54,7 @@ export function ContactButton({
 
   if (!user) {
     return (
-      <Link href="/ingresar" className={formStyles.primaryButton}>
+      <Link href={`/ingresar?next=${encodeURIComponent(currentUrl)}`} className={formStyles.primaryButton}>
         Iniciá sesión para contactar al vendedor
       </Link>
     )
