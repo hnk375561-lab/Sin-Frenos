@@ -46,14 +46,20 @@ export default function IngresarPage() {
   // Supabase también puede volver con `?error=...&error_description=...`
   // en vez de `?code=...` (ej.: link vencido o ya usado) — ese caso se
   // muestra como error en vez de intentar canjear nada.
+  //
+  // NOTA (fix lint react-hooks/set-state-in-effect): antes acá había un
+  // `setResolvingRedirect(true)` justo al entrar al efecto. Se sacó
+  // porque es redundante — el useState de arriba ya inicializa
+  // `resolvingRedirect` en `true` leyendo la misma URL (`code`/`error`/
+  // `error_description`) en el mismo mount, antes de que este efecto
+  // corra. Llamar setState sincrónicamente ahí no cambiaba nada (el
+  // estado ya era `true`) y disparaba el warning de renders en cascada.
   useEffect(() => {
     const url = new URL(window.location.href);
     const code = url.searchParams.get('code');
     const redirectError = url.searchParams.get('error_description') || url.searchParams.get('error');
 
     if (!code && !redirectError) return;
-
-    setResolvingRedirect(true);
 
     const cleanUrl = () => {
       url.searchParams.delete('code');
@@ -63,15 +69,17 @@ export default function IngresarPage() {
       window.history.replaceState({}, '', url.toString());
     };
 
-    if (redirectError) {
-      setError(decodeURIComponent(redirectError.replace(/\+/g, ' ')));
-      cleanUrl();
-      setResolvingRedirect(false);
-      return;
-    }
+    // Unificado en una sola promesa (en vez de un branch sincrónico +
+    // otro asincrónico): así el setState de ambos casos vive siempre
+    // dentro de un .then()/.catch(), nunca en el cuerpo del efecto
+    // directamente (ver react-hooks/set-state-in-effect más arriba).
+    const resolveSession = redirectError
+      ? Promise.resolve({
+          error: { message: decodeURIComponent(redirectError.replace(/\+/g, ' ')) },
+        })
+      : supabase.auth.exchangeCodeForSession(code!);
 
-    supabase.auth
-      .exchangeCodeForSession(code!)
+    resolveSession
       .then(({ error: exchangeError }) => {
         if (exchangeError) {
           setError(exchangeError.message);
