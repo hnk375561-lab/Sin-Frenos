@@ -11,6 +11,7 @@ import { getAvailableRankings } from '@/lib/rankings'
 import { computeSeoCategoryOptions, categoryToSlug } from '@/lib/vehicle-category'
 import { Reveal } from '@/components/ui/Reveal'
 import { ArchiveHero } from '@/components/home/ArchiveHero'
+import { MarketplaceHeroStrip } from '@/components/home/MarketplaceHeroStrip'
 import { VehicleArchiveIndex } from '@/components/home/VehicleArchiveIndex'
 import { ManufacturerArchive } from '@/components/home/ManufacturerArchive'
 import { ArchiveClassifications, type Classification } from '@/components/home/ArchiveClassifications'
@@ -43,8 +44,20 @@ export async function generateMetadata(): Promise<Metadata> {
  * - Profundidad editorial
  * - Rigor técnico
  *
- * SECCIONES (reconstruidas completamente):
- * 1. HERO ARCHIVO — identificador, título, buscador, fichas técnicas reales
+ * ACTUALIZACIÓN "MARKETPLACE-FIRST" (sept. 2026): se agregó una franja de
+ * marketplace (`MarketplaceHeroStrip`) ANTES del hero, y el costado
+ * derecho del hero ahora prioriza listings reales sobre fichas técnicas
+ * (`HeroSidePanel`, con fallback al catálogo si todavía no hay listings).
+ * El H1/copy del hero también pasó a hablar de "comprar y vender" en vez
+ * de "archivo verificado" — ver notas en `ArchiveHero.tsx` sobre el
+ * trade-off de SEO que esto implica (decisión tomada con el usuario:
+ * priorizar claridad de producto). El resto del home (índice de
+ * vehículos, fabricantes, rankings, etc.) sigue igual — el catálogo no
+ * se eliminó, bajó de jerarquía visual en la portada.
+ *
+ * SECCIONES:
+ * 0. FRANJA DE MARKETPLACE — listings recientes o placeholder + CTA a /publicar
+ * 1. HERO — identificador, título "marketplace", buscador, listings/fichas
  * 2. ÍNDICE DE VEHÍCULOS — organización por categorías tipo estantería
  * 3. ESTANTERÍA DE FABRICANTES — carpetas por marca
  * 4. CLASIFICACIONES DEL ARCHIVO — índices técnicos (rankings)
@@ -156,6 +169,13 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(generateWebsiteJsonLd()) }}
       />
       <div className="min-h-screen bg-paper">
+        {/* ============= FRANJA DE MARKETPLACE (layout "C moderada") =============
+            Antes del hero: listings recientes o placeholder "próximamente" +
+            CTA a /publicar. Ver MarketplaceHeroStrip.tsx para el razonamiento
+            completo de por qué esto NO se auto-oculta cuando no hay listings
+            reales todavía, a diferencia de ModelListingsPanel. */}
+        <MarketplaceHeroStrip />
+
         {/* ============= HERO DEL ARCHIVO ============= */}
         <ArchiveHero
           vehicleCount={totalVehicleCount}

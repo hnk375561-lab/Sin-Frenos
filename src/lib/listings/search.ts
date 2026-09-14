@@ -169,6 +169,31 @@ export async function getListingsForVehicleModel(
 }
 
 /**
+ * Últimos publicados del marketplace en general, sin filtrar por modelo
+ * — a diferencia de `getListingsForVehicleModel` (pensada para una ficha
+ * técnica puntual), esta alimenta `MarketplaceHeroStrip` en el home
+ * (`src/app/page.tsx`), donde el criterio es "lo más nuevo del
+ * marketplace", cualquier vehículo. Mismo criterio de orden y de
+ * `status = 'published'` que el resto de este archivo.
+ */
+export async function getRecentListings(limit = 4): Promise<ListingRow[]> {
+  const { data, error } = await supabase
+    .from('listings')
+    .select('*')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false, nullsFirst: false })
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (error || !data) {
+    console.error('[search] getRecentListings:', error?.message)
+    return []
+  }
+
+  return data as ListingRow[]
+}
+
+/**
  * Foto de portada de cada listing en un solo query (evita 1 request por
  * card) — mismo criterio de "no leer fila por fila" que ya usa
  * `mis-publicaciones/page.tsx` para su propia lista. Devuelve un mapa

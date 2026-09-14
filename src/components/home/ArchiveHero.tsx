@@ -1,13 +1,7 @@
 import Link from 'next/link'
 import { QuickSearchForm } from '@/components/home/QuickSearchForm'
-import { Reveal } from '@/components/ui/Reveal'
+import { HeroSidePanel } from '@/components/home/HeroSidePanel'
 import { type Vehicle } from '@/types'
-import { resolveEntityDisplayImage } from '@/lib/media'
-import { parsePowerHp } from '@/lib/vehicle-power'
-import { parsePriceUsd } from '@/lib/vehicle-price'
-import { EVIDENCE_STAMP_META } from '@/lib/evidence'
-import { cn } from '@/lib/utils'
-import Image from 'next/image'
 
 interface ArchiveHeroCategoryChip {
   label: string
@@ -24,19 +18,24 @@ interface ArchiveHeroProps {
 }
 
 /**
- * HERO DEL ARCHIVO AUTOMOTOR
- * Concepto: "CADA DATO TIENE UN ORIGEN"
- * 
- * Composición editorial asimétrica:
- * - Lado izquierdo: identificador de archivo, título, texto, buscador
- * - Lado derecho: fichas técnicas reales que parecen documentos físicos
- * 
- * Metáfora visual: expediente, dossier, papel, tinta, sellos documentales
+ * HERO — MARKETPLACE-FIRST (actualizado sept. 2026, ver traspaso)
+ * Concepto anterior: "CADA DATO TIENE UN ORIGEN" (archivo técnico).
+ * Concepto actual: "Comprá y vendé tu vehículo en Argentina" — el
+ * mensaje principal pasa a ser el marketplace; el catálogo técnico
+ * (evidencia, fichas, comparador) se mantiene como segundo mensaje y
+ * como accesos secundarios, no como identidad principal de la portada.
+ *
+ * Composición editorial asimétrica (sin cambios de estructura):
+ * - Lado izquierdo: identificador, título, buscador — sigue server-side
+ *   por LCP.
+ * - Lado derecho: listings reales del marketplace cuando existan,
+ *   fichas técnicas del catálogo como fallback (`HeroSidePanel.tsx`).
+ *
+ * Metáfora visual de "documento físico" conservada para las fichas del
+ * catálogo (siguen existiendo, solo bajaron de jerarquía); no se aplicó
+ * un rebrand visual completo — decisión explícita, ver doc maestro.
  */
 export function ArchiveHero({ vehicleCount, evidenceCoveragePct, featuredVehicles, searchExamples, categoryChips }: ArchiveHeroProps) {
-  // Tomar 2 vehículos destacados para las fichas técnicas
-  const sampleVehicles = featuredVehicles.slice(0, 2)
-
   return (
     <section className="relative min-h-screen bg-paper overflow-hidden">
       {/* Fondo con textura sutil de papel + luz cenital suave, para que
@@ -73,26 +72,40 @@ export function ArchiveHero({ vehicleCount, evidenceCoveragePct, featuredVehicle
             >
               <div className="h-2 w-2 flex-shrink-0 bg-oxide-red" />
               <span className="font-mono text-xs uppercase tracking-[0.2em] text-ink/70">
-                ARCHIVO AUTOMOTOR VERIFICADO
+                MARKETPLACE DE VEHÍCULOS EN ARGENTINA
               </span>
               {evidenceCoveragePct !== null && evidenceCoveragePct > 0 && (
                 <span className="font-mono text-xs uppercase tracking-[0.2em] text-archive-green sm:ml-auto">
-                  {evidenceCoveragePct}% CON FUENTE CITADA
+                  {evidenceCoveragePct}% DE FICHAS CON FUENTE CITADA
                 </span>
               )}
             </div>
 
-            {/* Título principal */}
+            {/* Título principal.
+                NOTA (traspaso "marketplace-first", sept. 2026): este H1
+                y el copy de acá abajo estaban indexados y rankeando en
+                Google como archivo/catálogo técnico ("Cada dato tiene un
+                origen"). Se decidió con el usuario asumir el riesgo de
+                SEO a corto plazo a cambio de claridad de producto
+                (opción (a) del trade-off, no (b) — ver prompt de
+                traspaso, sección 3, punto 3): el home tiene que decir
+                "comprar y vender" de entrada, no solo "archivo técnico
+                verificado". El catálogo (fichas, evidencia, comparador)
+                sigue intacto más abajo en la página y en sus propias
+                URLs (`/vehiculos/[slug]`) — lo que cambia es el mensaje
+                de LA PORTADA, no el contenido ni las rutas que indexan
+                por separado. */}
             <div className="space-y-4">
               <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] text-ink">
-                Cada dato
+                Comprá y vendé
                 <br />
-                <span className="text-oxide-red">tiene un origen.</span>
+                <span className="text-oxide-red">tu vehículo en Argentina.</span>
               </h1>
               <p className="font-sans text-lg sm:text-xl text-ink/70 max-w-xl leading-relaxed">
-                {vehicleCount} fichas técnicas con fuentes verificadas. 
-                Especificaciones de fabricante, documentación de ingeniería, 
-                sellos de evidencia. No es un catálogo, es un archivo.
+                Publicá tu auto o moto gratis, o encontrá el próximo entre
+                miles de fichas técnicas con fuentes verificadas.
+                {vehicleCount} modelos documentados te ayudan a decidir
+                antes de comprar.
               </p>
             </div>
 
@@ -127,12 +140,23 @@ export function ArchiveHero({ vehicleCount, evidenceCoveragePct, featuredVehicle
                 </div>
               )}
 
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap items-center gap-4">
+                {/* CTA de marketplace, primero en el orden visual — la
+                    fila entera antes solo tenía links al catálogo; ver
+                    nota de la sección anterior sobre el pivote de
+                    mensaje del hero. */}
+                <Link
+                  href="/publicar"
+                  prefetch={false}
+                  className="cta-shine font-mono text-xs uppercase tracking-[0.15em] bg-oxide-red text-white px-5 py-2.5 hover:bg-ink transition-colors duration-200"
+                >
+                  Publicar mi vehículo →
+                </Link>
                 <Link
                   href="/vehiculos"
                   className="font-mono text-xs uppercase tracking-[0.15em] text-ink/60 hover:text-ink transition-colors border-b border-transparent hover:border-ink/30"
                 >
-                  Explorar archivo completo →
+                  Ver fichas técnicas →
                 </Link>
                 <Link
                   href="/comparar"
@@ -144,140 +168,12 @@ export function ArchiveHero({ vehicleCount, evidenceCoveragePct, featuredVehicle
             </div>
           </div>
 
-          {/* LADO DERECHO: Fichas técnicas como documentos físicos */}
-          <div className="relative space-y-6 lg:mt-8">
-            {sampleVehicles.map((vehicle, index) => {
-              const image = resolveEntityDisplayImage(vehicle)
-              const powerLabel = parsePowerHp(vehicle)
-              const priceLabel = parsePriceUsd(vehicle)
-              const evidenceLevel = vehicle.evidence?.level
-
-              return (
-                <Reveal key={vehicle.slug} delay={300 + index * 150}>
-                  <div className="relative">
-                    {/* Hojas fantasma: sugieren que hay más fichas apiladas
-                        debajo de la que se ve, sin cargar contenido real de
-                        más (serían datos inventados) — es puro decorado. */}
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0 rounded-sm border border-border/50 bg-surface-alt/70 [transform:rotate(4deg)_translate(6px,8px)]"
-                    />
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0 rounded-sm border border-border/70 bg-surface-alt/90 [transform:rotate(-3deg)_translate(-4px,5px)]"
-                    />
-                    <div
-                      className="group relative z-10 bg-surface-card border border-border p-6 shadow-md transition-[transform,box-shadow] duration-300 ease-out [transform:rotate(var(--card-rotate))] hover:shadow-xl hover:[transform:rotate(0deg)_translateY(-4px)] motion-reduce:transition-none motion-reduce:hover:[transform:none]"
-                      style={{ '--card-rotate': index === 0 ? '-1deg' : '1deg' } as React.CSSProperties}
-                    >
-                    {/* Cabecera del documento */}
-                    <div className="flex items-start justify-between mb-4 pb-3 border-b border-border/50">
-                      <div className="space-y-1">
-                        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink/50">
-                          FICHA TÉCNICA
-                        </p>
-                        <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-ink/40">
-                          REF: {vehicle.slug.toUpperCase()}
-                        </p>
-                      </div>
-                      {evidenceLevel && (
-                        <div className={cn(
-                          'flex items-center gap-1.5 px-2 py-1 border',
-                          EVIDENCE_STAMP_META[evidenceLevel].className
-                        )}>
-                          <span className="font-mono text-[9px] uppercase tracking-wider">
-                            {EVIDENCE_STAMP_META[evidenceLevel].shortLabel}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Contenido de la ficha */}
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-4">
-                        {/* Imagen pequeña */}
-                        {image && (
-                          <div className="relative w-20 h-16 flex-shrink-0 overflow-hidden bg-paper border border-border/50">
-                            <Image
-                              src={image.src}
-                              alt={vehicle.title}
-                              fill
-                              className="object-cover"
-                              sizes="80px"
-                              priority={index === 0}
-                            />
-                          </div>
-                        )}
-                        
-                        {/* Título y datos */}
-                        <div className="flex-1 min-w-0 space-y-2">
-                          <h3 className="font-serif text-lg font-semibold text-ink leading-tight">
-                            {vehicle.title}
-                          </h3>
-                          <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs text-ink/60">
-                            {vehicle.manufacturer && (
-                              <span>{vehicle.manufacturer}</span>
-                            )}
-                            {vehicle.class && (
-                              <span>· {vehicle.class}</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Especificaciones técnicas */}
-                      <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border/50">
-                        {powerLabel && (
-                          <div>
-                            <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-ink/40 mb-1">
-                              Potencia
-                            </p>
-                            <p className="font-mono text-sm font-semibold text-ink">
-                              {powerLabel}
-                            </p>
-                          </div>
-                        )}
-                        {priceLabel && (
-                          <div>
-                            <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-ink/40 mb-1">
-                              Precio
-                            </p>
-                            <p className="font-mono text-sm font-semibold text-ink">
-                              {priceLabel}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Pie del documento */}
-                    <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between">
-                      <p className="font-mono text-[9px] text-ink/40">
-                        {(vehicle.updatedAt || vehicle.createdAt) ? new Date(vehicle.updatedAt || vehicle.createdAt).toLocaleDateString('es-ES', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric'
-                        }).toUpperCase() : 'FECHA NO DISPONIBLE'}
-                      </p>
-                      <Link
-                        href={`/vehiculos/${vehicle.slug}`}
-                        prefetch={false}
-                        className="font-mono text-[10px] uppercase tracking-[0.15em] text-oxide-red hover:text-ink transition-colors"
-                      >
-                        Ver ficha completa →
-                      </Link>
-                    </div>
-
-                    {/* Sello de verificación (animación al cargar) */}
-                    <div className="absolute -bottom-2 -right-2 w-12 h-12 border-2 border-archive-green/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                      <span className="font-serif text-archive-green text-lg">✓</span>
-                    </div>
-                    </div>
-                  </div>
-                </Reveal>
-              )
-            })}
-          </div>
+          {/* LADO DERECHO: listings reales del marketplace cuando ya
+              existan; fichas técnicas del catálogo como fallback
+              mientras no haya (ver `HeroSidePanel.tsx`). Client
+              component — hace su propio fetch a Supabase, mismo patrón
+              que `MarketplaceHeroStrip`. */}
+          <HeroSidePanel featuredVehicles={featuredVehicles} />
         </div>
       </div>
 
