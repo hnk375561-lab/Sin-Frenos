@@ -14,19 +14,34 @@ export default function IngresarPage() {
   // Arranca en true si la URL trae `?code=` o `?error=` (venimos del
   // magic link) para no mostrar el formulario en flash mientras se
   // resuelve el canje de sesión más abajo.
-  const [resolvingRedirect, setResolvingRedirect] = useState(false);
+  const [resolvingRedirect, setResolvingRedirect] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.has('code') || params.has('error') || params.has('error_description');
+  });
 
-  // `createBrowserClient` (@supabase/ssr) usa flowType 'pkce' por
-  // defecto. Con PKCE, el magic link no deja la sesión lista en el hash
-  // de la URL (como hacía el flujo implícito viejo) — deja un `?code=...`
-  // en el query string que HAY que canjear explícitamente llamando a
-  // `exchangeCodeForSession`. En un sitio con servidor eso vive en una
-  // ruta `/auth/callback`; acá, al ser `output: 'export'` (estático, sin
-  // servidor), no existía ninguna ruta ni código que hiciera ese canje —
-  // el usuario volvía del mail, caía en `/ingresar/?code=...` y se
-  // quedaba sin sesión para siempre, sin ningún error visible. Este
-  // efecto es el canje que faltaba, corriendo client-side en la misma
-  // página a la que apunta `emailRedirectTo` más abajo.
+  // `createBrowserClient` (@supabase/ssr) usa flowType 'implicit' (ver
+  // src/lib/supabase/client.ts) precisamente por lo que pasaba antes acá:
+  // con PKCE (el default de la librería) el magic link vuelve con
+  // `?code=...` en el query string, y canjear ese code requiere el
+  // "code_verifier" que quedó guardado en el localStorage del MISMO
+  // navegador/perfil que pidió el link. Si el usuario abre el mail desde
+  // otra app/navegador (lo normal: Gmail dispara el navegador por
+  // defecto del sistema, no necesariamente el mismo que usaste para
+  // pedir el acceso), ese navegador no tiene el verifier → el canje
+  // falla, y como es un sitio `output: 'export'` (estático, sin
+  // servidor ni ruta `/auth/callback`), no había ningún lado donde
+  // recuperarse de eso: el usuario quedaba en `/ingresar/?code=...` para
+  // siempre, sin sesión y sin ningún error visible.
+  //
+  // Con flujo implícito el magic link no lleva `?code=`, trae el token
+  // directo en el fragment de la URL (`#access_token=...`) y el cliente
+  // lo procesa solo al iniciar (`detectSessionInUrl`, true por
+  // defecto) — no depende de nada guardado localmente, así que funciona
+  // sin importar en qué navegador se abra. Este bloque de canje de
+  // `?code=` queda como red de seguridad por si llega un link viejo
+  // (emitido antes de este cambio) o si el proyecto vuelve a pkce más
+  // adelante.
   //
   // Supabase también puede volver con `?error=...&error_description=...`
   // en vez de `?code=...` (ej.: link vencido o ya usado) — ese caso se
@@ -55,13 +70,25 @@ export default function IngresarPage() {
       return;
     }
 
-    supabase.auth.exchangeCodeForSession(code!).then(({ error: exchangeError }) => {
-      if (exchangeError) {
-        setError(exchangeError.message);
-      }
-      cleanUrl();
-      setResolvingRedirect(false);
-    });
+    supabase.auth
+      .exchangeCodeForSession(code!)
+      .then(({ error: exchangeError }) => {
+        if (exchangeError) {
+          setError(exchangeError.message);
+        }
+        cleanUrl();
+        setResolvingRedirect(false);
+      })
+      .catch((exchangeError: Error) => {
+        // Sin este catch, si la promesa se rechaza en vez de resolver
+        // con { error } (ej.: no hay code_verifier en este navegador),
+        // el .then() de arriba nunca corre — la URL se queda con
+        // `?code=...` para siempre y la página trabada en "Confirmando
+        // el acceso..." sin ningún mensaje visible.
+        setError(exchangeError?.message ?? 'No se pudo confirmar el acceso.');
+        cleanUrl();
+        setResolvingRedirect(false);
+      });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
