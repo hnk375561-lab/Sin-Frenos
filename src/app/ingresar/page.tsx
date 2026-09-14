@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -11,6 +11,58 @@ export default function IngresarPage() {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Arranca en true si la URL trae `?code=` o `?error=` (venimos del
+  // magic link) para no mostrar el formulario en flash mientras se
+  // resuelve el canje de sesión más abajo.
+  const [resolvingRedirect, setResolvingRedirect] = useState(false);
+
+  // `createBrowserClient` (@supabase/ssr) usa flowType 'pkce' por
+  // defecto. Con PKCE, el magic link no deja la sesión lista en el hash
+  // de la URL (como hacía el flujo implícito viejo) — deja un `?code=...`
+  // en el query string que HAY que canjear explícitamente llamando a
+  // `exchangeCodeForSession`. En un sitio con servidor eso vive en una
+  // ruta `/auth/callback`; acá, al ser `output: 'export'` (estático, sin
+  // servidor), no existía ninguna ruta ni código que hiciera ese canje —
+  // el usuario volvía del mail, caía en `/ingresar/?code=...` y se
+  // quedaba sin sesión para siempre, sin ningún error visible. Este
+  // efecto es el canje que faltaba, corriendo client-side en la misma
+  // página a la que apunta `emailRedirectTo` más abajo.
+  //
+  // Supabase también puede volver con `?error=...&error_description=...`
+  // en vez de `?code=...` (ej.: link vencido o ya usado) — ese caso se
+  // muestra como error en vez de intentar canjear nada.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get('code');
+    const redirectError = url.searchParams.get('error_description') || url.searchParams.get('error');
+
+    if (!code && !redirectError) return;
+
+    setResolvingRedirect(true);
+
+    const cleanUrl = () => {
+      url.searchParams.delete('code');
+      url.searchParams.delete('error');
+      url.searchParams.delete('error_code');
+      url.searchParams.delete('error_description');
+      window.history.replaceState({}, '', url.toString());
+    };
+
+    if (redirectError) {
+      setError(decodeURIComponent(redirectError.replace(/\+/g, ' ')));
+      cleanUrl();
+      setResolvingRedirect(false);
+      return;
+    }
+
+    supabase.auth.exchangeCodeForSession(code!).then(({ error: exchangeError }) => {
+      if (exchangeError) {
+        setError(exchangeError.message);
+      }
+      cleanUrl();
+      setResolvingRedirect(false);
+    });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +77,15 @@ export default function IngresarPage() {
       setSent(true);
     }
   };
+
+  if (resolvingRedirect) {
+    return (
+      <div style={{ padding: 32, maxWidth: 400, margin: '0 auto' }}>
+        <h1>Ingresar</h1>
+        <p>Confirmando el acceso...</p>
+      </div>
+    );
+  }
 
   if (!loading && user) {
     return (
