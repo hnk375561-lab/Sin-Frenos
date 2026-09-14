@@ -108,9 +108,21 @@ export async function getPendingModerationActions(
   if (error) throw error
 
   return {
+    // FIX (corroboración de Fase 7, 13/09/2026): `moderation_actions.
+    // listing_id` referencia a `listings.id` (relación "N acciones -> 1
+    // listing"), así que Supabase devuelve `listings` como UN objeto
+    // anidado (`{ title: string } | null`), no un array — el `.select()`
+    // de arriba nunca trae una lista de listings por fila, trae el único
+    // padre de la FK. `item.listings[0]` indexaba un objeto como si
+    // fuera un array: en JS eso no tira error, day silenciosamente
+    // `undefined` (`({})[0] === undefined`), así que `listing` quedaba
+    // SIEMPRE `undefined` en runtime — el dashboard de moderación nunca
+    // mostraba el título del listing reportado, sin ningún error visible
+    // que lo delatara. Recién se nota ahora porque `@/types/supabase.ts`
+    // tipa el join correctamente y `tsc` lo marca como acceso inválido.
     actions: data.map(item => ({
       ...ModerationActionSchema.parse(item),
-      listing: item.listings && item.listings[0],
+      listing: item.listings ?? undefined,
     })),
     total: count || 0,
   }
