@@ -18,16 +18,21 @@ interface ArchiveHeroProps {
 }
 
 /**
- * HERO — MARKETPLACE-FIRST (actualizado sept. 2026, ver traspaso)
+ * HERO — MARKETPLACE-FIRST (sept. 2026, ver traspaso + ajuste posterior
+ * "todo rodea compra/venta, catálogo poco vistoso pero no invisible").
  * Concepto anterior: "CADA DATO TIENE UN ORIGEN" (archivo técnico).
- * Concepto actual: "Comprá y vendé tu vehículo en Argentina" — el
- * mensaje principal pasa a ser el marketplace; el catálogo técnico
- * (evidencia, fichas, comparador) se mantiene como segundo mensaje y
- * como accesos secundarios, no como identidad principal de la portada.
+ * Concepto actual: "Comprá y vendé tu vehículo en Argentina" — mensaje
+ * principal, subtítulo y las dos CTAs grandes (Publicar / Ver
+ * publicaciones) son 100% marketplace, sin mencionar el catálogo. El
+ * catálogo técnico (buscador, categorías, fichas, comparador, % de
+ * evidencia) sigue accesible, pero deliberadamente chico, apagado
+ * (font-mono text-[10px], text-ink/40) y al final de la columna
+ * izquierda — nunca se eliminó, solo bajó de jerarquía visual al mínimo
+ * que sigue siendo clickeable y legible.
  *
  * Composición editorial asimétrica (sin cambios de estructura):
- * - Lado izquierdo: identificador, título, buscador — sigue server-side
- *   por LCP.
+ * - Lado izquierdo: identificador, título, 2 CTAs, catálogo chico abajo
+ *   — sigue server-side por LCP.
  * - Lado derecho: listings reales del marketplace cuando existan,
  *   fichas técnicas del catálogo como fallback (`HeroSidePanel.tsx`).
  *
@@ -35,7 +40,7 @@ interface ArchiveHeroProps {
  * catálogo (siguen existiendo, solo bajaron de jerarquía); no se aplicó
  * un rebrand visual completo — decisión explícita, ver doc maestro.
  */
-export function ArchiveHero({ vehicleCount, evidenceCoveragePct, featuredVehicles, searchExamples, categoryChips }: ArchiveHeroProps) {
+export function ArchiveHero({ vehicleCount, evidenceCoveragePct, searchExamples, categoryChips }: ArchiveHeroProps) {
   return (
     <section className="relative min-h-screen bg-paper overflow-hidden">
       {/* Fondo con textura sutil de papel + luz cenital suave, para que
@@ -61,40 +66,36 @@ export function ArchiveHero({ vehicleCount, evidenceCoveragePct, featuredVehicle
               El fade-in decorativo se mantiene solo para las fichas de
               vehículo del lado derecho (contenido secundario, no LCP). */}
           <div className="space-y-8 lg:sticky lg:top-8">
-            {/* Identificador de archivo.
-                id="evidencia" + scroll-mt-24: destino real del enlace
-                "Evidencia citada" del Header (auditoría UX 2026-09-13,
-                hallazgo D-2). scroll-mt compensa el header sticky para
-                que el ancla no quede tapada al hacer scroll hasta acá. */}
+            {/* Identificador de marketplace. El ancla real de
+                "Evidencia citada" (Header) se movió más abajo, al bloque
+                chico de catálogo — ahí es donde ahora vive el dato de
+                cobertura de evidencia, no en este identificador
+                principal (que es 100% marketplace, ver ajuste "todo
+                rodea compra/venta"). */}
             <div
-              id="evidencia"
-              className="flex flex-wrap items-center gap-x-3 gap-y-2 scroll-mt-24 border-b border-oxide-red/30 pb-4"
+              className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-oxide-red/30 pb-4"
             >
               <div className="h-2 w-2 flex-shrink-0 bg-oxide-red" />
               <span className="font-mono text-xs uppercase tracking-[0.2em] text-ink/70">
                 MARKETPLACE DE VEHÍCULOS EN ARGENTINA
               </span>
-              {evidenceCoveragePct !== null && evidenceCoveragePct > 0 && (
-                <span className="font-mono text-xs uppercase tracking-[0.2em] text-archive-green sm:ml-auto">
-                  {evidenceCoveragePct}% DE FICHAS CON FUENTE CITADA
-                </span>
-              )}
             </div>
 
             {/* Título principal.
-                NOTA (traspaso "marketplace-first", sept. 2026): este H1
-                y el copy de acá abajo estaban indexados y rankeando en
-                Google como archivo/catálogo técnico ("Cada dato tiene un
-                origen"). Se decidió con el usuario asumir el riesgo de
-                SEO a corto plazo a cambio de claridad de producto
-                (opción (a) del trade-off, no (b) — ver prompt de
-                traspaso, sección 3, punto 3): el home tiene que decir
-                "comprar y vender" de entrada, no solo "archivo técnico
-                verificado". El catálogo (fichas, evidencia, comparador)
-                sigue intacto más abajo en la página y en sus propias
-                URLs (`/vehiculos/[slug]`) — lo que cambia es el mensaje
-                de LA PORTADA, no el contenido ni las rutas que indexan
-                por separado. */}
+                NOTA (traspaso "marketplace-first", sept. 2026, y ajuste
+                posterior "todo rodea compra/venta, catálogo poco
+                vistoso"): este H1 y el copy de acá abajo estaban
+                indexados y rankeando en Google como archivo/catálogo
+                técnico ("Cada dato tiene un origen"). Se decidió con el
+                usuario asumir el riesgo de SEO a corto plazo a cambio de
+                claridad de producto (opción (a) del trade-off, no (b) —
+                ver prompt de traspaso, sección 3, punto 3): el home
+                tiene que decir "comprar y vender" de entrada, sin
+                mencionar siquiera el catálogo en el copy principal. El
+                catálogo (fichas, evidencia, comparador) sigue intacto en
+                sus propias URLs (`/vehiculos/[slug]`) y tiene su propio
+                bloque más abajo en esta misma columna — chico y apagado
+                a propósito, no eliminado. */}
             <div className="space-y-4">
               <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] text-ink">
                 Comprá y vendé
@@ -102,78 +103,89 @@ export function ArchiveHero({ vehicleCount, evidenceCoveragePct, featuredVehicle
                 <span className="text-oxide-red">tu vehículo en Argentina.</span>
               </h1>
               <p className="font-sans text-lg sm:text-xl text-ink/70 max-w-xl leading-relaxed">
-                Publicá tu auto o moto gratis, o encontrá el próximo entre
-                miles de fichas técnicas con fuentes verificadas.
-                {vehicleCount} modelos documentados te ayudan a decidir
-                antes de comprar.
+                Publicá gratis tu auto o moto y llegá a compradores
+                reales. Sin comisiones, sin intermediarios: vendé lo que
+                tenés o encontrá lo que buscás, directo con el vendedor.
               </p>
             </div>
 
-            {/* Buscador */}
-            <div className="space-y-5">
+            {/* Dos CTAs de marketplace, mismo tamaño y jerarquía —
+                ninguna es "la secundaria": una es publicar (vender), la
+                otra es explorar publicaciones (comprar). El buscador y
+                los accesos al catálogo técnico van más abajo, chicos. */}
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/publicar"
+                prefetch={false}
+                className="cta-shine font-mono text-xs uppercase tracking-[0.15em] bg-oxide-red text-white px-6 py-3.5 hover:bg-ink transition-colors duration-200"
+              >
+                Publicar mi vehículo →
+              </Link>
+              <Link
+                href="/listings"
+                prefetch={false}
+                className="font-mono text-xs uppercase tracking-[0.15em] border border-ink/30 text-ink px-6 py-3.5 hover:border-ink hover:bg-surface-alt transition-colors duration-200"
+              >
+                Ver publicaciones →
+              </Link>
+            </div>
+
+            {/* Catálogo técnico: sigue ahí (no invisible — sección 3 del
+                traspaso original ya advertía sobre no perder SEO/tráfico
+                del catálogo), pero deliberadamente chico, apagado y al
+                final de la columna. Buscador incluido acá (no arriba del
+                todo): busca sobre el catálogo técnico (`/buscar`, Fuse.js
+                — ver `QuickSearchForm.tsx`), no sobre publicaciones del
+                marketplace, así que no tiene sentido que compita
+                visualmente con los CTAs de compra/venta de arriba. */}
+            <div id="evidencia" className="max-w-xs space-y-3 border-t border-ink/10 pt-6 scroll-mt-24">
+              <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-ink/40">
+                También: catálogo técnico ({vehicleCount} fichas
+                {evidenceCoveragePct !== null && evidenceCoveragePct > 0
+                  ? `, ${evidenceCoveragePct}% con fuente citada`
+                  : ''}
+                )
+              </p>
               <QuickSearchForm examples={searchExamples} />
 
-              {/* Pestañas de carpeta: acceso directo por categoría,
-                  con volumen real del catálogo. Metáfora: separadores
-                  de un archivador físico, cada uno con su etiqueta. */}
-              {categoryChips && categoryChips.length > 0 && (
-                <div
-                  className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-                  role="list"
-                  aria-label="Categorías principales del archivo"
-                >
-                  {categoryChips.map((chip) => (
+              {(categoryChips && categoryChips.length > 0) && (
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  {categoryChips.slice(0, 4).map((chip) => (
                     <Link
                       key={chip.href}
                       href={chip.href}
-                      role="listitem"
-                      className="group/tab flex flex-shrink-0 items-baseline gap-1.5 rounded-t-md border border-b-0 border-border bg-surface-alt px-3 py-2 transition-colors hover:bg-oxide-red hover:border-oxide-red"
+                      className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink/40 hover:text-ink/70 transition-colors"
                     >
-                      <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-ink group-hover/tab:text-white">
-                        {chip.label}
-                      </span>
-                      <span className="font-mono text-[10px] text-ink/50 group-hover/tab:text-white/80">
-                        {chip.count}
-                      </span>
+                      {chip.label}
                     </Link>
                   ))}
                 </div>
               )}
 
-              <div className="flex flex-wrap items-center gap-4">
-                {/* CTA de marketplace, primero en el orden visual — la
-                    fila entera antes solo tenía links al catálogo; ver
-                    nota de la sección anterior sobre el pivote de
-                    mensaje del hero. */}
-                <Link
-                  href="/publicar"
-                  prefetch={false}
-                  className="cta-shine font-mono text-xs uppercase tracking-[0.15em] bg-oxide-red text-white px-5 py-2.5 hover:bg-ink transition-colors duration-200"
-                >
-                  Publicar mi vehículo →
-                </Link>
+              <div className="flex flex-wrap gap-x-3 gap-y-1">
                 <Link
                   href="/vehiculos"
-                  className="font-mono text-xs uppercase tracking-[0.15em] text-ink/60 hover:text-ink transition-colors border-b border-transparent hover:border-ink/30"
+                  className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink/40 hover:text-ink/70 transition-colors"
                 >
-                  Ver fichas técnicas →
+                  Fichas técnicas
                 </Link>
                 <Link
                   href="/comparar"
-                  className="font-mono text-xs uppercase tracking-[0.15em] text-ink/60 hover:text-ink transition-colors border-b border-transparent hover:border-ink/30"
+                  className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink/40 hover:text-ink/70 transition-colors"
                 >
-                  Comparar fichas →
+                  Comparar
                 </Link>
               </div>
             </div>
           </div>
 
-          {/* LADO DERECHO: listings reales del marketplace cuando ya
-              existan; fichas técnicas del catálogo como fallback
-              mientras no haya (ver `HeroSidePanel.tsx`). Client
-              component — hace su propio fetch a Supabase, mismo patrón
-              que `MarketplaceHeroStrip`. */}
-          <HeroSidePanel featuredVehicles={featuredVehicles} />
+          {/* LADO DERECHO: listings reales del marketplace, o un panel
+              de marketplace vacío con CTA a /publicar si todavía no hay
+              — NUNCA cae al catálogo (ver `HeroSidePanel.tsx`, ajuste
+              "todo rodea compra/venta"). Client component — hace su
+              propio fetch a Supabase, mismo patrón que
+              `MarketplaceHeroStrip`. */}
+          <HeroSidePanel />
         </div>
       </div>
 
