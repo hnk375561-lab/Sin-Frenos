@@ -4,42 +4,46 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { SITE_URL } from '@/config/site';
 
 export default function IngresarPage() {
   const { user, loading } = useAuth();
   const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
+  const [code, setCode] = useState('');
+  const [step, setStep] = useState<'email' | 'code'>('email');
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    // FIX (14/09/2026): antes no se pasaba `emailRedirectTo`, así que
-    // Supabase usaba el "Site URL" configurado en su Dashboard — que
-    // apuntaba a la raíz de hnk375561-lab.github.io en vez de
-    // /Sin-Frenos/ (el sitio es un "project page" de GitHub Pages, vive
-    // en un subpath). Resultado: el link del mail siempre daba 404.
-    // SITE_URL ya trae el subpath correcto en producción (lo setea
-    // deploy-pages.yml vía NEXT_PUBLIC_SITE_URL en build time). Esto
-    // TAMBIÉN requiere agregar esta URL a la lista de "Redirect URLs"
-    // permitidas en Supabase Dashboard → Authentication → URL
-    // Configuration, o Supabase la va a rechazar igual y volver a caer
-    // en el Site URL por defecto.
+    setSubmitting(true);
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${SITE_URL}/ingresar/` },
+      options: { shouldCreateUser: true },
     });
+    setSubmitting(false);
     if (error) {
       setError(error.message);
     } else {
-      setSent(true);
+      setStep('code');
     }
   };
 
-  // Ya hay sesión: no tiene sentido mostrar el formulario de login de
-  // nuevo (y evita que alguien logueado mande otro magic link sin darse
-  // cuenta). El logout vive en el ícono del Header, no acá.
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: code,
+      type: 'email',
+    });
+    setSubmitting(false);
+    if (error) {
+      setError(error.message);
+    }
+  };
+
   if (!loading && user) {
     return (
       <div style={{ padding: 32, maxWidth: 400, margin: '0 auto' }}>
@@ -55,10 +59,8 @@ export default function IngresarPage() {
   return (
     <div style={{ padding: 32, maxWidth: 400, margin: '0 auto' }}>
       <h1>Ingresar</h1>
-      {sent ? (
-        <p>Te mandamos un link a {email}. Abrilo para entrar.</p>
-      ) : (
-        <form onSubmit={handleSubmit}>
+      {step === 'email' ? (
+        <form onSubmit={handleSendCode}>
           <input
             type="email"
             required
@@ -67,8 +69,41 @@ export default function IngresarPage() {
             onChange={(e) => setEmail(e.target.value)}
             style={{ display: 'block', width: '100%', padding: 8, marginBottom: 12 }}
           />
-          <button type="submit">Enviar link de acceso</button>
+          <button type="submit" disabled={submitting}>
+            {submitting ? 'Enviando...' : 'Enviar código de acceso'}
+          </button>
           {error && <p style={{ color: '#c0392b' }}>{error}</p>}
+        </form>
+      ) : (
+        <form onSubmit={handleVerifyCode}>
+          <p>
+            Te mandamos un código de 6 dígitos a {email}. Escribilo acá abajo (revisá también spam/promociones).
+          </p>
+          <input
+            type="text"
+            inputMode="numeric"
+            required
+            placeholder="123456"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            style={{ display: 'block', width: '100%', padding: 8, marginBottom: 12, fontSize: 20, letterSpacing: 4 }}
+          />
+          <button type="submit" disabled={submitting}>
+            {submitting ? 'Verificando...' : 'Ingresar'}
+          </button>
+          {error && <p style={{ color: '#c0392b' }}>{error}</p>}
+          <p>
+            <button
+              type="button"
+              onClick={() => {
+                setStep('email');
+                setError(null);
+              }}
+              style={{ background: 'none', border: 'none', color: '#555', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}
+            >
+              Usar otro email
+            </button>
+          </p>
         </form>
       )}
     </div>
