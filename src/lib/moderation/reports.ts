@@ -171,9 +171,15 @@ export async function getOpenReportsForModeration(
   if (error) throw error
 
   return {
+    // FIX (corroboración de Fase 7, 13/09/2026): mismo bug que en
+    // `src/lib/moderation/actions.ts` — `listing_reports.listing_id` es
+    // una FK "N reportes -> 1 listing", Supabase devuelve `listings` como
+    // objeto único, no array. `item.listings[0]` indexaba un objeto y
+    // devolvía `undefined` en silencio en cada fila; el dashboard de
+    // reportes nunca mostraba título ni seller_id del listing reportado.
     reports: data.map(item => ({
       ...ListingReportSchema.parse(item),
-      listing: item.listings && item.listings[0],
+      listing: item.listings ?? undefined,
     })),
     total: count || 0,
   }
