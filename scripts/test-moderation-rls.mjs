@@ -124,7 +124,7 @@ async function main() {
   })
 
   await test('Usuario regular NO puede ver reportes', async () => {
-    const { data, error } = await anonClient.from('listing_reports').select()
+    const { data, error: _error } = await anonClient.from('listing_reports').select()
 
     // Debe fallar o devolver lista vacía (dependiendo de política)
     // Para este test, esperamos que falle o esté vacío
@@ -144,7 +144,7 @@ async function main() {
 
     if (signInError) throw signInError
 
-    const { data, error } = await adminClient.from('listing_reports').select()
+    const { data: _data, error } = await adminClient.from('listing_reports').select()
     if (error) throw error
     // Admin debe poder ver (data puede ser vacío o no, lo importante es no error)
   })

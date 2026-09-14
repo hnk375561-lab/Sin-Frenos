@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { getOpenReportsForModeration, getListingReports } from '@/lib/moderation/reports'
+import { getOpenReportsForModeration } from '@/lib/moderation/reports'
 import { getListingModerationActions, createModerationAction } from '@/lib/moderation/actions'
 import { ListingReport } from '@/types/listing-report'
 import { ModerationAction, ModerationActionLabels, ModerationActionType } from '@/types/moderation'
@@ -25,9 +25,15 @@ export function ModerationDashboard() {
   const [selectedAction, setSelectedAction] = useState<string>('')
   const [isSubmittingAction, setIsSubmittingAction] = useState(false)
 
-  const supabase = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  // Memoizado: si se recreara en cada render, agregarlo a las deps del
+  // useEffect de abajo dispararía un loop de recargas infinito.
+  const supabase = useMemo(
+    () =>
+      createClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      ),
+    []
   )
 
   // Load pending listings
@@ -67,7 +73,7 @@ export function ModerationDashboard() {
     }
 
     loadData()
-  }, [])
+  }, [supabase])
 
   async function handleAction(listingId: string) {
     if (!selectedAction) return

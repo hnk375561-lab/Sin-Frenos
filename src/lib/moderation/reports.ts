@@ -155,7 +155,7 @@ export async function getOpenReportsForModeration(
   const offset = options?.offset || 0
 
   // Obtener reportes abiertos
-  let query = supabase
+  const query = supabase
     .from('listing_reports')
     .select(`
       *,

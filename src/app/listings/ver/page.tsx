@@ -132,6 +132,7 @@ function ListingContent() {
     <div style={{ padding: 32, maxWidth: 800, margin: '0 auto', fontFamily: 'sans-serif' }}>
       <div style={{ position: 'relative' }}>
         {cover && (
+          // eslint-disable-next-line @next/next/no-img-element -- URL dinámica de Supabase Storage, fuera de dominios conocidos por next/image (mismo criterio que ListingCard)
           <img
             src={cover.url}
             alt={listing.title}
@@ -214,6 +215,7 @@ function ListingContent() {
             {media
               .filter((m) => m.id !== cover?.id)
               .map((m) => (
+                // eslint-disable-next-line @next/next/no-img-element -- URL dinámica de Supabase Storage, fuera de dominios conocidos por next/image (mismo criterio que ListingCard)
                 <img
                   key={m.id}
                   src={m.url}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { getListingReportsSummary } from '@/lib/moderation/reports'
 import { ListingReportsSummary } from '@/types/listing-report'
@@ -18,9 +18,15 @@ export function ListingReportsSummaryDisplay({
   const [summary, setSummary] = useState<ListingReportsSummary | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  const supabase = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  // Memoizado: si se recreara en cada render, agregarlo a las deps del
+  // useEffect de abajo dispararía un loop de recargas infinito.
+  const supabase = useMemo(
+    () =>
+      createClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      ),
+    []
   )
 
   useEffect(() => {
@@ -36,7 +42,7 @@ export function ListingReportsSummaryDisplay({
     }
 
     loadSummary()
-  }, [listingId])
+  }, [listingId, supabase])
 
   if (isLoading || !summary || summary.total_reports === 0) {
     return null // No mostrar nada si no hay reportes
