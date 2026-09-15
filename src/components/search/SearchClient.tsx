@@ -15,6 +15,7 @@ import { STATUS_LABELS } from '@/lib/entity-labels'
 import { buildFuse } from '@/lib/entity-list-filters'
 import { vehiclePerformanceScore, hasPerformanceData } from '@/lib/vehicle-performance'
 import { SITE_NAME } from '@/config/site'
+import { withAssetPrefix } from '@/lib/asset-path'
 import type { SearchIndexItem, SearchIndexResponse } from '@/app/search-index.json/route'
 
 type StatusFilter = 'todos' | keyof typeof STATUS_LABELS
@@ -115,7 +116,7 @@ export function SearchClient({ counts }: SearchClientProps) {
   useEffect(() => {
     const controller = new AbortController()
 
-    fetch('/search-index.json', { signal: controller.signal })
+    fetch(withAssetPrefix('/search-index.json'), { signal: controller.signal })
       .then((res) => res.json() as Promise<SearchIndexResponse>)
       .then((data) => {
         setAllItems(data.items)

@@ -11,6 +11,7 @@ import { useDebouncedValue } from '@/lib/hooks/useDebouncedValue'
 import { useModalFocus } from '@/lib/hooks/useModalFocus'
 import { cn } from '@/lib/utils'
 import { SITE_NAME } from '@/config/site'
+import { withAssetPrefix } from '@/lib/asset-path'
 import type { SearchIndexResponse } from '@/app/search-index.json/route'
 
 const MAX_RESULTS = 8
@@ -65,7 +66,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     setIsLoading(true)
     const controller = new AbortController()
 
-    fetch('/search-index.json', { signal: controller.signal })
+    fetch(withAssetPrefix('/search-index.json'), { signal: controller.signal })
       .then((res) => res.json() as Promise<SearchIndexResponse>)
       .then((data) => {
         setAllItems(data.items)
