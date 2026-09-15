@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Entity, EntityType, InformationStatus, Vehicle } from '@/types'
 import { Card, CardBody } from '@/components/ui/Card'
@@ -12,7 +12,6 @@ import { ENTITY_TYPE_LABELS, STATUS_LABELS } from '@/lib/entity-labels'
 import { getGenericQuickFacts } from '@/lib/entity-fields'
 import { parsePowerHp } from '@/lib/vehicle-power'
 import { EVIDENCE_STAMP_META } from '@/lib/evidence'
-import { FLIP_VIEW_TRANSITION_NAME, consumeFlipSlug } from '@/lib/view-transitions'
 import { cn } from '@/lib/utils'
 
 const STATUS_SYMBOL: Record<InformationStatus, string> = {
@@ -312,7 +311,6 @@ export function EntityCard({
   const resolvedRelationCount = relationCount ?? entity.relations?.length ?? 0
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const [hovering, setHovering] = useState(false)
-  const flipSlug = consumeFlipSlug(entity.slug)
 
   useEffect(() => {
     if (!videoRef.current || !clipUrl) return
@@ -423,7 +421,6 @@ export function EntityCard({
               className={cn('relative w-full', isCompact ? 'aspect-[4/5]' : 'aspect-[3/4]')}
               onMouseEnter={() => setHovering(true)}
               onMouseLeave={() => setHovering(false)}
-              style={flipSlug ? ({ viewTransitionName: FLIP_VIEW_TRANSITION_NAME } as CSSProperties) : undefined}
             >
               <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute inset-0 motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover/card:scale-[1.08] motion-safe:group-has-[:focus-visible]/card:scale-[1.08]">
