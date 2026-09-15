@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
 import { Header } from '@/components/layout/Header'
+import { MobileTabBar } from '@/components/layout/MobileTabBar'
 import { TrendingBar } from '@/components/layout/TrendingBar'
 import { Footer } from '@/components/layout/Footer'
 import { ConsentBanner } from '@/components/layout/ConsentBanner'
@@ -197,6 +198,7 @@ export default async function RootLayout({
             stacking global de la página, no dentro de ningún contexto de
             apilamiento de una ruta. */}
         <BackToTop />
+        <MobileTabBar />
       </body>
     </html>
   )
