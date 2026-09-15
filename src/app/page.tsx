@@ -1,166 +1,81 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { EntityType, type Vehicle } from '@/types'
 import { generateHomepageMetadata, generateWebsiteJsonLd, serializeJsonLd } from '@/lib/seo'
+import { getEntitiesByType, getEntityCountsByType, getFeaturedEntities } from '@/lib/entities'
+import { getEntityImageMap } from '@/lib/media'
+import { getBidirectionalRelationCount } from '@/lib/relations'
+import { getVehicleCategory, computeCategoryOptions } from '@/lib/vehicle-category'
 import { QuickSearchForm } from '@/components/home/QuickSearchForm'
-import { MarketplaceHeroStrip } from '@/components/home/MarketplaceHeroStrip'
-import { Suspense } from 'react'
-import { FinancingCalculator } from '@/components/ui/FinancingCalculator'
-import { FinancingCalculatorSkeleton } from '@/components/ui/loading'
+import { HomeDiscovery } from '@/components/home/HomeDiscovery'
+import { EntityCard } from '@/components/entities/EntityCard'
+import { Reveal } from '@/components/ui/Reveal'
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateHomepageMetadata()
 }
 
-const MARKETPLACE_CATEGORIES = [
-  { label: 'Autos', value: 'autos', description: 'Sedanes, hatchbacks y deportivos', mark: '01', featured: true },
-  { label: 'Motos', value: 'motos', description: 'Urbanas, clásicas y de aventura', mark: '02', featured: false },
-  { label: 'Camionetas', value: 'camionetas', description: 'Pick-ups y SUVs para todos los días', mark: '03', featured: false },
-  { label: 'Utilitarios', value: 'utilitarios', description: 'Trabajo, carga y movilidad profesional', mark: '04', featured: false },
-]
-
-function CategoryCards() {
-  return (
-    <section className="marketplace-home-section marketplace-category-section bg-white" aria-labelledby="marketplace-categories-heading">
-      <div className="marketplace-home-container">
-        <div className="flex flex-wrap items-end justify-between gap-5">
-          <div>
-            <p className="marketplace-eyebrow text-[#C2410C]">Empezá por lo que buscás</p>
-            <h2 id="marketplace-categories-heading" className="marketplace-section-title">Encontrá el vehículo para tu próximo paso.</h2>
-          </div>
-          <Link href="/listings" className="marketplace-text-link">Ver todas las publicaciones <span aria-hidden="true">→</span></Link>
-        </div>
-        <div className="marketplace-category-grid mt-10">
-          {MARKETPLACE_CATEGORIES.map((category) => (
-            <Link
-              key={category.value}
-              href={`/listings?categoria=${category.value}`}
-              prefetch={false}
-              className={`marketplace-category-card marketplace-category-card-${category.value} group ${category.featured ? 'marketplace-category-card-featured' : ''}`}
-            >
-              <span className="marketplace-category-card-top"><span>{category.mark}</span><span aria-hidden="true">↗</span></span>
-              <span className="marketplace-category-silhouette" aria-hidden="true">{category.value === 'motos' ? 'MOTO' : category.value === 'camionetas' ? '4×4' : category.value === 'utilitarios' ? 'VAN' : 'AUTO'}</span>
-              <span className="mt-auto block text-2xl font-semibold tracking-[-0.05em]">{category.label}</span>
-              <span className="mt-2 block max-w-xs text-sm leading-relaxed opacity-75">{category.description}</span>
-              <span className="marketplace-category-button mt-6">Explorar {category.label.toLowerCase()} <span aria-hidden="true">→</span></span>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
+function formatNumber(value: number): string {
+  return value.toLocaleString('es-AR')
 }
 
-function HowItWorks() {
-  const steps = [
-    ['01', 'Buscá', 'Filtrá por tipo, ubicación, condición o presupuesto.', '⌕'],
-    ['02', 'Compará', 'Mirá opciones y hablá directo con quien publica.', '≋'],
-    ['03', 'Publicá', 'Subí tu vehículo y llegá a quienes ya están buscando.', '↗'],
-  ]
+export default async function Home() {
+  const [vehiclesRaw, counts, featuredRaw] = await Promise.all([
+    getEntitiesByType(EntityType.VEHICLE),
+    getEntityCountsByType(),
+    getFeaturedEntities(8, EntityType.VEHICLE),
+  ])
+  const vehicles = vehiclesRaw as Vehicle[]
+  const featured = featuredRaw as Vehicle[]
+  const imageBySlug = getEntityImageMap(vehicles)
+  const categories = computeCategoryOptions(vehicles, 2).slice(0, 6)
+  const relationCount = await Promise.all(vehicles.map((vehicle) => getBidirectionalRelationCount(vehicle)))
+  const totalRelations = relationCount.reduce((sum, value) => sum + value, 0) / 2
+  const featuredVehicle = featured[0] ?? vehicles.find((vehicle) => vehicle.featured) ?? vehicles[0]
+  const featuredImage = featuredVehicle ? imageBySlug[`vehiculos/${featuredVehicle.slug}`] : null
 
-  return (
-    <section className="marketplace-process-section" aria-labelledby="how-heading">
-      <div className="marketplace-home-container">
-        <div className="marketplace-process-intro">
-          <p className="marketplace-eyebrow text-[#C2410C]">Comprar o vender, sin vueltas</p>
-          <h2 id="how-heading" className="mt-4 max-w-3xl text-4xl font-semibold leading-[.98] tracking-[-.06em] text-white sm:text-6xl">Del primer vistazo al contacto.</h2>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-white/65">Todo lo que necesitás para encontrar una opción y avanzar. O para poner tu vehículo frente a la persona indicada.</p>
-        </div>
-        <div className="marketplace-process-grid mt-12">
-          {steps.map(([number, title, description, icon]) => (
-            <div key={number} className="marketplace-process-card">
-              <div className="marketplace-process-icon" aria-hidden="true">{icon}</div>
-              <div className="mt-10 flex items-center gap-3"><span className="text-sm font-bold text-[#C2410C]">{number}</span><span className="h-px flex-1 bg-white/15" /></div>
-              <h3 className="mt-5 text-2xl font-semibold tracking-[-.04em] text-white">{title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/60">{description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function FinancingBlock() {
-  return (
-    <section className="marketplace-financing-section" aria-labelledby="financing-heading">
-      <div className="marketplace-home-container">
-        <div className="grid gap-10 lg:grid-cols-[0.68fr_1.32fr] lg:items-start">
-          <div className="pt-3">
-            <p className="marketplace-eyebrow text-[#C2410C]">Hacé números antes de decidir</p>
-            <h2 id="financing-heading" className="marketplace-section-title">¿Cuánto te queda por mes?</h2>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-[#A1A1AA]">Una simulación rápida para saber qué opciones entran en tu presupuesto y seguir buscando con más claridad.</p>
-            <Link href="/financiamiento" className="marketplace-text-link mt-7 inline-flex">Ver guía de financiamiento <span aria-hidden="true">→</span></Link>
-          </div>
-          <div className="marketplace-financing-card">
-            <Suspense fallback={<FinancingCalculatorSkeleton />}>
-              <FinancingCalculator />
-            </Suspense>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function CatalogExit() {
-  return (
-    <section className="border-t border-[#27272A] bg-[#F4F4F5] py-8" aria-label="Catálogo técnico">
-      <div className="marketplace-home-container flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-[#71717A]">¿Buscás especificaciones de un modelo puntual?</p>
-        <Link href="/vehiculos" className="marketplace-text-link">Explorar catálogo técnico <span aria-hidden="true">→</span></Link>
-      </div>
-    </section>
-  )
-}
-
-export default function Home() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(generateWebsiteJsonLd()) }} />
-      <div className="marketplace-home min-h-screen bg-[#F4F4F5]">
-        <section className="marketplace-home-hero relative overflow-hidden">
-          <div className="marketplace-home-container relative z-10 pb-16 pt-14 sm:pb-24 sm:pt-20 lg:pb-28 lg:pt-24">
-            <div className="grid items-end gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
+      <main className="min-h-screen bg-surface-page">
+        <section className="relative overflow-hidden border-b border-edge bg-inverse py-20 text-white sm:py-28">
+          <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.12)_1px,transparent_1px)] [background-size:56px_56px]" aria-hidden="true" />
+          <div className="container-max relative">
+            <div className="grid gap-14 lg:grid-cols-[1.15fr_.85fr] lg:items-end">
               <div>
-                <p className="marketplace-eyebrow text-[#C2410C]">Marketplace automotor argentino</p>
-                <h1 className="mt-5 max-w-3xl text-5xl font-semibold leading-[0.96] tracking-[-0.07em] text-white sm:text-7xl lg:text-[6.5rem]">Comprá mejor.<br /><span className="text-[#C2410C]">Vendé más fácil.</span></h1>
-                <p className="mt-7 max-w-xl text-lg leading-relaxed text-white/65">Encontrá autos, motos y camionetas publicados en Argentina. O publicá el tuyo y conectá con personas que ya están buscando.</p>
-                <div className="marketplace-home-search mt-8 max-w-2xl">
-                  <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-white/55">¿Qué querés encontrar?</p>
-                  <QuickSearchForm examples={['Toyota Corolla', 'una camioneta 4x4', 'una moto para ciudad', 'un auto hasta 20 mil dólares']} />
-                </div>
-                <div className="mt-5 flex flex-wrap gap-3">
-                  <Link href="/publicar" prefetch={false} className="marketplace-home-primary-cta">Publicar mi vehículo <span aria-hidden="true">↗</span></Link>
-                  <Link href="/listings" className="marketplace-home-secondary-cta">Ver publicaciones</Link>
-                </div>
+                <p className="eyebrow text-orange-300">Archivo automotor · datos que se pueden consultar</p>
+                <h1 className="mt-6 max-w-4xl font-display text-5xl font-bold leading-[.94] tracking-[-.06em] sm:text-7xl lg:text-[6.8rem]">El mundo de los vehículos, <span className="text-orange-300">para explorar.</span></h1>
+                <p className="mt-7 max-w-2xl text-lg leading-relaxed text-white/70">Fichas técnicas, relaciones reales y comparaciones para entender qué hay detrás de cada modelo.</p>
+                <div className="mt-8 max-w-2xl"><QuickSearchForm examples={['Toyota Corolla', 'SUV compacto', 'motos trail', 'vehículos de más de 300 hp']} /></div>
+                <div className="mt-6 flex flex-wrap gap-3 text-sm"><Link href="/explorar" className="rounded-full bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-700">Empezar a explorar →</Link><Link href="/comparar" className="rounded-full border border-white/30 px-5 py-3 font-semibold text-white transition hover:border-white">Comparar vehículos</Link></div>
               </div>
-              <div className="hidden lg:block" aria-hidden="true">
-                <div className="marketplace-hero-stat-card">
-                  <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#C2410C]">Una nueva forma de moverte</span>
-                  <p className="mt-8 text-4xl font-semibold leading-tight tracking-[-0.05em] text-white">Tu próximo vehículo empieza con una buena búsqueda.</p>
-                  <div className="mt-10 flex items-center gap-3 text-sm text-white/55"><span className="h-2 w-2 rounded-full bg-[#C2410C]" /> Compra, venta y decisión en un solo lugar</div>
-                </div>
+              <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/15 bg-white/10">
+                {[
+                  [formatNumber(counts[EntityType.VEHICLE]), 'vehículos documentados', '/vehiculos'],
+                  [formatNumber(counts[EntityType.MANUFACTURER]), 'fabricantes', '/fabricantes'],
+                  [formatNumber(Math.round(totalRelations)), 'relaciones reales', '/explorar'],
+                  [formatNumber(counts[EntityType.GUIDE]), 'guías para seguir', '/guias'],
+                ].map(([value, label, href]) => <Link key={label} href={href} className="bg-white/[.06] p-5 transition hover:bg-white/[.12]"><span className="block font-mono text-3xl font-bold text-orange-300 sm:text-4xl">{value}</span><span className="mt-2 block text-xs uppercase tracking-[.12em] text-white/60">{label}</span></Link>)}
               </div>
             </div>
           </div>
         </section>
 
-        <MarketplaceHeroStrip />
-        <CategoryCards />
-        <HowItWorks />
-        <FinancingBlock />
-
-        <section className="marketplace-home-sell-banner" aria-labelledby="sell-heading">
-          <div className="marketplace-home-container text-center">
-            <p className="marketplace-eyebrow text-white/70">Tu vehículo puede ser el próximo</p>
-            <h2 id="sell-heading" className="mt-4 text-4xl font-semibold tracking-[-0.06em] text-white sm:text-6xl">Publicá hoy. Empezá a recibir consultas.</h2>
-            <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/75">Fotos, datos y contacto directo. Sin inventar ofertas: cuando publiques, tu vehículo aparece de verdad.</p>
-            <Link href="/publicar" prefetch={false} className="mt-8 inline-flex rounded-full bg-[#09090B] px-7 py-4 text-sm font-bold text-white transition hover:bg-[#27272A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#C2410C]">Ser el primero en publicar <span aria-hidden="true">↗</span></Link>
+        <section className="border-b border-edge bg-surface-card py-12 sm:py-16" aria-labelledby="categories-heading">
+          <div className="container-max">
+            <Reveal direction="chapter"><div className="flex flex-wrap items-end justify-between gap-5"><div><p className="eyebrow text-auto-accent">01 · Elegí un punto de entrada</p><h2 id="categories-heading" className="mt-3 text-3xl font-bold text-strong sm:text-5xl">No todos buscan lo mismo.</h2></div><Link href="/categorias" className="link-underline font-semibold text-auto-accent">Ver todas las categorías →</Link></div></Reveal>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {categories.map(({ group, count }, index) => <Reveal key={group} index={index}><Link href={`/categorias/${group.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`} className="group flex items-center justify-between rounded-xl border border-edge bg-surface-page p-5 transition hover:-translate-y-1 hover:border-auto-accent"><span><span className="block text-lg font-semibold text-strong">{group}</span><span className="mt-1 block text-sm text-muted">{count} modelos con esta categoría</span></span><span className="font-mono text-xl text-auto-accent transition-transform group-hover:translate-x-1">↗</span></Link></Reveal>)}
+            </div>
           </div>
         </section>
 
-        <CatalogExit />
-      </div>
+        <HomeDiscovery vehicles={vehicles} imageBySlug={imageBySlug} />
+
+        {featuredVehicle && <section className="border-b border-edge py-16 sm:py-24" aria-labelledby="featured-heading"><div className="container-max"><Reveal direction="chapter"><p className="eyebrow text-auto-accent">04 · Una ficha para mirar en profundidad</p><div className="mt-4 grid gap-8 lg:grid-cols-[1.1fr_.9fr] lg:items-center"><div className="overflow-hidden rounded-2xl border border-edge bg-surface-card">{featuredImage?.src ? <img src={featuredImage.src} alt={featuredVehicle.title} className="aspect-[16/10] w-full object-cover transition-transform duration-700 hover:scale-[1.03]" /> : <div className="flex aspect-[16/10] items-center justify-center text-muted">Imagen no documentada</div>}</div><div><h2 id="featured-heading" className="text-4xl font-bold tracking-tight text-strong sm:text-6xl">{featuredVehicle.title}</h2><p className="mt-4 text-lg leading-relaxed text-body">{featuredVehicle.description}</p><div className="mt-6 grid grid-cols-2 gap-3">{[["Fabricante", featuredVehicle.manufacturer], ["Categoría", getVehicleCategory(featuredVehicle.class)], ["Potencia", featuredVehicle.power], ["Año", String(featuredVehicle.anoLanzamiento ?? 'No documentado')]].map(([label, value]) => <div key={label} className="rounded-lg border border-edge bg-surface-card p-3"><span className="block font-mono text-[10px] uppercase tracking-wider text-muted">{label}</span><span className="mt-1 block text-sm font-semibold text-strong">{value || 'No documentado'}</span></div>)}</div><Link href={`/vehiculos/${featuredVehicle.slug}`} className="mt-7 inline-flex rounded-full bg-auto-accent px-5 py-3 font-semibold text-white hover:bg-auto-accent-strong">Abrir ficha completa →</Link></div></div></Reveal></div></section>}
+
+        <section className="border-b border-edge bg-surface-card py-16" aria-labelledby="featured-grid-heading"><div className="container-max"><div className="flex items-end justify-between gap-5"><div><p className="eyebrow text-auto-accent">05 · El archivo sigue creciendo</p><h2 id="featured-grid-heading" className="mt-3 text-3xl font-bold text-strong">Más vehículos para descubrir.</h2></div><Link href="/vehiculos" className="link-underline font-semibold text-auto-accent">Todo el catálogo →</Link></div><div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{featured.slice(0, 4).map((vehicle, index) => <Reveal key={vehicle.slug} index={index}><EntityCard entity={vehicle} image={imageBySlug[`vehiculos/${vehicle.slug}`]} priority={index < 2} /></Reveal>)}</div></div></section>
+      </main>
     </>
   )
 }

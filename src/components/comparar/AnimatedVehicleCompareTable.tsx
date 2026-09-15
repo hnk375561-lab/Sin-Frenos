@@ -86,6 +86,7 @@ function MetricCell({
   metric,
   isWinner,
   neutral,
+  bar,
   rowVariants,
   reducedMotion,
 }: {
@@ -93,6 +94,7 @@ function MetricCell({
   metric: Metric
   isWinner: boolean
   neutral: boolean
+  bar: number | null
   rowVariants: Variants
   reducedMotion: boolean
 }) {
@@ -112,6 +114,7 @@ function MetricCell({
           </span>
           {isWinner && <span className="shrink-0 rounded-full bg-auto-accent px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase text-[#09090B]">Mejor</span>}
         </div>
+        {bar !== null && <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-edge/50" aria-hidden="true"><motion.span initial={{ scaleX: reducedMotion ? bar : 0 }} animate={{ scaleX: bar }} transition={{ duration: 0.32, ease: 'easeOut' }} className="block h-full origin-left rounded-full bg-auto-accent" /></div>}
         {neutral && <p className="mt-2 font-sans text-[10px] font-medium uppercase tracking-wide text-neutral-500">No concluyente</p>}
         {level && <p className="mt-2 font-sans text-[10px] leading-tight text-neutral-500" title={level}>{EVIDENCE_LABELS[level] || level}</p>}
       </motion.div>
@@ -214,6 +217,10 @@ const VehicleColumn = forwardRef<HTMLDivElement, VehicleColumnProps>(function Ve
                 const priceComparable = metric.key === 'price' && !mixedCurrencies
                 const numericComparable = metric.direction !== null && comparableValues.every((value) => value !== null) && (metric.key !== 'price' || priceComparable) && sameEvidence
                 const winners = winningIndices(comparableValues, metric.direction, numericComparable)
+                const numericValues = comparableValues.filter((value): value is number => value !== null)
+                const maxValue = numericValues.length > 1 ? Math.max(...numericValues) : 0
+                const comparableValue = metric.getComparable(vehicle)
+                const bar = numericComparable && comparableValue !== null && maxValue > 0 ? comparableValue / maxValue : null
                 return (
                   <MetricCell
                     key={metric.key}
@@ -221,6 +228,7 @@ const VehicleColumn = forwardRef<HTMLDivElement, VehicleColumnProps>(function Ve
                     metric={metric}
                     isWinner={winners.has(index)}
                     neutral={metric.direction !== null && !numericComparable}
+                    bar={bar}
                     rowVariants={rowVariants}
                     reducedMotion={reducedMotion}
                   />
@@ -237,6 +245,7 @@ const VehicleColumn = forwardRef<HTMLDivElement, VehicleColumnProps>(function Ve
             metric={{ key: 'dimensions', label: 'Seguridad', group: 'Seguridad', direction: null, getValue: (v) => v.safety?.euroNCAP ? `${v.safety.euroNCAP}${v.safety.puntaje ? ` · ${v.safety.puntaje} puntos` : ''}` : null, getComparable: () => null }}
             isWinner={false}
             neutral={false}
+            bar={null}
             rowVariants={rowVariants}
             reducedMotion={reducedMotion}
           />

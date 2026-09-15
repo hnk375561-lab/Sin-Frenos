@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import type { Vehicle } from '@/types'
 import { EntityType } from '@/types'
-import { resolveEntityDisplayImage, resolveEntityDisplayImages } from '@/lib/media'
+import { resolveEntityDisplayImages } from '@/lib/media'
 import { getMediaForEntity } from '@/lib/media'
 import { ENTITY_IMAGE_CATEGORIES } from '@/lib/images'
 import type { VehicleCategory } from '@/lib/vehicle-category'
@@ -141,6 +141,24 @@ export function VehicleDetailLayout({
               <Link href="/vehiculos" className="rounded-md border border-edge-strong bg-surface-card px-4 py-2 text-sm font-semibold text-ink hover:border-auto-accent">Volver al catálogo</Link>
             </div>
           </div>
+          <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,.6fr)] lg:items-end">
+            <Reveal direction="swell" className="overflow-hidden rounded-2xl border border-edge/70 bg-surface-card shadow-lg">
+              <EntityImage entity={vehicle} image={images[0] ?? null} variant="thumbnail" priority className="min-h-[15rem]" />
+            </Reveal>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2">
+              {[
+                ['Potencia', vehicle.power],
+                ['Velocidad', vehicle.performance?.speed],
+                ['0–100', vehicle.performance?.acceleration],
+                ['Peso', vehicle.peso],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-xl border border-edge/70 bg-surface-card/80 p-3 backdrop-blur-sm">
+                  <span className="block font-mono text-[10px] uppercase tracking-wider text-neutral-500">{label}</span>
+                  <span className="mt-1 block break-words font-mono text-sm font-semibold text-ink">{displayValue(value) || 'No documentado'}</span>
+                </div>
+              ))}
+            </div>
+          </div>
           {vehicle.tags && vehicle.tags.length > 0 && <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-xs text-neutral-500">{vehicle.tags.map((tag) => <span key={tag}>{tag.replace(/-/g, ' ')}</span>)}</div>}
         </div>
       </section>
@@ -185,7 +203,7 @@ export function VehicleDetailLayout({
             </div>
 
             <aside className="space-y-4 lg:sticky lg:top-6">
-              <Card className="shadow-sm"><CardBody><p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-auto-accent">Resumen</p>{images.length > 1 ? <EntityGallery images={images} entityTitle={vehicle.title} /> : <EntityImage entity={vehicle} image={resolveEntityDisplayImage(vehicle)} variant="portrait" />}<dl className="mt-4 divide-y divide-edge">{summaryItems.map(([label, value]) => <div key={label} className="flex justify-between gap-3 py-2 text-xs"><dt className="text-neutral-500">{label}</dt><dd className="text-right font-medium text-ink">{displayValue(value)}</dd></div>)}</dl></CardBody></Card>
+              <Card className="shadow-sm"><CardBody><p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-auto-accent">Resumen</p>{images.length > 1 && <EntityGallery images={images} entityTitle={vehicle.title} />}<dl className="divide-y divide-edge">{summaryItems.map(([label, value]) => <div key={label} className="flex justify-between gap-3 py-2 text-xs"><dt className="text-neutral-500">{label}</dt><dd className="text-right font-medium text-ink">{displayValue(value)}</dd></div>)}</dl></CardBody></Card>
               {relatedMedia.length > 0 && <MediaCarousel title="Contenido audiovisual" assets={relatedMedia} />}
               <Card className="shadow-sm"><CardBody><EntityMetadata entity={vehicle} /></CardBody></Card>
               <ModelListingsPanel vehicleModelSlug={vehicle.slug} vehicleName={vehicle.title} />
