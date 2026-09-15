@@ -229,7 +229,7 @@ a:not(.no-style) {
 .reveal {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.6s var(--ease-standard), transform 0.6s var(--ease-standard);
+  transition: opacity var(--dur-slow) var(--ease-premium), transform var(--dur-slow) var(--ease-premium);
   transition-delay: var(--reveal-delay, 0ms);
 }
 
@@ -240,7 +240,7 @@ a:not(.no-style) {
 
 /* === TAP SCALE === */
 .tap-scale {
-  transition: transform 150ms var(--ease-standard);
+  transition: transform var(--dur-fast) var(--ease-standard);
 }
 
 .tap-scale:active {
@@ -261,7 +261,7 @@ a:not(.no-style) {
   width: 0;
   height: 1px;
   background-color: currentColor;
-  transition: width 200ms var(--ease-standard);
+  transition: width var(--dur-base) var(--ease-standard);
 }
 
 .link-underline:hover::after {
@@ -282,7 +282,7 @@ a:not(.no-style) {
   content: '';
   position: absolute;
   top: 0;
-  left: -100%;
+  left: 0;
   width: 100%;
   height: 100%;
   background: linear-gradient(
@@ -291,12 +291,13 @@ a:not(.no-style) {
     rgba(255, 255, 255, 0.2),
     transparent
   );
-  transition: left 600ms var(--ease-standard);
+  transform: translateX(-100%);
+  transition: transform var(--dur-slow) var(--ease-premium);
   pointer-events: none;
 }
 
 .cta-shine:hover::before {
-  left: 100%;
+  transform: translateX(100%);
 }
 
 /* === ANIMACIONES === */
@@ -312,7 +313,7 @@ a:not(.no-style) {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.6s var(--ease-standard) both;
+  animation: fadeIn var(--dur-slow) var(--ease-premium) both;
 }
 
 /* === SR ONLY === */
@@ -382,6 +383,12 @@ a:not(.no-style) {
 
 .scroll-cue-arrow {
   animation: scrollCueMove 1.8s var(--ease-standard) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue-arrow {
+    animation: none;
+  }
 }
 
 /* === PLIEGUE DE ESQUINA (dog-ear) ===
