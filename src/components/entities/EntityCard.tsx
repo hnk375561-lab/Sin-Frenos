@@ -65,6 +65,13 @@ function priceHeadline(vehicle: Vehicle): string | null {
   return clean || vehicle.price
 }
 
+function progressiveVehicleSpec(vehicle: Vehicle): string | null {
+  if (vehicle.performance?.acceleration) return `0–100: ${vehicle.performance.acceleration}`
+  if (vehicle.traccion) return `Tracción: ${vehicle.traccion}`
+  if (vehicle.evidence?.level) return `Evidencia: ${vehicle.evidence.level}`
+  return null
+}
+
 function vehicleShowcaseSpecs(vehicle: Vehicle): Array<{ label: string; value: string }> {
   const specs: Array<{ label: string; value: string }> = []
   const hp = parsePowerHp(vehicle)
@@ -330,6 +337,44 @@ export function EntityCard({
    * - Referencia de archivo (REF: XXX)
    * - Composición editorial, no showroom
    */
+  if (entity.type === EntityType.VEHICLE && layout === 'row') {
+    const vehicle = entity as Vehicle
+    const { brand, model } = splitVehicleName(vehicle)
+    const specs = vehicleShowcaseSpecs(vehicle)
+    const progressiveSpec = progressiveVehicleSpec(vehicle)
+    const price = priceHeadline(vehicle)
+
+    return (
+      <div className={cn('group', className)}>
+        <Link href={`/${entity.type}/${entity.slug}`} prefetch={false} className="block h-full">
+          <article className="group/card relative flex min-h-[148px] h-full w-full overflow-hidden border border-border bg-surface-card ring-1 ring-transparent motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:hover:scale-[1.03] motion-safe:has-[:focus-visible]:scale-[1.03] motion-safe:hover:shadow-2xl motion-safe:has-[:focus-visible]:shadow-2xl hover:border-oxide-red/50 hover:ring-2 hover:ring-oxide-red/40 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-oxide-red/40">
+            <div className="relative w-36 shrink-0 overflow-hidden bg-surface-input sm:w-48">
+              <div className="absolute inset-0 motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover/card:scale-[1.08] motion-safe:group-has-[:focus-visible]/card:scale-[1.08]">
+                <EntityImage entity={entity} image={image} priority={priority} />
+              </div>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-auto-dark/60 via-auto-dark/0 to-transparent opacity-0 motion-safe:transition-opacity motion-safe:duration-200 group-hover/card:opacity-100 group-has-[:focus-visible]/card:opacity-100 [@media(hover:none)]:opacity-70" />
+            </div>
+            <div className="flex min-w-0 flex-1 flex-col justify-between p-4 sm:p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  {brand && <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-ink/60">{brand}</p>}
+                  <h3 className="line-clamp-2 font-serif text-base font-semibold leading-tight text-ink sm:text-lg">{model}</h3>
+                  {specs.length > 0 && <p className="mt-2 truncate font-mono text-[10px] text-ink/60">{specs.map((spec) => spec.value).join(' · ')}</p>}
+                  {progressiveSpec && <p className="mt-2 font-mono text-[10px] text-ink/70 opacity-0 translate-y-2 motion-safe:transition-all motion-safe:duration-200 motion-safe:delay-75 group-hover/card:opacity-100 group-hover/card:translate-y-0 group-has-[:focus-visible]/card:opacity-100 group-has-[:focus-visible]/card:translate-y-0 [@media(hover:none)]:opacity-70 [@media(hover:none)]:translate-y-0">{progressiveSpec}</p>}
+                </div>
+                {evidenceStamp && <span className={cn('shrink-0 border px-2 py-1 font-mono text-[9px] uppercase tracking-wider motion-safe:transition-transform motion-safe:duration-150 group-hover/card:rotate-3 group-hover/card:scale-110 group-has-[:focus-visible]/card:rotate-3 group-has-[:focus-visible]/card:scale-110', evidenceStamp.className)}>{evidenceStamp.icon} {evidenceStamp.shortLabel}</span>}
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <p className="font-mono text-xs font-semibold text-ink motion-safe:transition-transform motion-safe:duration-200 group-hover/card:translate-x-0.5 group-has-[:focus-visible]/card:translate-x-0.5">{price || 'Consultar ficha'}</p>
+                <span className="font-mono text-[9px] uppercase tracking-wider text-oxide-red motion-safe:transition-transform motion-safe:duration-200 group-hover/card:translate-x-0.5 group-has-[:focus-visible]/card:translate-x-0.5">Ver ficha →</span>
+              </div>
+            </div>
+          </article>
+        </Link>
+      </div>
+    )
+  }
+
   if (entity.type === EntityType.VEHICLE && layout !== 'row') {
     const vehicle = entity as Vehicle
     const { brand, model } = splitVehicleName(vehicle)
@@ -337,6 +382,7 @@ export function EntityCard({
     const specsLine = specs.map((spec) => spec.value).join('  ·  ')
     const year = vehicleYearLabel(vehicle)
     const price = priceHeadline(vehicle)
+    const progressiveSpec = progressiveVehicleSpec(vehicle)
     const secondaryLine = [vehicle.class, year].filter(Boolean).join(' · ')
     const isCompact = size === 'compact'
     const statusText = STATUS_LABELS[entity.status as keyof typeof STATUS_LABELS] || entity.status
@@ -368,8 +414,8 @@ export function EntityCard({
         <Link href={`/${entity.type}/${entity.slug}`} prefetch={false} className="block h-full">
           <article
             className={cn(
-              'group/card relative flex h-full w-full overflow-hidden bg-surface-card border border-border transition-all duration-300',
-              'hover:border-oxide-red/50 hover:shadow-md'
+              'group/card relative flex h-full w-full overflow-hidden bg-surface-card border border-border ring-1 ring-transparent',
+              'motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:hover:scale-[1.03] motion-safe:has-[:focus-visible]:scale-[1.03] motion-safe:hover:shadow-2xl motion-safe:has-[:focus-visible]:shadow-2xl hover:border-oxide-red/50 hover:ring-2 hover:ring-oxide-red/40 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-oxide-red/40'
             )}
           >
             {/* CANVAS — la fotografía con aspecto de documento */}
@@ -379,12 +425,15 @@ export function EntityCard({
               onMouseLeave={() => setHovering(false)}
               style={flipSlug ? ({ viewTransitionName: FLIP_VIEW_TRANSITION_NAME } as CSSProperties) : undefined}
             >
-              <div className="absolute inset-0 transition-transform duration-300 group-hover/card:scale-[1.02]">
-                <EntityImage entity={entity} image={image} priority={priority} />
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute inset-0 motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover/card:scale-[1.08] motion-safe:group-has-[:focus-visible]/card:scale-[1.08]">
+                  <EntityImage entity={entity} image={image} priority={priority} />
+                </div>
               </div>
 
-              {/* Degradé mínimo para legibilidad */}
+              {/* Degradé mínimo para legibilidad + reveal de contraste */}
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-auto-dark/60 via-auto-dark/0 to-transparent opacity-0 motion-safe:transition-opacity motion-safe:duration-200 group-hover/card:opacity-100 group-has-[:focus-visible]/card:opacity-100 [@media(hover:none)]:opacity-70" />
               <div className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-ink/30 to-transparent" />
 
               {/* Clip de video ambient */}
@@ -426,7 +475,7 @@ export function EntityCard({
                   abajo, sobre la duplicación que había con este dato). */}
               {evidenceStamp && (
                 <div className={cn(
-                  'absolute top-3 right-3 font-mono text-[9px] uppercase tracking-wider px-2 py-1 border bg-white/90 backdrop-blur-sm',
+                  'absolute top-3 right-3 font-mono text-[9px] uppercase tracking-wider px-2 py-1 border bg-white/90 backdrop-blur-sm motion-safe:transition-transform motion-safe:duration-150 group-hover/card:rotate-3 group-hover/card:scale-110 group-has-[:focus-visible]/card:rotate-3 group-has-[:focus-visible]/card:scale-110',
                   evidenceStamp.className
                 )}>
                   <span className="mr-1">{evidenceStamp.icon}</span>
@@ -451,6 +500,11 @@ export function EntityCard({
                       {secondaryLine}
                     </p>
                   )}
+                  {progressiveSpec && (
+                    <p className="font-mono text-[10px] text-white/80 opacity-0 translate-y-2 motion-safe:transition-all motion-safe:duration-200 motion-safe:delay-75 group-hover/card:opacity-100 group-hover/card:translate-y-0 group-has-[:focus-visible]/card:opacity-100 group-has-[:focus-visible]/card:translate-y-0 [@media(hover:none)]:opacity-70 [@media(hover:none)]:translate-y-0">
+                      {progressiveSpec}
+                    </p>
+                  )}
                 </div>
 
                 {/* Specs line */}
@@ -469,7 +523,7 @@ export function EntityCard({
                 <div className="flex items-center justify-between">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     {price && (
-                      <p className="font-mono text-xs font-semibold text-white">
+                      <p className="font-mono text-xs font-semibold text-white motion-safe:transition-transform motion-safe:duration-200 group-hover/card:translate-x-0.5 group-has-[:focus-visible]/card:translate-x-0.5">
                         {price}
                       </p>
                     )}
@@ -532,11 +586,14 @@ export function EntityCard({
   return (
     <div className={cn('group', className)}>
       <Link href={`/${entity.type}/${entity.slug}`} prefetch={false} className="block h-full">
-        <Card className="h-full border border-border hover:border-oxide-red/50 transition-colors">
+        <Card className="group/card h-full border border-border ring-1 ring-transparent motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:hover:scale-[1.03] motion-safe:has-[:focus-visible]:scale-[1.03] motion-safe:hover:shadow-2xl motion-safe:has-[:focus-visible]:shadow-2xl hover:border-oxide-red/50 hover:ring-2 hover:ring-oxide-red/40 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-oxide-red/40">
           <CardBody className="flex flex-col h-full">
             {image && (
               <div className="relative aspect-video mb-4 overflow-hidden bg-paper border border-border/30">
-                <EntityImage entity={entity} image={image} priority={priority} />
+                <div className="absolute inset-0 motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover/card:scale-[1.08] motion-safe:group-has-[:focus-visible]/card:scale-[1.08]">
+                  <EntityImage entity={entity} image={image} priority={priority} />
+                </div>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-auto-dark/60 via-auto-dark/0 to-transparent opacity-0 motion-safe:transition-opacity motion-safe:duration-200 group-hover/card:opacity-100 group-has-[:focus-visible]/card:opacity-100 [@media(hover:none)]:opacity-70" />
               </div>
             )}
 
@@ -556,7 +613,7 @@ export function EntityCard({
                 {evidenceStamp && (
                   <span
                     className={cn(
-                      'font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border shrink-0',
+                      'font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border shrink-0 motion-safe:transition-transform motion-safe:duration-150 group-hover/card:rotate-3 group-hover/card:scale-110 group-has-[:focus-visible]/card:rotate-3 group-has-[:focus-visible]/card:scale-110',
                       evidenceStamp.className
                     )}
                     title="Nivel de evidencia"
@@ -591,7 +648,7 @@ export function EntityCard({
               <span className="font-mono text-[9px] text-ink/40">
                 REF: {entity.slug.slice(0, 6).toUpperCase()}
               </span>
-              <span className="font-mono text-[9px] text-oxide-red uppercase tracking-wider group-hover:translate-x-1 transition-transform">
+              <span className="font-mono text-[9px] text-oxide-red uppercase tracking-wider motion-safe:transition-transform motion-safe:duration-200 group-hover/card:translate-x-0.5 group-has-[:focus-visible]/card:translate-x-0.5">
                 Ver ficha →
               </span>
             </div>
