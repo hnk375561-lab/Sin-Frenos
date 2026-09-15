@@ -37,6 +37,7 @@ import { ModelListingsPanel } from '@/components/listings/ModelListingsPanel'
 import { AccessoriesAffiliateWidget } from '@/components/monetization/AccessoriesAffiliateWidget'
 import { NativeAdUnit } from '@/components/monetization/NativeAdUnit'
 import { getSponsorshipForVehicle } from '@/lib/sponsorships'
+import { VehicleDetailLayout } from '@/components/entities/VehicleDetailLayout'
 
 interface PageProps {
   params: Promise<{ entityType: string; slug: string }>
@@ -193,6 +194,29 @@ export default async function EntityPage({ params }: PageProps) {
   // una ruta que respondería 404.
   const vehicleCategory = type === EntityType.VEHICLE ? getVehicleCategory((entity as Vehicle).class) : null
   const categoryHref = type === EntityType.VEHICLE ? categoryPageHref((entity as Vehicle).class) : null
+
+  if (type === EntityType.VEHICLE) {
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }}
+        />
+        <VehicleDetailLayout
+          vehicle={entity as Vehicle}
+          related={related}
+          similarVehicles={similarVehicles}
+          relatedMedia={relatedMedia}
+          category={vehicleCategory}
+          categoryHref={categoryHref}
+        />
+      </>
+    )
+  }
 
   // Índices editoriales de sección: solo cuentan secciones que realmente
   // se van a renderizar, para que la numeración nunca muestre saltos
@@ -398,9 +422,10 @@ export default async function EntityPage({ params }: PageProps) {
                         </h3>
                         <div className="flex flex-wrap gap-2">
                           {manufacturerStats.categories.map(({ category, count }) => (
-                            <Link
-                              key={category}
-                              href={`/categorias/${categoryToSlug(category)}`}
+                              <Link
+                                key={category}
+                                prefetch={false}
+                                href={`/categorias/${categoryToSlug(category)}`}
                               className="inline-flex items-center gap-1.5 rounded-md border border-auto-accent/35 bg-auto-accent/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-auto-accent-strong backdrop-blur-sm transition-colors hover:border-auto-accent hover:bg-auto-accent/25"
                             >
                               {category}
@@ -421,6 +446,7 @@ export default async function EntityPage({ params }: PageProps) {
                             <li key={model.slug}>
                               <Link
                                 href={`/vehiculos/${model.slug}`}
+                                prefetch={false}
                                 className="link-underline text-sm text-neutral-500 transition-colors hover:text-auto-accent"
                               >
                                 {model.title}
@@ -537,124 +563,6 @@ export default async function EntityPage({ params }: PageProps) {
                     <SimilarVehiclesPanel items={similarVehicles} />
                   </CardBody>
                 </Card>
-              </Reveal>
-            )}
-
-            {/* Marketplace: publicaciones reales de este modelo (sección 8
-                del documento maestro — conecta el catálogo técnico con
-                `listings`). Va ANTES de toda la fila de monetización de
-                abajo (AdUnit, afiliados, leads): a diferencia de esos
-                canales, este es el único que hoy le da al marketplace
-                nuevo una fuente de tráfico propia — enterrarlo bajo 5
-                bloques de ads lo dejaría invisible en la práctica. No
-                requiere condicional acá: el propio componente decide no
-                renderizar nada si no hay publicaciones para este modelo. */}
-            {type === EntityType.VEHICLE && (
-              <Reveal direction="right" delay={190}>
-                <ModelListingsPanel vehicleModelSlug={entity.slug} vehicleName={entity.title} />
-              </Reveal>
-            )}
-
-            {/* Monetización: ficha destacada (patrocinio real, ver
-                src/lib/sponsorships.ts). Va antes que el AdUnit genérico
-                porque es un cliente pago específico de ESTA ficha —
-                más relevante que un anuncio de AdSense sin segmentar. */}
-            {vehicleSponsorship && (
-              <Reveal direction="right" delay={195}>
-                <SponsoredListingBanner
-                  sponsorship={vehicleSponsorship}
-                  vehicleName={entity.title}
-                  trackingLabel={`vehicle-${entity.slug}`}
-                />
-              </Reveal>
-            )}
-
-            {/* Monetization: Ad Unit */}
-            <Reveal direction="right" delay={200}>
-              <AdUnit slotId="8314744878" format="responsive" dataTrackingLabel={`ad-${entity.slug}`} />
-            </Reveal>
-
-            {/* Monetización: red de anuncios nativos, canal nuevo
-                (03/09/2026, ver NativeAdUnit.tsx) — no renderiza nada
-                hasta configurar una red (Taboola/Outbrain/MGID), no pisa
-                el AdUnit de arriba (redes distintas, inventario
-                distinto). */}
-            <Reveal direction="right" delay={205}>
-              <NativeAdUnit dataTrackingLabel={`native-ad-${entity.slug}`} />
-            </Reveal>
-
-            {/* Monetization: Affiliate buttons (for vehicles). ML es la
-                única fuente de comisión real acá (programa de afiliados
-                activo). El botón de OLX se sacó (sept 2026): OLX no
-                tiene programa de afiliados propio, así que ese link
-                solo mandaba tráfico gratis a un competidor sin generar
-                nada a cambio — el espacio ahora es 100% para el botón
-                que sí convierte en comisión. `OlxAffiliateButton` queda
-                en el repo sin uso (no se borra el componente) por si en
-                algún momento OLX abre un programa de afiliados real. */}
-            {type === EntityType.VEHICLE && (
-              <Reveal direction="right" delay={210}>
-                <div className="flex flex-wrap justify-center gap-3 py-4">
-                  <MercadoLibreAffiliateButton
-                    vehicleName={entity.title}
-                    trackingLabel={`vehicle-${entity.slug}`}
-                  />
-                </div>
-              </Reveal>
-            )}
-
-            {/* Monetization: seguro + financiación. Momento distinto al de
-                ML/OLX (esos son "dónde comprarlo", esto es "qué necesitás
-                una vez que lo compraste/elegiste"). */}
-            {type === EntityType.VEHICLE && (
-              <Reveal direction="right" delay={215}>
-                <MonetizationCtaGroup
-                  vehicleName={entity.title}
-                  showFintech
-                  showTramites
-                  trackingLabelPrefix={`vehicle-${entity.slug}`}
-                />
-              </Reveal>
-            )}
-
-            {/* Monetización: accesorios (cross-sell, canal nuevo
-                03/09/2026, ver AccessoriesAffiliateWidget.tsx). Momento
-                distinto al de arriba: "qué le sumo al vehículo", no "cómo
-                lo pago". Reutiliza el mismo programa de afiliados de ML,
-                activo desde ya sin acuerdo comercial nuevo. */}
-            {type === EntityType.VEHICLE && (
-              <Reveal direction="right" delay={216}>
-                <AccessoriesAffiliateWidget
-                  category={vehicleCategory}
-                  vehicleName={entity.title}
-                />
-              </Reveal>
-            )}
-
-            {/* Monetization: captura de leads de compra. Distinto de los
-                botones de arriba (esos mandan tráfico afuera); esto
-                captura el dato de contacto de la persona para revenderlo/
-                pasarlo a una concesionaria patrocinadora — ver
-                LeadQuoteForm.tsx para el modelo de negocio completo. */}
-            {type === EntityType.VEHICLE && (
-              <Reveal direction="right" delay={218}>
-                <LeadQuoteForm vehicleName={entity.title} trackingLabelPrefix={`vehicle-${entity.slug}`} />
-              </Reveal>
-            )}
-
-            {/* Monetización: cross-sell al lead de VENTA (canal separado,
-                ver SellVehicleLeadForm.tsx). Acá solo un link liviano
-                (no el form completo) para no saturar 250 fichas — el
-                form completo vive en /vender-tu-auto. */}
-            {type === EntityType.VEHICLE && (
-              <Reveal direction="right" delay={219}>
-                <p className="text-center text-xs text-neutral-400">
-                  ¿Tenés un vehículo para vender o entregar como parte de pago?{' '}
-                  <Link href="/vender-tu-auto" className="link-underline text-auto-accent-strong">
-                    Contanos acá
-                  </Link>
-                  .
-                </p>
               </Reveal>
             )}
 
