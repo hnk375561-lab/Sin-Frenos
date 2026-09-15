@@ -40,14 +40,15 @@
 
 ### Typography
 
-- **Heading Font:** Syncopate
-- **Body Font:** Space Mono
-- **Mood:** kinetic, motion, futuristic, speed, wide, tech
-- **Google Fonts:** [Syncopate + Space Mono](https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap)
+- **Heading/UI Font:** Fira Sans
+- **Data/Tabular Font:** Fira Code
+- **Role split:** Fira Sans handles headings, labels, descriptions, controls, and evidence explanations; Fira Code is reserved for numeric specs, units, prices, comparison values, slugs, and source metadata where aligned numerals improve scanning.
+- **Rationale:** Fira Sans provides a high-x-height, neutral, readable voice at dense UI sizes. Fira Code gives technical values stable character widths and clear numerals without turning the entire interface into a developer-themed monospace surface. Together they support credibility, compact tables, and rapid comparison rather than speed-brand theatrics.
+- **Google Fonts:** [Fira Sans + Fira Code](https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap)
 
 **CSS Import:**
 ```css
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
 ```
 
 ### Spacing Variables
@@ -82,29 +83,28 @@
 ```css
 /* Primary Button */
 .btn-primary {
-  background: #DC2626;
-  color: white;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
-  transition: all 200ms ease;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
   cursor: pointer;
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  background: var(--color-secondary);
 }
 
 /* Secondary Button */
 .btn-secondary {
   background: transparent;
-  color: #1E293B;
-  border: 2px solid #1E293B;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
-  transition: all 200ms ease;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
   cursor: pointer;
 }
 ```
@@ -113,17 +113,19 @@
 
 ```css
 .card {
-  background: #F8FAFC;
+  background: var(--color-card);
+  color: var(--color-card-foreground);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 24px;
   box-shadow: var(--shadow-md);
-  transition: all 200ms ease;
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
   cursor: pointer;
 }
 
 .card:hover {
+  border-color: var(--color-primary);
   box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
 }
 ```
 
@@ -131,17 +133,19 @@
 
 ```css
 .input {
+  background: var(--color-card);
+  color: var(--color-card-foreground);
   padding: 12px 16px;
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 16px;
-  transition: border-color 200ms ease;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .input:focus {
-  border-color: #1E293B;
+  border-color: var(--color-ring);
   outline: none;
-  box-shadow: 0 0 0 3px #1E293B20;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ring) 12%, transparent);
 }
 ```
 
@@ -149,12 +153,14 @@
 
 ```css
 .modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
+  background: color-mix(in srgb, var(--color-foreground) 50%, transparent);
   backdrop-filter: blur(4px);
 }
 
 .modal {
-  background: white;
+  background: var(--color-card);
+  color: var(--color-card-foreground);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 32px;
   box-shadow: var(--shadow-xl);
@@ -167,37 +173,70 @@
 
 ## Style Guidelines
 
-**Style:** Motion-Driven
+**Style:** Data-Dense Dashboard / Technical Reference
 
-**Keywords:** Animation-heavy, microinteractions, smooth transitions, scroll effects, parallax, entrance anim, page transitions
+**Keywords:** information-dense, structured, flat surfaces, measurable hierarchy, compact tables, evidence-forward, neutral, technical catalog
 
-**Best For:** Portfolio sites, storytelling platforms, interactive experiences, entertainment apps, creative, SaaS
+**Best For:** Vehicle spec sheets, side-by-side comparators, reference catalogs, technical documentation, financial and operational data tools
 
-**Key Effects:** Scroll anim (Intersection Observer), hover (300-400ms), entrance, parallax (3-5 layers), page transitions
+**Core Principle:** Maximize trustworthy information visibility without visual noise. Use a restrained grid, clear borders, compact spacing, and strong typographic hierarchy. Density is intentional, but every value must remain legible and every confidence state must be distinguishable without relying on motion or color alone.
 
-### Page Pattern
+**Key Effects:** Row and card highlighting on hover, 150–200ms border/background transitions, filter-result updates, sticky comparison headers, and restrained disclosure transitions. No parallax, no decorative page transitions, no animation-heavy hero, and no content hidden behind entrance animations.
 
-**Pattern Name:** Hero-Centric Design
+### Page Patterns
 
-- **Conversion Strategy:** One primary CTA. Let the hero dominate the initial viewport without hiding the next content cue. Use a static hero and non-pulsing CTA when reduced motion is requested; provide video controls. Pause hero media offscreen/hidden and keep the final hero message and CTA static under reduced motion.
-- **CTA Placement:** Hero dominant (center/bottom) + Sticky nav CTA
-- **Section Order:** Full-bleed Hero (headline + visual) > Single value prop strip > Key benefit or proof > Primary CTA
+#### Vehicle Detail — Evidence-First Spec Sheet
+
+- **Primary task:** Identify the vehicle, answer power/price/performance questions immediately, then inspect the evidence behind each claim.
+- **Section order:** Compact identity header with manufacturer/class and confidence summary > dominant KPI/spec strip for power, price, speed, and acceleration > evidence panel with primary source and limitations > structured technical sections > related vehicles.
+- **Layout:** Two-column desktop grid with a sticky or visually persistent summary rail; single-column mobile flow with the evidence summary kept near the primary specs.
+- **CTA/action placement:** Compare and related-navigation actions sit beside the identity header; source links sit directly beside the evidence they support. Do not lead with a marketing CTA.
+- **Density rule:** Empty optional fields collapse cleanly; populated fields extend the relevant section without creating artificial blank cards.
+
+#### Comparator — Scannable Decision Matrix
+
+- **Primary task:** Determine category winners and confidence differences across two or more vehicles without reading paragraphs.
+- **Section order:** Vehicle selector row > compact vehicle identity columns > grouped comparison matrix for power, price, performance, dimensions, and equipment > evidence/confidence row per metric > caveats and source links.
+- **Layout:** CSS grid/table-like alignment with sticky metric labels and sticky vehicle headers where practical; use horizontal scrolling on small screens with the metric label preserved.
+- **Comparison treatment:** Highlight the stronger value only when the metric is meaningfully comparable; show “no concluyente” or an equivalent neutral state when units, markets, years, or evidence levels prevent a fair winner.
+- **Motion rule:** Filter and selection changes may transition opacity/background subtly, but no animated reordering or decorative choreography.
+
+#### Listing — Filterable Catalog Grid
+
+- **Primary task:** Scan many vehicles quickly, narrow by manufacturer/class/market, and choose a detail page.
+- **Section order:** Page title with result count and evidence coverage > compact filter/search toolbar > dense responsive card grid or row view > pagination/load-more affordance.
+- **Card hierarchy:** Image and title > manufacturer/class > power, price, and one performance value > prominent confidence badge and source cue. Keep cards comparable and avoid oversized showroom imagery.
+- **Layout:** Responsive grid optimized for multiple items per viewport; filters remain accessible without dominating the content. Each repeated vehicle link must preserve `prefetch={false}`.
+- **Empty/loading rule:** Use stable skeleton geometry and explicit no-results guidance; never replace the catalog with a decorative hero.
 
 ---
 
 ## Motion
 
-**Scroll Reveal** (Subtle) — Trigger: scroll (viewport enter) | Duration: 300-400ms | Easing: `power1.out`
+Motion is functional and immediate. Content is rendered in its final position on first paint; there are no scroll-triggered reveals, parallax effects, page-transition choreographies, or animation-library dependencies.
 
-```js
-gsap.from(el, { opacity: 0, y: 12, duration: 0.35, ease: 'power1.out', scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none reverse' } });
+- **Hover and focus:** Use CSS transitions of 150–200ms for border, background, color, and box-shadow changes. Never move surrounding layout or rely on transform-based lift for essential state communication.
+- **Filters and comparison updates:** Preserve the current layout and apply only a brief opacity or background transition when results or selected vehicles change. Do not animate row reordering or delay the updated data.
+- **Disclosure controls:** Use an accessible native disclosure pattern; a short height/opacity transition is optional only when it does not hide content from keyboard or screen-reader users.
+- **Loading states:** Use stable skeleton geometry or an inline status indicator. Do not make data appear only after an entrance animation.
+- **Reduced motion:** Under `prefers-reduced-motion: reduce`, remove non-essential transitions and render all states immediately.
+
+```css
+@media (prefers-reduced-motion: no-preference) {
+  .interactive-surface {
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
 ```
-
-**Framework notes:** Requires the ScrollTrigger plugin registered once via gsap.registerPlugin(ScrollTrigger); Use matchMedia('(prefers-reduced-motion: reduce)') to skip non-essential motion and render the final state immediately
-
-- ✅ Keep the y offset small (8-16px) so it reads as a fade, not a slide
-- ❌ Don't reveal below-the-fold content needed for SEO/crawlers as invisible-by-default without a no-JS fallback
-- ⚡ toggleActions 'play none none reverse' avoids re-triggering on every scroll direction change
 
 ---
 
