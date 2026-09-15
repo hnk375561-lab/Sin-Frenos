@@ -1,20 +1,15 @@
 'use client'
 
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Vehicle } from '@/types'
 import type { ResolvedDisplayImage } from '@/lib/images'
-import { StatBar } from '@/components/entities/StatBar'
-import { useModalFocus } from '@/lib/hooks/useModalFocus'
-import { cn } from '@/lib/utils'
-import { parsePriceUsd, hasMixedPriceCurrencies } from '@/lib/vehicle-price'
-import { performanceToScale } from '@/lib/vehicle-performance'
-import { getBestValueIndices } from '@/lib/vehicle-compare-best'
+import { getAllEquipmentNames, getEquipmentStatus, type EquipmentStatus } from '@/lib/vehicle-compare-equipment'
 import { parsePowerHp } from '@/lib/vehicle-power'
-import { parseTrunkVolume } from '@/lib/vehicle-trunk'
-import { getSafetyInfo } from '@/lib/vehicle-safety-score'
-import { getAllEquipmentNames, getVehicleEquipmentMatrix } from '@/lib/vehicle-compare-equipment'
+import { hasMixedPriceCurrencies, parsePriceUsd } from '@/lib/vehicle-price'
+import { cn } from '@/lib/utils'
+import { useModalFocus } from '@/lib/hooks/useModalFocus'
 import { FAB_LAYER_COMPARE_BAR, FAB_LAYER_COMPARE_SHEET, setFabLayer } from '@/lib/scroll/fab-layer'
 
 export const MAX_COMPARE = 5
@@ -27,17 +22,7 @@ interface VehicleCompareBarProps {
   onOpen: () => void
 }
 
-/**
- * Barra flotante inferior, visible solo cuando hay 1+ vehículos
- * seleccionados para comparar. Miniaturas + botón "Comparar" que abre el
- * panel completo (VehicleCompareSheet). Puramente presentacional — todo el
- * estado de selección vive en EntityListExplorer, único lugar donde el
- * usuario puede tildar una card.
- */
 export function VehicleCompareBar({ selected, imageBySlug, onRemove, onClear, onOpen }: VehicleCompareBarProps) {
-  // Mide el alto real de la barra y se lo reporta al FAB "volver arriba"
-  // (src/lib/scroll/fab-layer.ts) para que suba por encima de ella en vez
-  // de taparla — la barra convive con el FAB en el pie del viewport.
   const barRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -47,9 +32,7 @@ export function VehicleCompareBar({ selected, imageBySlug, onRemove, onClear, on
     }
     const el = barRef.current
     if (!el) return
-    const measure = () => {
-      setFabLayer(FAB_LAYER_COMPARE_BAR, { height: el.getBoundingClientRect().height })
-    }
+    const measure = () => setFabLayer(FAB_LAYER_COMPARE_BAR, { height: el.getBoundingClientRect().height })
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(el)
@@ -64,90 +47,32 @@ export function VehicleCompareBar({ selected, imageBySlug, onRemove, onClear, on
   if (selected.length === 0) return null
 
   return (
-    <div
-      ref={barRef}
-      className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-[max(1.5rem,env(safe-area-inset-bottom))]"
-      role="region"
-      aria-label="Comparador de vehículos"
-    >
-      <div className="glass-surface flex w-full max-w-2xl flex-wrap items-center gap-3 rounded-2xl border border-edge bg-surface-card/95 p-3 shadow-md backdrop-blur-md sm:gap-4 sm:p-4">
+    <div ref={barRef} className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-[max(1.5rem,env(safe-area-inset-bottom))]" role="region" aria-label="Comparador de vehículos">
+      <div className="flex w-full max-w-2xl flex-wrap items-center gap-3 rounded-2xl border border-edge bg-surface-card/95 p-3 shadow-md backdrop-blur-md sm:gap-4 sm:p-4">
         <div className="flex flex-1 items-center gap-2">
-          {selected.map((v) => {
-            const img = imageBySlug?.[`vehiculos/${v.slug}`]
+          {selected.map((vehicle) => {
+            const image = imageBySlug?.[`vehiculos/${vehicle.slug}`]
             return (
-              <div key={v.slug} className="group relative">
+              <div key={vehicle.slug} className="group relative">
                 <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-edge bg-surface-card sm:h-12 sm:w-12">
-                  {img?.src ? (
-                    <Image src={img.src} alt={v.title} width={48} height={48} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-[9px] font-semibold uppercase text-neutral-400">
-                      {v.title.slice(0, 2)}
-                    </div>
-                  )}
+                  {image?.src ? <Image src={image.src} alt={vehicle.title} width={48} height={48} className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center text-[9px] font-semibold uppercase text-neutral-400">{vehicle.title.slice(0, 2)}</div>}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onRemove(v.slug)}
-                  aria-label={`Quitar ${v.title} de la comparación`}
-                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border border-edge bg-surface-elevated text-neutral-500 transition duration-200 hover:text-auto-accent active:scale-90 group-hover:opacity-100 focus-visible:border-auto-accent focus-visible:text-auto-accent focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent before:absolute before:-inset-1.5 before:rounded-full before:content-[''] opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                >
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-                    <path d="M18 6 6 18M6 6l12 12" />
-                  </svg>
+                <button type="button" onClick={() => onRemove(vehicle.slug)} aria-label={`Quitar ${vehicle.title} de la comparación`} className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border border-edge bg-surface-elevated text-neutral-500 transition duration-200 hover:text-auto-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
                 </button>
               </div>
             )
           })}
-          <span className="ml-1 text-xs text-neutral-500">
-            {selected.length}/{MAX_COMPARE} seleccionados
-          </span>
+          <span className="ml-1 text-xs text-neutral-500">{selected.length}/{MAX_COMPARE} seleccionados</span>
         </div>
-
         <div className="flex shrink-0 items-center gap-2">
-          <button
-            type="button"
-            onClick={onClear}
-            className="rounded-lg px-3 py-2 text-xs font-semibold text-neutral-500 transition-colors hover:text-neutral-900"
-          >
-            Limpiar
-          </button>
-          <button
-            type="button"
-            onClick={onOpen}
-            disabled={selected.length < 2}
-            className="rounded-lg bg-auto-accent px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#171130] shadow-[0_0_24px_-6px_rgba(255,106,26,0.25)] transition-transform disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none enabled:hover:scale-[1.03]"
-          >
-            Comparar
-          </button>
+          <button type="button" onClick={onClear} className="rounded-lg px-3 py-2 text-xs font-semibold text-neutral-500 transition-colors hover:text-neutral-900">Limpiar</button>
+          <button type="button" onClick={onOpen} disabled={selected.length < 2} className="rounded-lg bg-auto-accent px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#171130] transition-colors hover:bg-auto-accent-orange disabled:cursor-not-allowed disabled:opacity-40">Comparar</button>
         </div>
       </div>
     </div>
   )
 }
-
-const PERFORMANCE_ROWS: Array<{ key: 'speed' | 'acceleration' | 'handling' | 'braking'; label: string }> = [
-  { key: 'speed', label: 'Velocidad' },
-  { key: 'acceleration', label: 'Aceleración' },
-  { key: 'handling', label: 'Manejo' },
-  { key: 'braking', label: 'Frenado' },
-]
-
-/**
- * Filas de comparación de texto simple, con campos reales del dominio
- * automotor en vez de los legado `customizable`/`driven_by` (oportunidad
- * P0 #2 de la auditoría "AutoFicha: aprovechamiento de datos"):
- * `customizable` era `false` en las 250 fichas sin ninguna variación —
- * no comparaba nada — y `driven_by` estaba 0/250 poblado. Precio,
- * consumo, dimensiones, transmisión y tracción sí varían entre vehículos
- * y son, en los hechos, lo que alguien comparando autos quiere ver.
- */
-const TEXT_COMPARE_ROWS: Array<{ key: 'price' | 'consumo' | 'dimensiones' | 'transmision' | 'traccion'; label: string }> = [
-  { key: 'price', label: 'Precio' },
-  { key: 'consumo', label: 'Consumo' },
-  { key: 'dimensiones', label: 'Dimensiones' },
-  { key: 'transmision', label: 'Transmisión' },
-  { key: 'traccion', label: 'Tracción' },
-]
 
 interface VehicleCompareTableProps {
   vehicles: Vehicle[]
@@ -155,273 +80,190 @@ interface VehicleCompareTableProps {
   onRemove?: (slug: string) => void
 }
 
-/**
- * Contenido puro de la comparación: fotos + nombre + filas alineadas por
- * atributo (clase, precio/consumo/dimensiones/transmisión/tracción, y las
- * 4 métricas de rendimiento). Extraído de `VehicleCompareSheet` para poder
- * reutilizarlo tanto
- * en el panel modal (sobre el listado de `/vehiculos`) como en la página
- * standalone `/comparar` — mismo componente, dos contenedores distintos
- * (overlay vs. sección de página normal). `onRemove` es opcional: si no
- * se pasa, no se muestra el botón de quitar por vehículo (ej. si el
- * caller prefiere manejar la remoción desde otro lugar de su UI).
- */
-export function VehicleCompareTable({ vehicles, imageBySlug, onRemove }: VehicleCompareTableProps) {
-  if (vehicles.length === 0) return null
+type MetricKey = 'power' | 'price' | 'speed' | 'acceleration' | 'dimensions' | 'consumo' | 'transmision' | 'traccion'
+type Direction = 'higher' | 'lower' | null
 
-  // P1 [PENDIENTE → CORREGIDO, Pase 4 / Bloque 5, auditoría mobile]:
-  // el umbral anterior (`vehicles.length > 3`) asumía que 2-3 vehículos
-  // "siempre entran cómodas en una fila" — cierto en desktop, falso en
-  // un viewport real de ~360-390px. Con 3 columnas sin piso de ancho,
-  // celdas como "Dimensiones" ("4230 x 1780 x 1650 mm") o "Consumo"
-  // ("6.5 L/100km (mixto)") no tienen lugar ni para una palabra y
-  // quedan partidas letra por letra. La cantidad de vehículos no es lo
-  // que importa: lo que importa es si el viewport real alcanza. Por
-  // eso ahora cada columna tiene un piso fijo (140px, el mínimo donde
-  // esas celdas siguen legibles) vía `minmax(140px, 1fr)` en el propio
-  // grid, y el contenedor SIEMPRE puede scrollear horizontal si hace
-  // falta — en pantallas anchas el `1fr` ocupa todo el espacio
-  // disponible sin scroll (comportamiento idéntico al de antes); en
-  // mobile, si 2+ columnas de 140px no entran, aparece scroll horizontal
-  // en vez de aplastar el contenido. Mismo criterio aplicado también a
-  // la grilla de equipamiento y a `CompareRow` más abajo.
-  const MIN_COMPARE_COLUMN_PX = 140
-  const compareGridColumns = `repeat(${vehicles.length}, minmax(${MIN_COMPARE_COLUMN_PX}px, 1fr))`
+type Metric = {
+  key: MetricKey
+  label: string
+  group: string
+  direction: Direction
+  getValue: (vehicle: Vehicle) => string | null
+  getComparable: (vehicle: Vehicle) => number | null
+  comparableUnit?: string
+}
+
+const EVIDENCE_LABELS: Record<string, string> = {
+  'oficial-nombrado': 'Oficial · nombrado',
+  'oficial-visual': 'Oficial · visual',
+  'oficial-visual-multifuente': 'Oficial · multifuente',
+  respaldado: 'Respaldado',
+  especulativo: 'Especulativo',
+}
+
+const extractNumeric = (value?: string | null): number | null => {
+  if (!value) return null
+  const match = value.replace(',', '.').match(/-?\d+(?:\.\d+)?/)
+  if (!match) return null
+  const parsed = Number(match[0])
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+const display = (value: unknown): string | null => {
+  if (value === null || value === undefined || value === '') return null
+  if (Array.isArray(value)) return value.join(' · ')
+  return typeof value === 'object' ? null : String(value)
+}
+
+const METRICS: Metric[] = [
+  { key: 'power', label: 'Potencia', group: 'Potencia y precio', direction: 'higher', getValue: (v) => v.power || null, getComparable: (v) => parsePowerHp(v), comparableUnit: 'hp' },
+  { key: 'price', label: 'Precio', group: 'Potencia y precio', direction: 'lower', getValue: (v) => v.price || null, getComparable: (v) => parsePriceUsd(v), comparableUnit: 'USD' },
+  { key: 'speed', label: 'Velocidad máxima', group: 'Rendimiento', direction: 'higher', getValue: (v) => v.performance?.speed || null, getComparable: (v) => extractNumeric(v.performance?.speed), comparableUnit: 'km/h' },
+  { key: 'acceleration', label: 'Aceleración', group: 'Rendimiento', direction: 'lower', getValue: (v) => v.performance?.acceleration || null, getComparable: (v) => extractNumeric(v.performance?.acceleration), comparableUnit: 's' },
+  { key: 'dimensions', label: 'Dimensiones', group: 'Dimensiones y uso', direction: null, getValue: (v) => v.dimensiones || null, getComparable: () => null },
+  { key: 'consumo', label: 'Consumo', group: 'Dimensiones y uso', direction: null, getValue: (v) => v.consumo || null, getComparable: () => null },
+  { key: 'transmision', label: 'Transmisión', group: 'Equipamiento', direction: null, getValue: (v) => v.transmision || null, getComparable: () => null },
+  { key: 'traccion', label: 'Tracción', group: 'Equipamiento', direction: null, getValue: (v) => v.traccion || null, getComparable: () => null },
+]
+
+function evidenceLevel(vehicle: Vehicle): string | null {
+  return vehicle.evidence?.level || null
+}
+
+function confidenceIsComparable(vehicles: Vehicle[]): boolean {
+  const levels = new Set(vehicles.map(evidenceLevel))
+  return levels.size === 1 && !levels.has(null)
+}
+
+function winningIndices(values: Array<number | null>, direction: Direction, allowed: boolean): Set<number> {
+  if (!allowed || !direction || values.some((value) => value === null)) return new Set()
+  const numeric = values as number[]
+  const target = direction === 'higher' ? Math.max(...numeric) : Math.min(...numeric)
+  const matches = numeric.reduce<number[]>((acc, value, index) => value === target ? [...acc, index] : acc, [])
+  return matches.length === 1 ? new Set(matches) : new Set()
+}
+
+function MetricCell({ vehicle, metric, isWinner, neutral }: { vehicle: Vehicle; metric: Metric; isWinner: boolean; neutral: boolean }) {
+  const value = display(metric.getValue(vehicle))
+  const level = evidenceLevel(vehicle)
+  return (
+    <div className={cn('min-h-[76px] border-l border-edge px-3 py-3', isWinner && 'bg-auto-accent/10 ring-1 ring-inset ring-auto-accent/40')}>
+      <div className="flex items-start justify-between gap-2">
+        <span className="break-words font-mono text-[13px] leading-snug text-ink">{value || <span className="text-neutral-400">No disponible</span>}</span>
+        {isWinner && <span className="shrink-0 rounded-full bg-auto-accent px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase text-[#171130]">Mejor</span>}
+      </div>
+      {neutral && <p className="mt-2 font-sans text-[10px] font-medium uppercase tracking-wide text-neutral-500">No concluyente</p>}
+      {level && <p className="mt-2 font-sans text-[10px] leading-tight text-neutral-500" title={level}>{EVIDENCE_LABELS[level] || level}</p>}
+    </div>
+  )
+}
+
+function EquipmentCell({ vehicle, equipmentName, allKnown }: { vehicle: Vehicle; equipmentName: string; allKnown: boolean }) {
+  const status: EquipmentStatus = getEquipmentStatus(vehicle, equipmentName)
+  const statusLabel = status === 'present' ? 'Sí' : status === 'absent' ? 'No' : 'No disponible'
+  const level = evidenceLevel(vehicle)
+  return (
+    <div className="min-h-[58px] border-l border-edge px-3 py-3">
+      <span className={cn('inline-flex rounded-md px-2 py-1 font-mono text-xs font-semibold', status === 'present' && 'bg-emerald-500/10 text-emerald-700', status === 'absent' && allKnown && 'bg-red-500/10 text-red-700', status === 'unknown' && 'bg-surface-alt text-neutral-500')}>
+        {statusLabel}
+      </span>
+      {status === 'unknown' && <p className="mt-1 font-sans text-[10px] uppercase tracking-wide text-neutral-500">No concluyente</p>}
+      {level && <p className="mt-2 font-sans text-[10px] leading-tight text-neutral-500">{EVIDENCE_LABELS[level] || level}</p>}
+    </div>
+  )
+}
+
+function GroupLabel({ children, columns }: { children: string; columns: number }) {
+  return <div className="grid border-t border-edge bg-surface-alt" style={{ gridColumn: '1 / -1', gridTemplateColumns: `minmax(150px, 180px) repeat(${columns}, minmax(180px, 1fr))` }}><div className="sticky left-0 z-10 border-r border-edge px-3 py-2 font-sans text-[10px] font-bold uppercase tracking-[0.16em] text-auto-accent">{children}</div><div className="col-span-full" /></div>
+}
+
+export function VehicleCompareTable({ vehicles, imageBySlug, onRemove }: VehicleCompareTableProps) {
+  if (vehicles.length < 2) {
+    return <div className="rounded-lg border border-dashed border-edge bg-surface-alt px-6 py-10 text-center"><p className="font-sans text-sm font-semibold text-ink">Agregá otro vehículo para comparar</p><p className="mt-1 text-xs text-neutral-500">La matriz aparece cuando hay al menos 2 vehículos seleccionados.</p></div>
+  }
+
+  const columns = `minmax(150px, 180px) repeat(${vehicles.length}, minmax(180px, 1fr))`
+  const sameEvidence = confidenceIsComparable(vehicles)
+  const mixedCurrencies = hasMixedPriceCurrencies(vehicles)
+  const allEquipment = getAllEquipmentNames(vehicles)
+  const uniqueGroups = Array.from(new Set(METRICS.map((metric) => metric.group)))
 
   return (
-    <div className="overflow-x-auto">
-      <div style={{ minWidth: `${vehicles.length * MIN_COMPARE_COLUMN_PX}px` }}>
-        <div
-          className="grid gap-4"
-          style={{ gridTemplateColumns: compareGridColumns }}
-        >
-          {vehicles.map((v) => {
-            const img = imageBySlug?.[`vehiculos/${v.slug}`]
-            return (
-              <div key={v.slug} className="flex flex-col">
-                <div className="relative mb-3 aspect-[4/3] overflow-hidden rounded-xl border border-edge bg-surface-card">
-                  {img?.src ? (
-                    <Image
-                      src={img.src}
-                      alt={v.title}
-                      fill
-                      sizes={
-                        vehicles.length <= 2
-                          ? '(min-width: 1024px) 900px, (min-width: 640px) 700px, 500px'
-                          : '(min-width: 1024px) 700px, (min-width: 640px) 500px, 400px'
-                      }
-                      quality={95}
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
-                      Sin imagen
+    <section aria-label="Matriz de decisión comparativa" className="space-y-4">
+      <div className="rounded-lg border border-edge bg-surface-card shadow-sm">
+        <div className="overflow-x-auto overscroll-x-contain">
+          <div className="min-w-[720px]">
+            <div className="sticky top-0 z-30 grid border-b border-edge bg-surface-card/95 backdrop-blur-md" style={{ gridTemplateColumns: columns }}>
+              <div className="sticky left-0 z-40 flex items-end border-r border-edge bg-surface-card/95 px-3 py-3 font-sans text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-500">Métrica</div>
+              {vehicles.map((vehicle) => {
+                const image = imageBySlug?.[`vehiculos/${vehicle.slug}`]
+                return (
+                  <div key={vehicle.slug} className="relative border-l border-edge px-3 py-3">
+                    <div className="flex gap-3">
+                      <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md border border-edge bg-surface-alt">
+                        {image?.src ? <Image src={image.src} alt={vehicle.title} fill sizes="64px" className="object-cover" /> : <span className="flex h-full items-center justify-center text-[10px] text-neutral-400">Sin imagen</span>}
+                      </div>
+                      <div className="min-w-0">
+                        <Link prefetch={false} href={`/vehiculos/${vehicle.slug}`} className="line-clamp-2 font-sans text-sm font-semibold text-ink transition-colors hover:text-auto-accent">{vehicle.title}</Link>
+                        <p className="mt-1 truncate font-sans text-[11px] text-neutral-500">{vehicle.manufacturer || 'Fabricante no documentado'}</p>
+                      </div>
                     </div>
-                  )}
-                  {onRemove && (
-                    <button
-                      type="button"
-                      onClick={() => onRemove(v.slug)}
-                      aria-label={`Quitar ${v.title} de la comparación`}
-                      className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full border border-white/15 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
-                    >
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-                        <path d="M18 6 6 18M6 6l12 12" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-                <Link
-                  href={`/vehiculos/${v.slug}`}
-                  prefetch={false}
-                  className="mb-1 line-clamp-2 text-sm font-bold text-neutral-900 transition-colors hover:text-auto-accent"
-                >
-                  {v.title}
-                </Link>
-                {v.manufacturer && (
-                  <p className="text-xs text-neutral-500">{v.manufacturer}</p>
-                )}
-              </div>
-            )
-          })}
-        </div>
-
-        <div className="mt-6 space-y-5 border-t border-edge pt-5">
-          <CompareRow label="Clase">
-            {vehicles.map((v) => (
-              <span key={v.slug} className="text-sm capitalize text-neutral-900">
-                {v.class ? v.class.replace(/-/g, ' ') : '—'}
-              </span>
-            ))}
-          </CompareRow>
-
-          {TEXT_COMPARE_ROWS.map((row) => {
-            // Solo el precio tiene una dirección de "mejor" inequívoca
-            // (menor USD) — ver comentario en vehicle-compare-best.ts
-            // sobre por qué consumo/dimensiones/transmisión/tracción no
-            // se destacan (texto libre heterogéneo, sin unidad común).
-            // FASE 4: detecta si hay monedas mixtas — si las hay, no
-            // compara automáticamente.
-            const bestIndices =
-              row.key === 'price' && !hasMixedPriceCurrencies(vehicles)
-                ? getBestValueIndices(
-                    vehicles.map((v) => parsePriceUsd(v)),
-                    'min'
-                  )
-                : new Set<number>()
-
-            return (
-              <CompareRow key={row.key} label={row.label}>
-                {vehicles.map((v, i) => (
-                  <span
-                    key={v.slug}
-                    className={cn(
-                      'inline-flex w-fit items-center gap-1.5 rounded-md text-sm text-neutral-900',
-                      bestIndices.has(i) && 'rounded-lg bg-auto-accent/10 px-2 py-1 ring-1 ring-inset ring-auto-accent/40'
-                    )}
-                  >
-                    {v[row.key] || '—'}
-                    {bestIndices.has(i) && <BestValueBadge />}
-                  </span>
-                ))}
-              </CompareRow>
-            )
-          })}
-
-          {PERFORMANCE_ROWS.map((row) => {
-            const bestIndices = getBestValueIndices(
-              vehicles.map((v) => performanceToScale(v.performance?.[row.key])),
-              'max'
-            )
-
-            return (
-              <CompareRow key={row.key} label={row.label} align="stretch">
-                {vehicles.map((v, i) => (
-                  <div
-                    key={v.slug}
-                    className={cn(
-                      bestIndices.has(i) && 'rounded-lg bg-auto-accent/10 p-2 ring-1 ring-inset ring-auto-accent/40'
-                    )}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <StatBar label={row.label} value={v.performance?.[row.key]} />
-                      {bestIndices.has(i) && <BestValueBadge className="shrink-0" />}
-                    </div>
-                    {!v.performance?.[row.key] && (
-                      <span className="text-xs text-neutral-400">Sin dato</span>
-                    )}
+                    {onRemove && <button type="button" onClick={() => onRemove(vehicle.slug)} className="mt-3 rounded-md border border-edge px-2 py-1 font-sans text-[10px] font-semibold text-neutral-500 transition-colors hover:border-auto-accent hover:text-auto-accent" aria-label={`Quitar ${vehicle.title}`}>Quitar</button>}
                   </div>
-                ))}
-              </CompareRow>
-            )
-          })}
+                )
+              })}
+            </div>
 
-          {/* FASE 4: Potencia */}
-          <CompareRow label="Potencia">
-            {vehicles.map((v) => {
-              const hp = parsePowerHp(v)
-              return (
-                <span key={v.slug} className="text-sm text-neutral-900">
-                  {hp ? `${Math.round(hp)} hp` : v.power || '—'}
-                </span>
-              )
-            })}
-          </CompareRow>
+            <div className="grid" style={{ gridTemplateColumns: columns }}>
+              {uniqueGroups.map((group) => (
+                <div key={group} className="contents">
+                  <GroupLabel columns={vehicles.length}>{group}</GroupLabel>
+                  {METRICS.filter((metric) => metric.group === group).map((metric) => {
+                    const comparableValues = vehicles.map(metric.getComparable)
+                    const priceComparable = metric.key === 'price' && !mixedCurrencies
+                    const numericComparable = metric.direction !== null && comparableValues.every((value) => value !== null) && (metric.key !== 'price' || priceComparable) && sameEvidence
+                    const winners = winningIndices(comparableValues, metric.direction, numericComparable)
+                    return (
+                      <div key={metric.key} className="contents">
+                        <div className="sticky left-0 z-10 flex min-h-[76px] items-start border-t border-r border-edge bg-surface-card px-3 py-3 font-sans text-xs font-semibold text-ink">{metric.label}<span className="ml-1 text-neutral-400" title="Las celdas muestran el nivel de evidencia individual">ⓘ</span></div>
+                        {vehicles.map((vehicle, index) => <MetricCell key={vehicle.slug} vehicle={vehicle} metric={metric} isWinner={winners.has(index)} neutral={metric.direction !== null && !numericComparable} />)}
+                      </div>
+                    )
+                  })}
+                </div>
+              ))}
 
-          {/* FASE 4: Año de lanzamiento */}
-          <CompareRow label="Año">
-            {vehicles.map((v) => (
-              <span key={v.slug} className="text-sm text-neutral-900">
-                {v.anoLanzamiento || '—'}
-              </span>
-            ))}
-          </CompareRow>
-
-          {/* FASE 4: Baúl */}
-          <CompareRow label="Baúl (l)">
-            {vehicles.map((v, i) => {
-              const volume = parseTrunkVolume(v)
-              const bestIndices = getBestValueIndices(
-                vehicles.map((v2) => parseTrunkVolume(v2)),
-                'max'
-              )
-              return (
-                <span
-                  key={v.slug}
-                  className={cn(
-                    'inline-flex w-fit items-center gap-1.5 rounded-md text-sm text-neutral-900',
-                    bestIndices.has(i) && 'rounded-lg bg-auto-accent/10 px-2 py-1 ring-1 ring-inset ring-auto-accent/40'
-                  )}
-                >
-                  {volume ? `${volume}` : v.baul || '—'}
-                  {bestIndices.has(i) && volume && <BestValueBadge />}
-                </span>
-              )
-            })}
-          </CompareRow>
-
-          {/* FASE 4: Seguridad */}
-          <CompareRow label="Seguridad">
-            {vehicles.map((v) => {
-              const safetyInfo = getSafetyInfo(v)
-              return (
-                <span key={v.slug} className="text-sm text-neutral-900">
-                  {safetyInfo ? `${safetyInfo.score} ⭐ Euro NCAP` : '—'}
-                </span>
-              )
-            })}
-          </CompareRow>
-        </div>
-
-        {/* FASE 4: Sección de Equipamiento */}
-        {(() => {
-          const allEquipment = getAllEquipmentNames(vehicles)
-          if (allEquipment.length === 0) return null
-
-          return (
-            <div className="mt-8 border-t border-edge pt-6">
-              <h3 className="mb-4 text-sm font-semibold text-neutral-900">Equipamiento</h3>
-              <div className="space-y-2">
+              <div className="contents">
+                <GroupLabel columns={vehicles.length}>Seguridad y equipamiento</GroupLabel>
+                <div className="sticky left-0 z-10 flex min-h-[76px] items-start border-t border-r border-edge bg-surface-card px-3 py-3 font-sans text-xs font-semibold text-ink">Seguridad</div>
+                {vehicles.map((vehicle) => <MetricCell key={vehicle.slug} vehicle={vehicle} metric={{ key: 'dimensions', label: 'Seguridad', group: 'Seguridad', direction: null, getValue: (v) => v.safety?.euroNCAP ? `${v.safety.euroNCAP}${v.safety.puntaje ? ` · ${v.safety.puntaje} puntos` : ''}` : null, getComparable: () => null }} isWinner={false} neutral={false} />)}
                 {allEquipment.map((equipmentName) => (
-                  <div key={equipmentName} className="rounded-lg border border-edge bg-surface-card/40 p-3">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">{equipmentName}</p>
-                    <div
-                      className="grid gap-3"
-                      style={{ gridTemplateColumns: compareGridColumns }}
-                    >
-                      {vehicles.map((v) => {
-                        const matrix = getVehicleEquipmentMatrix(v, [equipmentName])
-                        const status = matrix[0]?.status || 'unknown'
-                        const icon =
-                          status === 'present' ? '✓' : status === 'absent' ? '✕' : '—'
-                        const bgColor =
-                          status === 'present'
-                            ? 'bg-green-500/10 text-green-600 dark:text-green-400'
-                            : status === 'absent'
-                              ? 'bg-red-500/10 text-red-600 dark:text-red-400'
-                              : 'bg-surface-card text-neutral-500'
-
-                        return (
-                          <div
-                            key={v.slug}
-                            className={cn(
-                              'flex items-center justify-center rounded-md py-1.5 text-xs font-semibold',
-                              bgColor
-                            )}
-                          >
-                            {icon}
-                          </div>
-                        )
-                      })}
-                    </div>
+                  <div key={equipmentName} className="contents">
+                    <div className="sticky left-0 z-10 flex min-h-[58px] items-start border-t border-r border-edge bg-surface-card px-3 py-3 font-sans text-xs text-ink">{equipmentName}</div>
+                    {vehicles.map((vehicle) => <EquipmentCell key={vehicle.slug} vehicle={vehicle} equipmentName={equipmentName} allKnown={vehicles.every((item) => Boolean(item.equipamiento?.length))} />)}
                   </div>
                 ))}
               </div>
             </div>
-          )
-        })()}
+          </div>
+        </div>
       </div>
-    </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="rounded-lg border border-edge bg-surface-alt p-4">
+          <h3 className="font-sans text-xs font-bold uppercase tracking-[0.14em] text-ink">Cómo leer esta matriz</h3>
+          <p className="mt-2 text-xs leading-relaxed text-neutral-600">“Mejor” solo aparece cuando la unidad, la moneda, el dato y el nivel de evidencia permiten una comparación defendible. En cualquier otro caso se muestra “No concluyente”.</p>
+        </div>
+        <div className="rounded-lg border border-edge bg-surface-alt p-4">
+          <h3 className="font-sans text-xs font-bold uppercase tracking-[0.14em] text-ink">Fuentes y limitaciones</h3>
+          <ul className="mt-2 space-y-2 text-xs leading-relaxed text-neutral-600">
+            {vehicles.map((vehicle) => <li key={vehicle.slug}><strong className="text-ink">{vehicle.title}:</strong> {vehicle.evidence?.primarySource || 'Fuente primaria no documentada.'}{vehicle.evidence?.limitations?.length ? ` Limitaciones: ${vehicle.evidence.limitations.join(' ')}` : ''}</li>)}
+            {mixedCurrencies && <li>Los precios usan monedas diferentes; no se declara un ganador de precio ni se inventa conversión.</li>}
+            {!sameEvidence && <li>Los niveles de evidencia difieren; los valores numéricos no reciben un ganador automático.</li>}
+          </ul>
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -433,34 +275,19 @@ interface VehicleCompareSheetProps {
   onRemove: (slug: string) => void
 }
 
-/**
- * Panel de comparación a pantalla completa (overlay): hasta MAX_COMPARE
- * vehículos lado a lado, montado sobre el listado de `/vehiculos` (ver
- * `EntityListExplorer`). Para la comparación como sección propia del
- * sitio (no un overlay temporal) ver `/comparar`, que reutiliza
- * `VehicleCompareTable` directamente embebida en la página.
- */
 export function VehicleCompareSheet({ open, vehicles, imageBySlug, onClose, onRemove }: VehicleCompareSheetProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
+    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose() }
     document.addEventListener('keydown', onKey)
     document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = ''
-    }
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = '' }
   }, [open, onClose])
 
   useModalFocus(open, dialogRef)
 
-  // El panel comparte z-50 con el FAB y con el documento bloqueado no
-  // tiene función contra el scroll de página: se lo oculta mientras el
-  // panel está abierto (src/lib/scroll/fab-layer.ts).
   useEffect(() => {
     setFabLayer(FAB_LAYER_COMPARE_SHEET, open ? { hide: true } : null)
     return () => setFabLayer(FAB_LAYER_COMPARE_SHEET, null)
@@ -469,77 +296,13 @@ export function VehicleCompareSheet({ open, vehicles, imageBySlug, onClose, onRe
   if (!open || vehicles.length === 0) return null
 
   return (
-    <div
-      ref={dialogRef}
-      tabIndex={-1}
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center sm:p-6"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Comparador de vehículos"
-      onClick={onClose}
-    >
-      <div
-        className="max-h-[92dvh] w-full max-w-4xl overflow-y-auto rounded-t-2xl border border-edge bg-surface-card shadow-md sm:rounded-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-edge bg-surface-card/95 px-5 py-4 backdrop-blur-md">
-          <h2 className="text-lg font-bold text-neutral-900">Comparar vehículos</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Cerrar comparador"
-            className="relative flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-surface-alt hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent before:absolute before:-inset-1 before:rounded-lg before:content-['']"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
-          </button>
+    <div ref={dialogRef} tabIndex={-1} className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label="Comparador de vehículos" onClick={onClose}>
+      <div className="max-h-[92dvh] w-full max-w-6xl overflow-y-auto rounded-t-2xl border border-edge bg-surface-card shadow-md sm:rounded-2xl" onClick={(event) => event.stopPropagation()}>
+        <div className="sticky top-0 z-50 flex items-center justify-between border-b border-edge bg-surface-card/95 px-5 py-4 backdrop-blur-md">
+          <h2 className="font-sans text-lg font-bold text-ink">Comparar vehículos</h2>
+          <button type="button" onClick={onClose} aria-label="Cerrar comparador" className="relative flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-surface-alt hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button>
         </div>
-
-        <div className="p-5">
-          <VehicleCompareTable vehicles={vehicles} imageBySlug={imageBySlug} onRemove={onRemove} />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/**
- * Marca visual para la celda con el mejor valor de una fila del
- * comparador (audit2.md sección 16, quick win #13).
- */
-function BestValueBadge({ className }: { className?: string }) {
-  return (
-    <span
-      className={cn(
-        'inline-flex shrink-0 items-center rounded-full bg-auto-accent px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#171130]',
-        className
-      )}
-    >
-      Mejor
-    </span>
-  )
-}
-
-function CompareRow({
-  label,
-  align = 'center',
-  children,
-}: {
-  label: string
-  align?: 'center' | 'stretch'
-  children: ReactNode
-}) {
-  return (
-    <div>
-      <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-neutral-400">{label}</p>
-      <div
-        className={cn('grid gap-4', align === 'center' && 'items-center')}
-        style={{
-          gridTemplateColumns: `repeat(${Array.isArray(children) ? children.length : 1}, minmax(140px, 1fr))`,
-        }}
-      >
-        {children}
+        <div className="p-5"><VehicleCompareTable vehicles={vehicles} imageBySlug={imageBySlug} onRemove={onRemove} /></div>
       </div>
     </div>
   )
