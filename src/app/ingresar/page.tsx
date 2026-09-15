@@ -59,6 +59,10 @@ export default function IngresarPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError('Ingresá un email válido para recibir tu link de acceso.')
+      return
+    }
     const { error: signInError } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: `${SITE_URL}/ingresar/` },
@@ -81,7 +85,7 @@ export default function IngresarPage() {
       {sent ? (
         <div className="marketplace-auth-sent"><div className="marketplace-auth-mail" aria-hidden="true">@</div><h2>Revisá tu bandeja de entrada</h2><p>Mandamos un link seguro a <strong>{email}</strong>. Abrilo desde cualquier dispositivo y vas a volver directo a Sin Frenos.</p><p className="marketplace-auth-muted">¿No lo ves? Revisá spam o promociones. El link puede tardar unos segundos.</p><button type="button" onClick={() => setSent(false)} className="marketplace-auth-secondary">Usar otro email</button></div>
       ) : (
-        <form onSubmit={handleSubmit} className="marketplace-auth-form"><label htmlFor="auth-email">Tu email</label><input id="auth-email" type="email" required placeholder="tu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} /><button type="submit" className="marketplace-auth-primary">Enviar link de acceso <span aria-hidden="true">↗</span></button>{error && <p role="alert" className="marketplace-auth-error">No pudimos enviar el link: {error}</p>}</form>
+        <form onSubmit={handleSubmit} noValidate className="marketplace-auth-form"><label htmlFor="auth-email">Tu email</label><input id="auth-email" type="email" required placeholder="tu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} /><button type="submit" className="marketplace-auth-primary">Enviar link de acceso <span aria-hidden="true">↗</span></button>{error && <p role="alert" className="marketplace-auth-error">{error}</p>}</form>
       )}
       <p className="marketplace-auth-footer">Al entrar aceptás usar Sin Frenos para comprar, vender y comunicarte de forma directa.</p>
     </AuthShell>

@@ -28,6 +28,7 @@ import { formStyles } from '@/components/listings/publicar/formStyles'
 
 const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
 const MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024
+const MAX_PHOTOS = 10
 const MIN_PHOTOS = 1
 const RECOMMENDED_PHOTOS = 4
 
@@ -76,6 +77,12 @@ export function StepPhotos({ draft, onChange, onNext, onBack }: StepPhotosProps)
       })
     })
 
+    const remainingSlots = MAX_PHOTOS - draft.photos.length
+    if (accepted.length > remainingSlots) {
+      accepted.slice(remainingSlots).forEach((photo) => URL.revokeObjectURL(photo.previewUrl))
+      accepted.splice(remainingSlots)
+      rejected.push(`Podés subir hasta ${MAX_PHOTOS} fotos por publicación.`)
+    }
     if (rejected.length > 0) setError(rejected.join(' '))
     if (accepted.length === 0) return
 
@@ -151,7 +158,7 @@ export function StepPhotos({ draft, onChange, onNext, onBack }: StepPhotosProps)
       >
         <span className="grid h-12 w-12 place-items-center rounded-full bg-[#0b7a75] text-2xl font-black text-white" aria-hidden="true">+</span>
         <span className="text-base font-extrabold text-[#12212a]">Arrastrá tus fotos acá o elegilas desde tu dispositivo</span>
-        <span className={formStyles.helperText}>JPG, PNG o WEBP — hasta 15 MB cada una</span>
+        <span className={formStyles.helperText}>JPG, PNG o WEBP — hasta 15 MB cada una · máximo {MAX_PHOTOS} fotos</span>
       </label>
       <input
         id="listing-photos-input"

@@ -52,12 +52,6 @@ export function Header() {
 
   useEffect(() => {
     if (!menuOpen) return
-    const closeId = window.setTimeout(() => setMenuOpen(false), 0)
-    return () => window.clearTimeout(closeId)
-  }, [pathname, menuOpen])
-
-  useEffect(() => {
-    if (!menuOpen) return
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setMenuOpen(false)
     }
@@ -131,7 +125,7 @@ export function Header() {
           ) : (
             <Link href={`/ingresar?next=${encodeURIComponent(pathname || '/')}`} aria-label="Ingresar" className={cn(iconButtonClass, 'hidden sm:flex')}><UserIcon /></Link>
           )}
-          <Link href="/publicar" prefetch={false} className="hidden rounded-full bg-[#ff6b47] px-4 py-2.5 text-sm font-semibold text-[#10171c] transition hover:bg-[#ff8b6d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8b6d] focus-visible:ring-offset-2 focus-visible:ring-offset-[#10171c] sm:inline-flex">Publicar</Link>
+          <Link href="/publicar" prefetch={false} className="inline-flex rounded-full bg-[#ff6b47] px-3 py-2.5 text-xs font-bold text-[#10171c] transition hover:bg-[#ff8b6d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8b6d] focus-visible:ring-offset-2 focus-visible:ring-offset-[#10171c] sm:px-4 sm:text-sm">Publicar</Link>
           <button type="button" onClick={() => setMenuOpen((value) => !value)} aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={menuOpen} aria-controls="mobile-nav" className={cn(iconButtonClass, 'lg:hidden')}>
             {menuOpen ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg> : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>}
           </button>
@@ -140,17 +134,17 @@ export function Header() {
 
       <nav id="mobile-nav" aria-label="Navegación móvil" aria-hidden={!menuOpen} className={cn('overflow-hidden border-t border-white/10 bg-[#10171c] transition-[max-height,opacity] duration-200 lg:hidden', menuOpen ? 'max-h-[38rem] opacity-100' : 'pointer-events-none max-h-0 opacity-0')}>
         <div className="container-max pb-5 pt-3">
-          <Link href="/publicar" prefetch={false} className="mb-3 flex items-center justify-between rounded-2xl bg-[#ff6b47] px-4 py-3.5 text-sm font-semibold text-[#10171c]">Publicar un vehículo <span aria-hidden="true">↗</span></Link>
+          <Link href="/publicar" prefetch={false} onClick={() => setMenuOpen(false)} className="mb-3 flex items-center justify-between rounded-2xl bg-[#ff6b47] px-4 py-3.5 text-sm font-semibold text-[#10171c]">Publicar un vehículo <span aria-hidden="true">↗</span></Link>
           <div className="grid grid-cols-2 gap-1">
             {[...NAV_LINKS, ...SECONDARY_LINKS].map((link) => (
-              <Link key={link.href} href={link.href} prefetch={false} aria-current={isActive(link.href) ? 'page' : undefined} className={cn('rounded-xl px-3 py-3 text-sm font-medium transition-colors', isActive(link.href) ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white')}>
+              <Link key={link.href} href={link.href} prefetch={false} onClick={() => setMenuOpen(false)} aria-current={isActive(link.href) ? 'page' : undefined} className={cn('rounded-xl px-3 py-3 text-sm font-medium transition-colors', isActive(link.href) ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white')}>
                 {link.label}
               </Link>
             ))}
           </div>
           <div className="mt-3 flex items-center gap-3 border-t border-white/10 pt-3 text-sm text-white/55">
-            <Link href="/favoritos" className="sm:hidden">Favoritos</Link>
-            {user ? <button type="button" onClick={() => signOut()} className="sm:hidden">Cerrar sesión</button> : <Link href={`/ingresar?next=${encodeURIComponent(pathname || '/')}`} className="sm:hidden">Ingresar</Link>}
+            <Link href="/favoritos" onClick={() => setMenuOpen(false)} className="sm:hidden">Favoritos</Link>
+            {user ? <button type="button" onClick={() => signOut()} className="sm:hidden">Cerrar sesión</button> : <Link href={`/ingresar?next=${encodeURIComponent(pathname || '/')}`} onClick={() => setMenuOpen(false)} className="sm:hidden">Ingresar</Link>}
           </div>
         </div>
       </nav>

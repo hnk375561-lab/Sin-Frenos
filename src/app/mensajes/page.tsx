@@ -192,7 +192,7 @@ function ConversationThread({
         </ul>
       )}
 
-      <form onSubmit={handleReply} className="mt-4 flex gap-2">
+      <form onSubmit={handleReply} className="mt-4 flex flex-col gap-2 sm:flex-row">
         <input
           type="text"
           value={reply}
@@ -200,7 +200,7 @@ function ConversationThread({
           placeholder="Escribí una respuesta…"
           className={formStyles.input}
         />
-        <button type="submit" disabled={sending || !reply.trim()} className={formStyles.primaryButton}>
+        <button type="submit" disabled={sending || !reply.trim()} className={`${formStyles.primaryButton} shrink-0`}>
           {sending ? 'Enviando…' : 'Enviar'}
         </button>
       </form>

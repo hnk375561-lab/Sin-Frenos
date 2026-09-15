@@ -108,7 +108,7 @@ export function ContactButton({
         className={`${formStyles.textarea} mt-2`}
       />
       {error && <p className={`${formStyles.errorText} mt-2`}>{error}</p>}
-      <div className="mt-3 flex gap-2">
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
         <button type="submit" disabled={sending} className={formStyles.primaryButton}>
           {sending ? 'Enviando…' : 'Enviar mensaje'}
         </button>
