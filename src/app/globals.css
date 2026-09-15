@@ -927,7 +927,7 @@ a:not(.no-style) {
   color: #fff;
   position: relative;
   isolation: isolate;
-  transition: transform 220ms var(--ease-premium), box-shadow 220ms var(--ease-premium), filter 220ms var(--ease-premium);
+  transition: transform var(--dur-base) var(--ease-premium), box-shadow var(--dur-base) var(--ease-premium), filter var(--dur-base) var(--ease-premium);
 }
 .marketplace-category-card::before {
   content: '';
@@ -938,7 +938,7 @@ a:not(.no-style) {
   background: rgba(255,255,255,.14);
   transform: rotate(-12deg);
   z-index: -1;
-  transition: transform 320ms var(--ease-premium);
+  transition: transform var(--dur-base) var(--ease-premium);
 }
 .marketplace-category-card:hover { transform: translateY(-8px) rotate(-.6deg); box-shadow: 0 26px 50px rgba(23,17,48,.2); filter: saturate(1.08); }
 .marketplace-category-card:hover::before { transform: rotate(-12deg) scale(1.16) translateY(-8%); }
@@ -948,7 +948,7 @@ a:not(.no-style) {
 .marketplace-category-card-utilitarios { background: linear-gradient(145deg, #7B4DFF, #342B51); }
 .marketplace-category-card-top { display: flex; justify-content: space-between; font-size: .75rem; font-weight: 800; letter-spacing: .16em; opacity: .8; }
 .marketplace-category-silhouette { margin-top: auto; margin-bottom: 2rem; font-size: clamp(3rem, 8vw, 7rem); line-height: .8; font-weight: 950; letter-spacing: -.12em; opacity: .24; }
-.marketplace-category-button { display: inline-flex; width: fit-content; align-items: center; gap: .55rem; border: 1px solid rgba(255,255,255,.42); border-radius: 9999px; padding: .75rem 1rem; font-size: .8rem; font-weight: 800; background: rgba(0,0,0,.12); transition: background-color 180ms ease, border-color 180ms ease; }
+.marketplace-category-button { display: inline-flex; width: fit-content; align-items: center; gap: .55rem; border: 1px solid rgba(255,255,255,.42); border-radius: 9999px; padding: .75rem 1rem; font-size: .8rem; font-weight: 800; background: rgba(0,0,0,.12); transition: background-color var(--dur-fast) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard); }
 .marketplace-category-card:hover .marketplace-category-button { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.75); }
 .marketplace-process-section { padding-block: 5.5rem; background: #171130; }
 .marketplace-process-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
