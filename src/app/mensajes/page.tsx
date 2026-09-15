@@ -41,7 +41,7 @@ import {
 } from '@/lib/conversations'
 import { formStyles } from '@/components/listings/publicar/formStyles'
 
-const cardClass = 'rounded-lg border border-edge bg-surface-card p-4 sm:p-5'
+const cardClass = 'marketplace-message-card'
 
 function formatWhen(iso: string | null): string {
   if (!iso) return ''
@@ -61,11 +61,11 @@ function ConversationList({
 }) {
   if (conversations.length === 0) {
     return (
-      <div className={cardClass}>
-        <p className="text-sm text-neutral-600">
-          Todavía no tenés conversaciones. Cuando contactes a un vendedor (o alguien te contacte a vos
-          por una publicación), van a aparecer acá.
-        </p>
+      <div className={`${cardClass} text-center`}>
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#dff2f0] text-2xl font-black text-[#0b7a75]" aria-hidden="true">↗</div>
+        <p className="mt-4 text-base font-extrabold text-[#12212a]">Tu bandeja está lista.</p>
+        <p className="mt-2 text-sm leading-relaxed text-[#62717a]">Contactá a un vendedor desde cualquier publicación para empezar una conversación real.</p>
+        <Link href="/listings" className="marketplace-auth-primary mt-5">Explorar publicaciones <span aria-hidden="true">→</span></Link>
       </div>
     )
   }
@@ -79,24 +79,24 @@ function ConversationList({
             prefetch={false}
             className={`flex gap-3 rounded-lg border p-3 text-left transition duration-200 ${
               c.id === activeId
-                ? 'border-auto-accent bg-auto-accent/5'
-                : 'border-edge bg-surface-card hover:bg-surface-card-hover'
+                ? 'border-[#f05a3c] bg-[#fff0ed]'
+                : 'border-[#c7dcda] bg-white hover:border-[#0b7a75] hover:bg-[#eef8f7]'
             }`}
           >
-            <div className="h-14 w-20 shrink-0 overflow-hidden rounded-md border border-edge bg-surface-alt">
+            <div className="h-14 w-20 shrink-0 overflow-hidden rounded-xl border border-[#c7dcda] bg-[#dff2f0]">
               {c.listingCoverUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element -- URL dinámica de Supabase Storage, mismo criterio que ListingCard
                 <img src={c.listingCoverUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
               ) : null}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-neutral-900">{c.listingTitle}</p>
-              <p className="truncate text-xs text-neutral-500">
+              <p className="truncate text-sm font-extrabold text-[#12212a]">{c.listingTitle}</p>
+              <p className="truncate text-xs text-[#62717a]">
                 {c.isSeller ? 'Comprador: ' : 'Vendedor: '}
                 {c.otherUserDisplayName}
               </p>
               {c.lastMessagePreview && (
-                <p className="mt-1 truncate text-xs text-neutral-400">{c.lastMessagePreview}</p>
+                <p className="mt-1 truncate text-xs text-[#71858c]">{c.lastMessagePreview}</p>
               )}
             </div>
           </Link>
@@ -160,18 +160,18 @@ function ConversationThread({
 
   return (
     <div className={cardClass}>
-      <div className="mb-3 border-b border-edge pb-3">
-        <p className="text-sm font-semibold text-neutral-900">{conversation.listingTitle}</p>
-        <p className="text-xs text-neutral-500">
+      <div className="mb-4 border-b border-[#dce8e7] pb-4">
+        <p className="text-lg font-extrabold tracking-[-.03em] text-[#12212a]">{conversation.listingTitle}</p>
+        <p className="text-xs text-[#62717a]">
           Conversación con {conversation.otherUserDisplayName}
         </p>
-        <Link href={`/listings/ver?id=${conversation.listingId}`} className="text-xs font-medium text-auto-accent underline">
+        <Link href={`/listings/ver?id=${conversation.listingId}`} className="text-xs font-bold text-[#0b7a75] underline">
           Ver publicación
         </Link>
       </div>
 
       {loadingMessages ? (
-        <p className="text-sm text-neutral-500">Cargando mensajes…</p>
+        <div className="h-32 animate-pulse rounded-2xl bg-[#eef8f7]" aria-label="Cargando mensajes…" />
       ) : (
         <ul className="space-y-2">
           {messages.map((m) => {
@@ -179,9 +179,7 @@ function ConversationThread({
             return (
               <li key={m.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                 <div
-                  className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
-                    isMine ? 'bg-auto-accent text-white' : 'border border-edge bg-surface-alt text-neutral-800'
-                  }`}
+                  className={`marketplace-message-bubble ${isMine ? 'mine' : 'theirs'}`}
                 >
                   <p>{m.content}</p>
                   <p className={`mt-1 text-[10px] ${isMine ? 'text-white/70' : 'text-neutral-400'}`}>
@@ -246,7 +244,7 @@ function MensajesContent() {
   if (authLoading) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <p className="text-sm text-neutral-500">Cargando…</p>
+        <div className="marketplace-message-card h-32 animate-pulse bg-[#eef8f7]" aria-label="Cargando mensajes…" />
       </main>
     )
   }
@@ -254,8 +252,8 @@ function MensajesContent() {
   if (!user) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <h1 className="text-xl font-semibold text-neutral-900">Mensajes</h1>
-        <p className="mt-2 text-sm text-neutral-600">Necesitás iniciar sesión para ver tus mensajes.</p>
+        <h1 className="text-4xl font-extrabold tracking-[-.06em] text-[#12212a]">Tus mensajes</h1>
+        <p className="mt-2 text-sm text-[#62717a]">Iniciá sesión para hablar con vendedores y seguir tus consultas.</p>
         <Link href="/ingresar" className={`mt-4 inline-block ${formStyles.primaryButton}`}>
           Ingresar
         </Link>
@@ -266,11 +264,13 @@ function MensajesContent() {
   const activeConversation = conversations.find((c) => c.id === activeId) ?? null
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
-      <h1 className="text-xl font-semibold text-neutral-900">Mensajes</h1>
+    <main className="marketplace-message-page">
+      <div className="marketplace-message-shell">
+      <p className="marketplace-eyebrow text-[#0b7a75]">Contacto directo</p>
+      <h1 className="mt-2 text-4xl font-extrabold tracking-[-.06em] text-[#12212a]">Tus mensajes</h1>
       {error && <p className={`${formStyles.errorText} mt-2`}>{error}</p>}
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+      <div className="marketplace-message-grid">
         <div>
           {conversationsLoading ? (
             <p className="text-sm text-neutral-500">Cargando conversaciones…</p>
@@ -292,7 +292,7 @@ function MensajesContent() {
             </div>
           )}
         </div>
-      </div>
+      </div></div>
     </main>
   )
 }
@@ -301,9 +301,7 @@ export default function MensajesPage() {
   return (
     <Suspense
       fallback={
-        <main className="mx-auto max-w-4xl px-4 py-10">
-          <p className="text-sm text-neutral-500">Cargando…</p>
-        </main>
+        <main className="marketplace-message-page"><div className="marketplace-message-shell"><div className="marketplace-message-card h-40 animate-pulse bg-[#eef8f7]" aria-label="Cargando mensajes…" /></div></main>
       }
     >
       <MensajesContent />

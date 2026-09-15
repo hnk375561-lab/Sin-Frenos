@@ -62,12 +62,11 @@ export function ContactButton({
 
   if (sent) {
     return (
-      <div role="status" className="rounded-lg border border-auto-accent/30 bg-auto-accent/5 p-4 text-sm text-neutral-700">
-        ✅ Mensaje enviado. Podés seguir la conversación en{' '}
-        <Link href="/mensajes" className="font-semibold underline">
-          tus mensajes
-        </Link>
-        .
+      <div role="status" className="rounded-2xl border border-[#b8d6d3] bg-[#dff2f0] p-5 text-sm text-[#0b5d5a]">
+        <p className="font-extrabold">Mensaje enviado.</p>
+        <p className="mt-1">El vendedor lo va a ver en sus mensajes. Podés seguir la conversación desde{' '}
+          <Link href="/mensajes" className="font-extrabold underline">tu bandeja</Link>.
+        </p>
       </div>
     )
   }

@@ -142,11 +142,15 @@ export function StepPhotos({ draft, onChange, onNext, onBack }: StepPhotosProps)
 
       <label
         htmlFor="listing-photos-input"
-        className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-edge bg-surface-card p-6 text-center transition duration-200 hover:bg-surface-card-hover focus-visible:outline-none"
+        className="marketplace-photo-dropzone"
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={(event) => {
+          event.preventDefault()
+          addFiles(event.dataTransfer.files)
+        }}
       >
-        <span className="text-sm font-semibold text-neutral-900">
-          Elegí fotos desde tu dispositivo
-        </span>
+        <span className="grid h-12 w-12 place-items-center rounded-full bg-[#0b7a75] text-2xl font-black text-white" aria-hidden="true">+</span>
+        <span className="text-base font-extrabold text-[#12212a]">Arrastrá tus fotos acá o elegilas desde tu dispositivo</span>
         <span className={formStyles.helperText}>JPG, PNG o WEBP — hasta 15 MB cada una</span>
       </label>
       <input
@@ -163,8 +167,14 @@ export function StepPhotos({ draft, onChange, onNext, onBack }: StepPhotosProps)
 
       {error && <p className={`mt-2 ${formStyles.errorText}`}>{error}</p>}
 
+      {sortedPhotos.length === 0 && !error && (
+        <div className="mt-4 rounded-2xl border border-[#dce8e7] bg-[#f5f8f8] p-4 text-center text-sm text-[#62717a]">
+          Todavía no hay fotos. La primera que subas se va a marcar automáticamente como portada.
+        </div>
+      )}
+
       {sortedPhotos.length > 0 && (
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {sortedPhotos.map((photo) => (
             <div
               key={photo.id}
@@ -175,7 +185,7 @@ export function StepPhotos({ draft, onChange, onNext, onBack }: StepPhotosProps)
                 e.preventDefault()
                 reorder(e.dataTransfer.getData('text/plain'), photo.id)
               }}
-              className="group relative overflow-hidden rounded-md border border-edge"
+              className={`marketplace-photo-tile group ${photo.isCover ? 'is-cover' : ''}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- preview local de un File vía object URL, no un asset de next/image */}
               <img
@@ -184,16 +194,16 @@ export function StepPhotos({ draft, onChange, onNext, onBack }: StepPhotosProps)
                 className="aspect-square w-full cursor-grab object-cover active:cursor-grabbing"
               />
               {photo.isCover && (
-                <span className="absolute left-1 top-1 rounded-md bg-auto-accent px-2 py-0.5 text-[11px] font-semibold text-white">
+                <span className="absolute left-2 top-2 rounded-full bg-[#f05a3c] px-2.5 py-1 text-[11px] font-bold text-white">
                   Portada
                 </span>
               )}
-              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/60 p-1 opacity-0 transition duration-150 group-hover:opacity-100">
+              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-[#12212a]/85 p-2 opacity-0 transition duration-150 group-hover:opacity-100 focus-within:opacity-100">
                 {!photo.isCover && (
                   <button
                     type="button"
                     onClick={() => setCover(photo.id)}
-                    className="rounded px-1.5 py-0.5 text-[11px] font-semibold text-white hover:bg-white/20"
+                    className="rounded-full px-2 py-1 text-[11px] font-bold text-white hover:bg-white/20"
                   >
                     Marcar portada
                   </button>
@@ -201,7 +211,7 @@ export function StepPhotos({ draft, onChange, onNext, onBack }: StepPhotosProps)
                 <button
                   type="button"
                   onClick={() => removePhoto(photo.id)}
-                  className="ml-auto rounded px-1.5 py-0.5 text-[11px] font-semibold text-white hover:bg-white/20"
+                  className="ml-auto rounded-full px-2 py-1 text-[11px] font-bold text-white hover:bg-white/20"
                 >
                   Quitar
                 </button>

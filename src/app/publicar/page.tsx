@@ -4,50 +4,13 @@ import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { PublishWizard } from '@/components/listings/publicar/PublishWizard'
 
-/**
- * Ruta `/publicar` — Fase 4 del documento maestro ("wizard completo con
- * subida real de fotos"). Esta página SOLO resuelve el auth-gate; toda la
- * lógica del wizard en sí vive en `PublishWizard.tsx` (mismo criterio que
- * documenta `create.ts`: "el caller es quien ya hizo el auth-gate y tiene
- * la sesión resuelta").
- *
- * `output: 'export'` sigue intacto (sección 1/16 del documento maestro):
- * esta página es 100% client component, no hay nada server-side acá —
- * el build estático la sirve igual que cualquier otra ruta del sitio.
- */
 export default function PublicarPage() {
   const { user, loading } = useAuth()
-
   if (loading) {
-    return (
-      <div className="mx-auto max-w-2xl px-4 py-12">
-        <p className="text-sm text-neutral-500">Cargando…</p>
-      </div>
-    )
+    return <main className="marketplace-auth-page"><div className="marketplace-auth-card"><div className="marketplace-auth-status"><div className="marketplace-auth-spinner" aria-hidden="true" /><h1>Preparando tu publicación</h1><p>Estamos dejando todo listo para que puedas empezar.</p></div></div></main>
   }
-
   if (!user) {
-    return (
-      <div className="mx-auto max-w-2xl px-4 py-12 text-center">
-        <h1 className="mb-2 text-xl font-semibold text-neutral-900">Necesitás una cuenta para publicar</h1>
-        <p className="mb-6 text-sm text-neutral-600">
-          Iniciá sesión con tu email — es gratis y solo te va a pedir el link que te mandamos por
-          correo, sin contraseña.
-        </p>
-        <Link
-          href="/ingresar"
-          className="inline-block rounded-md bg-auto-accent px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-auto-accent-strong"
-        >
-          Ingresar
-        </Link>
-      </div>
-    )
+    return <main className="marketplace-auth-page"><div className="marketplace-auth-card"><p className="marketplace-auth-kicker">Convertite en vendedor</p><h1 className="marketplace-auth-heading">Tu próximo comprador puede estar buscando ahora.</h1><p className="mt-4 text-sm leading-relaxed text-[#62717a]">Publicar es gratis. Vas a cargar fotos, datos y contacto directo en ocho pasos simples. Sin contraseñas: entrá con un link seguro por email.</p><Link href="/ingresar" className="marketplace-auth-primary mt-7">Ingresar para publicar <span aria-hidden="true">↗</span></Link></div></main>
   }
-
-  return (
-    <div className="px-4 py-8 sm:py-12">
-      <h1 className="mb-6 text-center text-2xl font-bold text-neutral-900">Publicá tu vehículo</h1>
-      <PublishWizard userId={user.id} />
-    </div>
-  )
+  return <main className="min-h-[75vh] bg-[#f5f8f8] px-4 py-8 sm:py-12"><div className="mx-auto w-full max-w-2xl"><div className="mb-6"><p className="marketplace-eyebrow text-[#0b7a75]">Publicá en Sin Frenos</p><h1 className="mt-2 text-4xl font-extrabold tracking-[-.06em] text-[#12212a]">Mostrá tu vehículo. Recibí consultas.</h1><p className="mt-3 max-w-xl text-sm leading-relaxed text-[#62717a]">Te vamos a acompañar paso a paso. Podés volver atrás y editar todo antes de publicar.</p></div><PublishWizard userId={user.id} /></div></main>
 }

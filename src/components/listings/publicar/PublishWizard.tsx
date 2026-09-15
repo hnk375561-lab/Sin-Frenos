@@ -70,20 +70,21 @@ export function PublishWizard({ userId }: PublishWizardProps) {
 
   if (published) {
     return (
-      <div className="rounded-lg border border-edge bg-surface-card p-6 text-center sm:p-8">
-        <h2 className="mb-2 text-lg font-semibold text-neutral-900">
+      <div className="marketplace-wizard-success">
+        <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-white/15 text-3xl font-black text-white" aria-hidden="true">✓</div>
+        <h2>
           {published.status === 'published' ? '¡Publicado!' : '¡Listo! Tu publicación quedó en revisión'}
         </h2>
-        <p className="mb-6 text-sm text-neutral-600">
+        <p>
           {published.status === 'published'
-            ? 'Ya está visible para todo el mundo en Sin Frenos.'
-            : 'Es la primera publicación de tu cuenta, así que la revisamos antes de que se vea públicamente. No suele demorar mucho.'}
+            ? 'Tu vehículo ya está visible. Las personas que buscan una opción como la tuya ya pueden encontrarte y contactarte.'
+            : 'La recibimos y la estamos revisando antes de mostrarla públicamente. Te avisaremos cuando esté lista.'}
         </p>
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="mt-7 flex flex-wrap justify-center gap-3">
           <button
             type="button"
             onClick={() => router.push(`/listings/ver?id=${published.listingId}`)}
-            className="rounded-md bg-auto-accent px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-auto-accent-strong"
+            className="rounded-full bg-white px-5 py-3 text-sm font-extrabold text-[#0b7a75] transition hover:bg-[#dff2f0]"
           >
             Ver mi publicación
           </button>
@@ -94,7 +95,7 @@ export function PublishWizard({ userId }: PublishWizardProps) {
               setCurrentStep(1)
               setPublished(null)
             }}
-            className="rounded-md border border-edge bg-transparent px-4 py-2 text-sm font-semibold text-neutral-700 transition duration-200 hover:bg-surface-card-hover"
+            className="rounded-full border border-white/35 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10"
           >
             Publicar otro vehículo
           </button>
@@ -105,9 +106,10 @@ export function PublishWizard({ userId }: PublishWizardProps) {
 
   return (
     <div className="mx-auto w-full max-w-2xl">
-      <p className="mb-4 text-center text-xs font-medium uppercase tracking-wide text-neutral-500">
-        Paso {currentStep} de {TOTAL_STEPS}
-      </p>
+      <div className="marketplace-wizard-progress">
+        <div className="marketplace-wizard-progress-top"><span>Paso {currentStep} de {TOTAL_STEPS}</span><span>{Math.round((currentStep / TOTAL_STEPS) * 100)}% completo</span></div>
+        <div className="marketplace-wizard-progress-bar" aria-hidden="true"><span style={{ width: `${(currentStep / TOTAL_STEPS) * 100}%` }} /></div>
+      </div>
 
       {currentStep === 1 && (
         <StepCategoryCondition draft={draft} onChange={updateDraft} onNext={goNext} />
