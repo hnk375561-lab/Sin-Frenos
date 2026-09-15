@@ -70,7 +70,7 @@ export function QuickSearchForm({ examples = DEFAULT_EXAMPLES }: QuickSearchForm
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const trimmed = value.trim()
-    router.push(trimmed ? `/buscar?q=${encodeURIComponent(trimmed)}` : '/buscar')
+    router.push(trimmed ? `/listings?q=${encodeURIComponent(trimmed)}` : '/listings')
   }
 
   // NOTA (auditoría UX, hallazgo [3.2]): el atajo "/" vivía acá, local a
@@ -85,7 +85,7 @@ export function QuickSearchForm({ examples = DEFAULT_EXAMPLES }: QuickSearchForm
   return (
     <form
       onSubmit={handleSubmit}
-      action="/buscar"
+      action="/listings"
       method="get"
       className="relative mx-auto w-full max-w-none"
       role="search"
