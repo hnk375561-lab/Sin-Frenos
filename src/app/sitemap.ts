@@ -5,6 +5,7 @@ import { computeSeoCategoryOptions, categoryToSlug } from '@/lib/vehicle-categor
 import { getFixedComparisonPairs, fixedComparisonSlug } from '@/lib/fixed-comparisons'
 import { getAvailableRankings } from '@/lib/rankings'
 import { SITE_URL } from '@/config/site'
+import { getBuildListings } from '@/lib/listings/build-time'
 
 // Requerido por Next.js cuando el proyecto usa `output: "export"`
 // (export estático, necesario para desplegar en GitHub Pages, que no
@@ -44,9 +45,10 @@ function safeDate(value: string): Date {
  * vacía a los motores de búsqueda no tiene valor SEO.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [allEntities, countsByType] = await Promise.all([
+  const [allEntities, countsByType, marketplaceListings] = await Promise.all([
     getAllEntities(),
     getEntityCountsByType(),
+    getBuildListings(),
   ])
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -117,6 +119,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.6,
+    },
+    {
+      url: `${SITE_URL}/guias/vender-auto-usado-argentina`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
     },
     {
       url: `${SITE_URL}/privacidad`,
@@ -209,6 +217,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ]
 
+  const listingRoutes: MetadataRoute.Sitemap = marketplaceListings.map((listing) => ({
+    url: `${SITE_URL}/listings/${listing.id}`,
+    lastModified: listing.updated_at ? safeDate(listing.updated_at) : new Date(),
+    changeFrequency: 'daily' as const,
+    priority: 0.8,
+  }))
+
   // Antes acá se agregaban además `/vehiculos/fabricante/{slug}` (roadmap
   // punto 4): esa ruta se consolidó en `/fabricantes/{slug}` —la ficha
   // real de la entidad Manufacturer, ya incluida arriba en
@@ -216,5 +231,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Anunciar la URL vieja en el sitemap solo le pediría a los motores de
   // búsqueda que indexen una redirección en vez de la URL final.
 
-  return [...staticRoutes, ...listRoutes, ...categoryRoutes, ...comparisonRoutes, ...rankingRoutes, ...entityRoutes]
+  return [...staticRoutes, ...listRoutes, ...categoryRoutes, ...comparisonRoutes, ...rankingRoutes, ...entityRoutes, ...listingRoutes]
 }
