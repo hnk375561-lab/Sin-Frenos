@@ -35,6 +35,8 @@ jobs:
             "$SITE_URL/vehiculos/toyota-hilux"
             "$SITE_URL/fabricantes"
             "$SITE_URL/sitemap.xml"
+            "$SITE_URL/buscar/"
+            "$SITE_URL/search-index.json"
           )
           # El job de deploy (deploy-pages.yml) corre en paralelo a este,
           # sin emitir ningún evento que este workflow pueda esperar, así
@@ -70,4 +72,4 @@ jobs:
             exit 1
           fi
           echo ""
-          echo "smoke-test: OK — las 5 URLs clave respondieron 200."
+          echo "smoke-test: OK — las 7 URLs clave respondieron 200."

@@ -35,18 +35,22 @@ module.exports = {
         
         // Colores neutrales derivados
         neutral: {
-          50: '#FCFAFF',
-          100: '#18181B',
-          200: '#27272A',
-          300: '#3F3F46',
-          400: '#71717A',
-          500: '#A1A1AA',
-          600: '#A1A1AA',
-          700: '#A1A1AA',
+          50: '#FAFAFA',
+          100: '#F4F4F5',
+          200: '#E4E4E7',
+          300: '#D4D4D8',
+          400: '#A1A1AA',
+          500: '#71717A',
+          600: '#52525B',
+          700: '#3F3F46',
           800: '#27272A',
           900: '#18181B',
           950: '#09090B',
         },
+        strong: '#09090B',
+        body: '#27272A',
+        muted: '#52525B',
+        subtle: '#71717A',
         
         // Colores de superficie
         'surface-page': '#F4F4F5',

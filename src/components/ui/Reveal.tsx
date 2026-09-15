@@ -5,82 +5,63 @@ import { ReactNode, useEffect, useRef, useState } from 'react'
 interface RevealProps {
   children: ReactNode
   className?: string
-  /** Retraso en ms aplicado cuando el elemento entra en pantalla */
   delay?: number
-  /** Dirección de entrada. 'curtain' = cortina en clip-path (ver globals.css),
-   *  para secciones donde se quiere un reveal más cinematográfico que el
-   *  fade+slide de las demás direcciones. 'chapter' = apertura de capítulo
-   *  (máscara + ascenso con curva cine) para cabeceras de sección/página;
-   *  'glide' = entrada horizontal direccional; 'swell' = crecimiento sutil
-   *  para secciones dominadas por media. */
-  direction?: 'up' | 'left' | 'right' | 'zoom' | 'curtain' | 'chapter' | 'glide' | 'swell'
-  /** Si es true, la animación se repite cada vez que reingresa al viewport */
+  direction?: 'up' | 'left' | 'right' | 'zoom' | 'curtain' | 'chapter' | 'glide' | 'swell' | 'rise' | 'glide-l' | 'glide-r'
   once?: boolean
+  index?: number
 }
 
-/**
- * Envuelve a sus hijos y les agrega una animación de aparición (fade + slide)
- * disparada por IntersectionObserver, usando las utilidades .reveal /
- * .reveal-visible definidas en globals.css. Cero dependencias externas.
- */
+const observer = typeof window !== 'undefined'
+  ? new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+        entry.target.classList.add('reveal-visible')
+        if (entry.target.getAttribute('data-reveal-once') !== 'false') observer?.unobserve(entry.target)
+      })
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' })
+  : null
+
+function normalizeDirection(direction: RevealProps['direction']): string {
+  if (direction === 'up') return 'rise'
+  if (direction === 'left' || direction === 'glide') return 'glide-l'
+  if (direction === 'right') return 'glide-r'
+  if (direction === 'zoom') return 'swell'
+  return direction || 'rise'
+}
+
 export function Reveal({
   children,
   className = '',
   delay = 0,
   direction = 'up',
   once = true,
+  index = 0,
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
+  const normalizedDirection = normalizeDirection(direction)
 
   useEffect(() => {
     const node = ref.current
     if (!node) return
-
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reducedMotion) {
-      // The reduced-motion CSS rule makes `.reveal` visible immediately.
-      // Avoid a synchronous state update inside this effect: it causes an
-      // unnecessary cascading render and is rejected by the hooks lint rule.
-      return
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          if (once) observer.unobserve(node)
-        } else if (!once) {
-          setVisible(false)
-        }
-      },
-      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
-    )
-
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setReducedMotion(media.matches)
+    if (media.matches || !observer) return
+    node.setAttribute('data-reveal-once', String(once))
     observer.observe(node)
-
-    // Red de seguridad: si por cualquier motivo (error de hidratación en
-    // otro componente de la misma página, IntersectionObserver que nunca
-    // dispara, etc.) `.reveal-visible` no llega a aplicarse, el contenido
-    // quedaría en opacity:0 PERO seguiría siendo clickeable (el `<Link>`
-    // ya está en el DOM desde el SSR) — invisible pero interactivo, el
-    // peor de los dos mundos. Este timeout fuerza visible=true igual
-    // pasado 1.5s, priorizando "se ve aunque sin animación" por sobre
-    // "invisible para siempre".
-    const fallback = setTimeout(() => setVisible(true), 1500)
-
+    const fallback = window.setTimeout(() => node.classList.add('reveal-visible'), 1800)
     return () => {
-      observer.disconnect()
-      clearTimeout(fallback)
+      observer.unobserve(node)
+      window.clearTimeout(fallback)
     }
   }, [once])
 
   return (
     <div
       ref={ref}
-      data-dir={direction}
-      className={`reveal ${visible ? 'reveal-visible' : ''} ${className}`.trim()}
-      style={{ ['--reveal-delay' as string]: `${delay}ms` }}
+      data-dir={normalizedDirection}
+      className={`reveal ${reducedMotion ? 'reveal-visible' : ''} ${className}`.trim()}
+      style={{ ['--reveal-delay' as string]: `${Math.min(delay + Math.min(index, 5) * 40, 240)}ms` }}
     >
       {children}
     </div>
