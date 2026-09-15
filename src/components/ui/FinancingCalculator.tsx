@@ -234,7 +234,7 @@ export function FinancingCalculator() {
         )}
 
         {result && (
-          <Link href="/listings" className="inline-flex w-full items-center justify-center rounded-full bg-[#FF2E88] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#D90067] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5BA3] focus-visible:ring-offset-2">
+          <Link href="/listings" className="inline-flex w-full items-center justify-center rounded-full bg-[#FF2E88] px-5 py-3 text-sm font-bold text-[#171130] transition hover:bg-[#D90067] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5BA3] focus-visible:ring-offset-2">
             Buscar vehículos dentro de este presupuesto <span aria-hidden="true" className="ml-2">→</span>
           </Link>
         )}
@@ -272,7 +272,7 @@ export function FinancingCalculator() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleLeadSubmit}
-                className="inline-flex w-full items-center justify-center rounded-full bg-[#FF2E88] px-5 py-3 text-sm font-bold text-white transition duration-200 hover:bg-[#171130] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23D9FF] focus-visible:ring-offset-2 sm:w-auto"
+                className="inline-flex w-full items-center justify-center rounded-full bg-[#FF2E88] px-5 py-3 text-sm font-bold text-[#171130] transition duration-200 hover:bg-[#171130] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23D9FF] focus-visible:ring-offset-2 sm:w-auto"
               >
                 Enviar por WhatsApp
                 <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">

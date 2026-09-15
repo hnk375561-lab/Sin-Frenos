@@ -128,7 +128,7 @@ export function ForSaleFlyerForm({ className = '' }: { className?: string }) {
       <button
         type="submit"
         disabled={disabled || status === 'loading'}
-        className="mt-3 w-full rounded-md bg-auto-accent px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-auto-accent-strong disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-3 w-full rounded-md bg-auto-accent px-3 py-2 text-sm font-semibold text-[#171130] transition-colors hover:bg-auto-accent-strong disabled:cursor-not-allowed disabled:opacity-50"
       >
         {status === 'loading' ? 'Generando PDF…' : 'Descargar cartel (gratis)'}
       </button>

@@ -115,7 +115,7 @@ export function VehicleCompareBar({ selected, imageBySlug, onRemove, onClear, on
             type="button"
             onClick={onOpen}
             disabled={selected.length < 2}
-            className="rounded-lg bg-auto-accent px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-[0_0_24px_-6px_rgba(255,106,26,0.25)] transition-transform disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none enabled:hover:scale-[1.03]"
+            className="rounded-lg bg-auto-accent px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#171130] shadow-[0_0_24px_-6px_rgba(255,106,26,0.25)] transition-transform disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none enabled:hover:scale-[1.03]"
           >
             Comparar
           </button>
@@ -512,7 +512,7 @@ function BestValueBadge({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        'inline-flex shrink-0 items-center rounded-full bg-auto-accent px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white',
+        'inline-flex shrink-0 items-center rounded-full bg-auto-accent px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#171130]',
         className
       )}
     >

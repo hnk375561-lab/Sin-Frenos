@@ -156,7 +156,7 @@ export function StepPhotos({ draft, onChange, onNext, onBack }: StepPhotosProps)
           addFiles(event.dataTransfer.files)
         }}
       >
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-[#FF2E88] text-2xl font-black text-white" aria-hidden="true">+</span>
+        <span className="grid h-12 w-12 place-items-center rounded-full bg-[#FF2E88] text-2xl font-black text-[#171130]" aria-hidden="true">+</span>
         <span className="text-base font-extrabold text-[#171130]">Arrastrá tus fotos acá o elegilas desde tu dispositivo</span>
         <span className={formStyles.helperText}>JPG, PNG o WEBP — hasta 15 MB cada una · máximo {MAX_PHOTOS} fotos</span>
       </label>
@@ -201,7 +201,7 @@ export function StepPhotos({ draft, onChange, onNext, onBack }: StepPhotosProps)
                 className="aspect-square w-full cursor-grab object-cover active:cursor-grabbing"
               />
               {photo.isCover && (
-                <span className="absolute left-2 top-2 rounded-full bg-[#FF2E88] px-2.5 py-1 text-[11px] font-bold text-white">
+                <span className="absolute left-2 top-2 rounded-full bg-[#FF2E88] px-2.5 py-1 text-[11px] font-bold text-[#171130]">
                   Portada
                 </span>
               )}

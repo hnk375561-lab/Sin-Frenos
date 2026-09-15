@@ -133,7 +133,7 @@ export function WishlistButton({ type, slug, title, variant = 'card', className 
         // no perder área táctil aunque el ícono visible siga siendo chico.
         'relative z-20 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border backdrop-blur-sm transition-colors before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[""] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent',
         active
-          ? 'border-auto-accent bg-auto-accent text-white'
+          ? 'border-auto-accent bg-auto-accent text-[#171130]'
           : 'border-white/25 bg-black/40 text-white/80 hover:border-white/50',
         className
       )}
