@@ -1,0 +1,1 @@
+export default function Loading() { return <main className="container-max min-h-screen py-12"><div className="h-12 w-2/3 animate-pulse rounded bg-surface-alt" /><div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{Array.from({ length: 8 }, (_, index) => <div key={index} className="aspect-[4/3] animate-pulse rounded-xl bg-surface-alt" />)}</div></main> }

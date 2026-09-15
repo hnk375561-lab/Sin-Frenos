@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { SITE_NAME } from '@/config/site'
@@ -9,6 +9,7 @@ import { useWishlist } from '@/lib/hooks/useWishlist'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { CommandPalette } from '@/components/search/CommandPalette'
+import { useModalFocus } from '@/lib/hooks/useModalFocus'
 
 const NAV_LINKS = [
   { href: '/listings', label: 'Comprar' },
@@ -47,6 +48,7 @@ export function Header() {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
+  const mobileNavRef = useRef<HTMLElement | null>(null)
   const { count: wishlistCount, hydrated: wishlistHydrated } = useWishlist()
   const { user, loading: authLoading, signOut } = useAuth()
 
@@ -57,6 +59,17 @@ export function Header() {
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [menuOpen])
+
+  useModalFocus(menuOpen, mobileNavRef)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
   }, [menuOpen])
 
   useEffect(() => {
@@ -132,7 +145,7 @@ export function Header() {
         </div>
       </div>
 
-      <nav id="mobile-nav" aria-label="Navegación móvil" aria-hidden={!menuOpen} className={cn('overflow-hidden border-t border-white/10 bg-[#09090B] transition-[max-height,opacity] duration-200 lg:hidden', menuOpen ? 'max-h-[38rem] opacity-100' : 'pointer-events-none max-h-0 opacity-0')}>
+      <nav ref={mobileNavRef} id="mobile-nav" tabIndex={-1} aria-label="Navegación móvil" aria-hidden={!menuOpen} className={cn('border-t border-white/10 bg-[#09090B] transition-[transform,opacity] duration-200 lg:hidden', menuOpen ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0')}>
         <div className="container-max pb-5 pt-3">
           <Link href="/publicar" prefetch={false} onClick={() => setMenuOpen(false)} className="mb-3 flex items-center justify-between rounded-2xl bg-[#C2410C] px-4 py-3.5 text-sm font-semibold text-white">Publicar un vehículo <span aria-hidden="true">↗</span></Link>
           <div className="grid grid-cols-2 gap-1">
