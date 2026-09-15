@@ -64,7 +64,16 @@ export function EvidenceBlock({ evidence }: EvidenceBlockProps) {
             <dt className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-neutral-500">
               Fuente primaria
             </dt>
-            <dd className="text-ink">{evidence.primarySource}</dd>
+            <dd className="text-ink">
+              <a
+                href={evidence.primarySource}
+                target="_blank"
+                rel="noreferrer"
+                className="break-all underline decoration-auto-accent/50 underline-offset-2 transition-colors hover:text-auto-accent"
+              >
+                {evidence.primarySource}
+              </a>
+            </dd>
           </div>
         )}
         {evidence.secondarySource && (
@@ -72,7 +81,16 @@ export function EvidenceBlock({ evidence }: EvidenceBlockProps) {
             <dt className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-neutral-500">
               Fuente secundaria
             </dt>
-            <dd className="text-neutral-500">{evidence.secondarySource}</dd>
+            <dd className="text-neutral-500">
+              <a
+                href={evidence.secondarySource}
+                target="_blank"
+                rel="noreferrer"
+                className="break-all underline decoration-auto-accent/40 underline-offset-2 transition-colors hover:text-auto-accent"
+              >
+                {evidence.secondarySource}
+              </a>
+            </dd>
           </div>
         )}
       </dl>
