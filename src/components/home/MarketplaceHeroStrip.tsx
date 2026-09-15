@@ -41,10 +41,10 @@ function PlaceholderCard({ index }: { index: number }) {
         <span>{String(index + 1).padStart(2, '0')}</span>
       </div>
       <div className="p-5">
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#FF2E88]">Próxima publicación</p>
-        <p className="mt-3 text-lg font-semibold tracking-[-0.03em] text-[#171130]">Tu vehículo puede ocupar este lugar.</p>
-        <p className="mt-2 text-sm leading-relaxed text-[#667780]">Este espacio está reservado para una oferta real de la comunidad.</p>
-        <Link href="/publicar" prefetch={false} className="mt-5 inline-flex text-sm font-bold text-[#FF2E88] hover:text-[#c8442a]">Publicar ahora →</Link>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#C2410C]">Próxima publicación</p>
+        <p className="mt-3 text-lg font-semibold tracking-[-0.03em] text-[#09090B]">Tu vehículo puede ocupar este lugar.</p>
+        <p className="mt-2 text-sm leading-relaxed text-[#71717A]">Este espacio está reservado para una oferta real de la comunidad.</p>
+        <Link href="/publicar" prefetch={false} className="mt-5 inline-flex text-sm font-bold text-[#C2410C] hover:text-[#991B1B]">Publicar ahora →</Link>
       </div>
     </div>
   )
@@ -88,7 +88,7 @@ export function MarketplaceHeroStrip() {
       <div className="marketplace-home-container">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
-            <p className="marketplace-eyebrow text-[#23D9FF]">Marketplace Sin Frenos</p>
+            <p className="marketplace-eyebrow text-[#C2410C]">Marketplace Sin Frenos</p>
             <h2 id="recent-listings-heading" className="mt-3 max-w-2xl text-3xl font-semibold tracking-[-0.05em] text-white sm:text-5xl">
               {hasAnyReal ? 'Publicaciones recientes' : 'El próximo vehículo puede ser el tuyo.'}
             </h2>
@@ -108,7 +108,7 @@ export function MarketplaceHeroStrip() {
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-5">
           <p className="text-sm text-white/50">{loading ? 'Cargando publicaciones…' : hasAnyReal ? 'Actualizado con las últimas publicaciones disponibles.' : 'No mostramos autos inventados. Cuando publiques, tu oferta aparece acá.'}</p>
-          <Link href="/listings" className="text-sm font-bold text-[#23D9FF] transition hover:text-white">Explorar marketplace →</Link>
+          <Link href="/listings" className="text-sm font-bold text-[#C2410C] transition hover:text-white">Explorar marketplace →</Link>
         </div>
       </div>
     </section>

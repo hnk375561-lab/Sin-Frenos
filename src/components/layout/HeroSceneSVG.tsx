@@ -1,6 +1,6 @@
 /**
  * Escena de fondo 100% original (SVG + gradientes), inspirada en la estética
- * "sunset synthwave" del sitio (paleta Leonida Nights: magenta/cian/dorado
+ * "sunset synthwave" del sitio (paleta Leonida Nights: action/cian/dorado
  * ya definida en tailwind.config.js), pero sin usar ningún asset de
  * Rockstar Games / Take-Two: nada de key art oficial, boxart, logos ni
  * personajes con parecido a Jason/Lucia. Todo dibujado a mano en vector:
@@ -8,23 +8,23 @@
  * clásico estilizado en silueta (sin marca).
  *
  * Tres variantes de paleta — una por cada color de "Leonida Nights"
- * (magenta / cian / dorado, tailwind.config.js) — para mantener la
+ * (action / cian / dorado, tailwind.config.js) — para mantener la
  * rotación visual del hero sin depender de archivos de imagen. Antes
- * solo existían `magenta` y `cyan`: el dorado, aun siendo el tercer
+ * solo existían `action` y `neutral`: el dorado, aun siendo el tercer
  * acento oficial del sitio (el mismo que ya usan vehículos, armas,
  * actividades y negocios en `CATEGORY_ACCENT` de `src/app/page.tsx`),
- * nunca aparecía en el fondo del hero. `gold` cierra ese hueco con la
+ * nunca aparecía en el fondo del hero. `eco` cierra ese hueco con la
  * misma técnica (gradiente de cielo + sol, sin assets nuevos).
  */
 
 interface HeroSceneSVGProps {
-  variant?: 'magenta' | 'cyan' | 'gold'
+  variant?: 'action' | 'neutral' | 'eco'
   /**
    * Identificador único de esta instancia, para desambiguar los `id` de
    * `<defs>` (gradientes) cuando dos instancias con el mismo `variant`
    * conviven en el DOM (p. ej. si `RotatingHeroBackground` llegara a
    * recibir un array `backgrounds` con la misma paleta repetida). Sin
-   * esto, los `id="sky-magenta"` etc. colisionarían — SVG inválido, y el
+   * esto, los `id="sky-action"` etc. colisionarían — SVG inválido, y el
    * navegador puede resolver `url(#...)` contra el primer `id` que
    * encuentre para ambas instancias. Default al propio `variant` para no
    * romper compatibilidad con callers existentes que no lo pasan.
@@ -36,25 +36,25 @@ interface HeroSceneSVGProps {
 
 /**
  * Paleta por variante — mismo criterio que `CATEGORY_ACCENT` en
- * `src/app/page.tsx` (magenta = personajes/facciones, cian = lugares/
+ * `src/app/page.tsx` (action = personajes/facciones, cian = lugares/
  * material audiovisual, dorado = vehículos/objetos/economía), aplicado acá
- * a cielo/sol en vez de a un borde de card. `gold` reutiliza el naranja
- * cálido que `magenta` ya tenía como base del degradé (`#FF5BA3`) para el
- * cielo, y sube el dorado (`#23D9FF`, el mismo hex que `CATEGORY_ACCENT`)
+ * a cielo/sol en vez de a un borde de card. `eco` reutiliza el naranja
+ * cálido que `action` ya tenía como base del degradé (`#C2410C`) para el
+ * cielo, y sube el dorado (`#C2410C`, el mismo hex que `CATEGORY_ACCENT`)
  * a color principal en vez de acento secundario.
  */
 const SCENE_PALETTES: Record<
   NonNullable<HeroSceneSVGProps['variant']>,
   { skyTop: string; skyMid: string; skyBottom: string; sun: string }
 > = {
-  magenta: { skyTop: '#2a0a3d', skyMid: '#FF2E88', skyBottom: '#FF5BA3', sun: '#ffd700' },
-  cyan: { skyTop: '#0a1a3d', skyMid: '#3d84ff', skyBottom: '#a78bfa', sun: '#23D9FF' },
-  gold: { skyTop: '#2a1a05', skyMid: '#23D9FF', skyBottom: '#ff8a3d', sun: '#ffe08a' },
+  action: { skyTop: '#2a0a3d', skyMid: '#C2410C', skyBottom: '#C2410C', sun: '#166534' },
+  neutral: { skyTop: '#18181B', skyMid: '#C2410C', skyBottom: '#FB923C', sun: '#C2410C' },
+  eco: { skyTop: '#2a1a05', skyMid: '#C2410C', skyBottom: '#FB923C', sun: '#BBF7D0' },
 }
 
-export function HeroSceneSVG({ variant = 'magenta', instanceId, className, style }: HeroSceneSVGProps) {
+export function HeroSceneSVG({ variant = 'action', instanceId, className, style }: HeroSceneSVGProps) {
   const { skyTop, skyMid, skyBottom, sun } = SCENE_PALETTES[variant]
-  const silhouette = '#171130'
+  const silhouette = '#09090B'
   const uid = instanceId ?? variant
 
   return (

@@ -156,8 +156,8 @@ export function StepPhotos({ draft, onChange, onNext, onBack }: StepPhotosProps)
           addFiles(event.dataTransfer.files)
         }}
       >
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-[#FF2E88] text-2xl font-black text-[#171130]" aria-hidden="true">+</span>
-        <span className="text-base font-extrabold text-[#171130]">Arrastrá tus fotos acá o elegilas desde tu dispositivo</span>
+        <span className="grid h-12 w-12 place-items-center rounded-full bg-[#C2410C] text-2xl font-black text-[#09090B]" aria-hidden="true">+</span>
+        <span className="text-base font-extrabold text-[#09090B]">Arrastrá tus fotos acá o elegilas desde tu dispositivo</span>
         <span className={formStyles.helperText}>JPG, PNG o WEBP — hasta 15 MB cada una · máximo {MAX_PHOTOS} fotos</span>
       </label>
       <input
@@ -175,7 +175,7 @@ export function StepPhotos({ draft, onChange, onNext, onBack }: StepPhotosProps)
       {error && <p className={`mt-2 ${formStyles.errorText}`}>{error}</p>}
 
       {sortedPhotos.length === 0 && !error && (
-        <div className="mt-4 rounded-2xl border border-[#ECE7FA] bg-[#F6F3FF] p-4 text-center text-sm text-[#4E446C]">
+        <div className="mt-4 rounded-2xl border border-[#27272A] bg-[#F4F4F5] p-4 text-center text-sm text-[#A1A1AA]">
           Todavía no hay fotos. La primera que subas se va a marcar automáticamente como portada.
         </div>
       )}
@@ -201,11 +201,11 @@ export function StepPhotos({ draft, onChange, onNext, onBack }: StepPhotosProps)
                 className="aspect-square w-full cursor-grab object-cover active:cursor-grabbing"
               />
               {photo.isCover && (
-                <span className="absolute left-2 top-2 rounded-full bg-[#FF2E88] px-2.5 py-1 text-[11px] font-bold text-[#171130]">
+                <span className="absolute left-2 top-2 rounded-full bg-[#C2410C] px-2.5 py-1 text-[11px] font-bold text-[#09090B]">
                   Portada
                 </span>
               )}
-              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-[#171130]/85 p-2 opacity-0 transition duration-150 group-hover:opacity-100 focus-within:opacity-100">
+              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-[#09090B]/85 p-2 opacity-0 transition duration-150 group-hover:opacity-100 focus-within:opacity-100">
                 {!photo.isCover && (
                   <button
                     type="button"

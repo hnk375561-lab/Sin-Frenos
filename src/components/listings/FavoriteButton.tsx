@@ -38,8 +38,8 @@ export function FavoriteButton({
         e.stopPropagation()
         void toggleFavorite(listingId)
       }}
-      className={`inline-flex items-center justify-center rounded-full border border-white/70 bg-white/90 p-2 text-[#4E446C] shadow-[0_5px_16px_rgba(23,17,48,.16)] backdrop-blur transition duration-200 hover:scale-110 hover:text-[#FF2E88] disabled:cursor-not-allowed disabled:opacity-50 ${
-        favorited ? 'border-[#FF5BA3] bg-[#FFE0ED] text-[#FF2E88]' : ''
+      className={`inline-flex items-center justify-center rounded-full border border-white/70 bg-white/90 p-2 text-[#A1A1AA] shadow-[0_5px_16px_rgba(9,9,11,.16)] backdrop-blur transition duration-200 hover:scale-110 hover:text-[#C2410C] disabled:cursor-not-allowed disabled:opacity-50 ${
+        favorited ? 'border-[#C2410C] bg-[#FEE2E2] text-[#C2410C]' : ''
       } ${className}`}
     >
       <svg

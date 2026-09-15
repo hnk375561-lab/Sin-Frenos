@@ -253,6 +253,7 @@ export default async function CategoryBestValuePage({ params }: PageProps) {
               <Link
                 key={other}
                 href={`/categorias/${categoryToSlug(other)}/mejor-calidad-precio`}
+                prefetch={false}
                 className="inline-flex items-center gap-1.5 rounded-md border border-edge bg-surface-alt/80 px-3 py-1.5 text-sm text-neutral-500 transition-colors hover:border-auto-accent hover:text-auto-accent-strong"
               >
                 {other}

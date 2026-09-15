@@ -16,11 +16,11 @@ import { A4_HEIGHT, A4_WIDTH, PdfCursor, embedStandardFonts, hexToRgb } from '@/
 // estático): el reporte pasa a ser gratis. Ver `PremiumReportButton.tsx`.
 
 const COLORS = {
-  bg: '#271D4B',
-  accent: '#FF2E88',
-  text: '#F6F3FF',
-  textSecondary: '#B8B0D8',
-  border: '#413367',
+  bg: '#27272A',
+  accent: '#C2410C',
+  text: '#F4F4F5',
+  textSecondary: '#A1A1AA',
+  border: '#3F3F46',
 }
 
 const SPEC_ROWS: Array<{ key: keyof Vehicle; label: string }> = [

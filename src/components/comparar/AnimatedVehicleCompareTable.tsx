@@ -110,7 +110,7 @@ function MetricCell({
           <span className="break-words font-mono text-[13px] leading-snug text-ink">
             {value || <span className="text-neutral-400">No disponible</span>}
           </span>
-          {isWinner && <span className="shrink-0 rounded-full bg-auto-accent px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase text-[#171130]">Mejor</span>}
+          {isWinner && <span className="shrink-0 rounded-full bg-auto-accent px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase text-[#09090B]">Mejor</span>}
         </div>
         {neutral && <p className="mt-2 font-sans text-[10px] font-medium uppercase tracking-wide text-neutral-500">No concluyente</p>}
         {level && <p className="mt-2 font-sans text-[10px] leading-tight text-neutral-500" title={level}>{EVIDENCE_LABELS[level] || level}</p>}

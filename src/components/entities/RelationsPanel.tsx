@@ -37,7 +37,7 @@ interface RelationsPanelProps {
  * auto-accent/auto-darker (paleta "Placa Técnica" heredada) a
  * oxide-red/ink (identidad "Archivo") para que este panel sea
  * consistente con el resto del sitio. auto-accent y oxide-red son el
- * mismo color (#B23A24) — el cambio es de nombre, no visual. El overlay
+ * mismo color (#C2410C) — el cambio es de nombre, no visual. El overlay
  * hover:bg-auto-darker/40 sí era un bug real: auto-darker es casi negro
  * (#050607) y el panel vive sobre fondo papel claro, así que ese hover
  * se veía como una mancha oscura en vez de un hover sutil.

@@ -67,7 +67,7 @@ export function VehicleCompareBar({ selected, imageBySlug, onRemove, onClear, on
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <button type="button" onClick={onClear} className="rounded-lg px-3 py-2 text-xs font-semibold text-neutral-500 transition-colors hover:text-neutral-900">Limpiar</button>
-          <button type="button" onClick={onOpen} disabled={selected.length < 2} className="rounded-lg bg-auto-accent px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#171130] transition-colors hover:bg-auto-accent-orange disabled:cursor-not-allowed disabled:opacity-40">Comparar</button>
+          <button type="button" onClick={onOpen} disabled={selected.length < 2} className="rounded-lg bg-auto-accent px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#09090B] transition-colors hover:bg-auto-accent-orange disabled:cursor-not-allowed disabled:opacity-40">Comparar</button>
         </div>
       </div>
     </div>
@@ -150,7 +150,7 @@ function MetricCell({ vehicle, metric, isWinner, neutral }: { vehicle: Vehicle; 
     <div className={cn('min-h-[76px] border-l border-edge px-3 py-3', isWinner && 'bg-auto-accent/10 ring-1 ring-inset ring-auto-accent/40')}>
       <div className="flex items-start justify-between gap-2">
         <span className="break-words font-mono text-[13px] leading-snug text-ink">{value || <span className="text-neutral-400">No disponible</span>}</span>
-        {isWinner && <span className="shrink-0 rounded-full bg-auto-accent px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase text-[#171130]">Mejor</span>}
+        {isWinner && <span className="shrink-0 rounded-full bg-auto-accent px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase text-[#09090B]">Mejor</span>}
       </div>
       {neutral && <p className="mt-2 font-sans text-[10px] font-medium uppercase tracking-wide text-neutral-500">No concluyente</p>}
       {level && <p className="mt-2 font-sans text-[10px] leading-tight text-neutral-500" title={level}>{EVIDENCE_LABELS[level] || level}</p>}

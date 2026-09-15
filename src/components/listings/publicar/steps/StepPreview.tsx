@@ -128,32 +128,32 @@ export function StepPreview({ draft, onChange, onBack, userId, onPublished }: St
         </p>
       </div>
 
-      <hr className="my-6 border-[#ECE7FA]" />
+      <hr className="my-6 border-[#27272A]" />
 
-      <h3 className="mb-3 text-lg font-extrabold tracking-[-.03em] text-[#171130]">Así se va a ver tu publicación</h3>
+      <h3 className="mb-3 text-lg font-extrabold tracking-[-.03em] text-[#09090B]">Así se va a ver tu publicación</h3>
 
-      <div className="flex flex-col gap-4 rounded-2xl border border-[#D8CDF7] bg-[#F0EBFF] p-4 sm:flex-row">
-        <div className="h-40 w-full shrink-0 overflow-hidden rounded-xl bg-[#E8D7FF] sm:h-28 sm:w-40">
+      <div className="flex flex-col gap-4 rounded-2xl border border-[#3F3F46] bg-[#18181B] p-4 sm:flex-row">
+        <div className="h-40 w-full shrink-0 overflow-hidden rounded-xl bg-[#27272A] sm:h-28 sm:w-40">
           {coverPhoto ? (
             // eslint-disable-next-line @next/next/no-img-element -- preview local de un File vía object URL, no un asset de next/image
             <img src={coverPhoto.previewUrl} alt="" className="h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full w-full items-center justify-center px-3 text-center text-xs font-bold text-[#FF2E88]">
+            <div className="flex h-full w-full items-center justify-center px-3 text-center text-xs font-bold text-[#C2410C]">
               Tu portada aparecerá acá
             </div>
           )}
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate text-lg font-extrabold text-[#171130]">
+          <p className="truncate text-lg font-extrabold text-[#09090B]">
             {draft.title.trim() || 'Sin título todavía'}
           </p>
-          <p className="text-sm text-[#4E446C]">
+          <p className="text-sm text-[#A1A1AA]">
             {draft.brand} {draft.model} {draft.version}
             {draft.year ? ` · ${draft.year}` : ''}
             {draft.mileageKm != null ? ` · ${draft.mileageKm.toLocaleString('es-AR')} km` : ''}
           </p>
-          <p className="mt-2 text-lg font-black text-[#FF2E88]">
+          <p className="mt-2 text-lg font-black text-[#C2410C]">
             {draft.priceType === 'on_request'
               ? 'Precio a convenir'
               : `${draft.priceCurrency} ${draft.priceAmount?.toLocaleString('es-AR') ?? '—'}`}{' '}
@@ -162,7 +162,7 @@ export function StepPreview({ draft, onChange, onBack, userId, onPublished }: St
 
           <div className="mt-2 flex flex-wrap gap-2">
             {category && (
-                <span className={`${severityBadgeBaseClass} border border-[#D8CDF7] bg-white text-[#FF2E88]`}>
+                <span className={`${severityBadgeBaseClass} border border-[#3F3F46] bg-white text-[#C2410C]`}>
                 {category.name}
               </span>
             )}
@@ -200,7 +200,7 @@ export function StepPreview({ draft, onChange, onBack, userId, onPublished }: St
         </ul>
       )}
 
-      <div className={`${formStyles.navRow} rounded-2xl bg-[#171130] p-4`}>
+      <div className={`${formStyles.navRow} rounded-2xl bg-[#09090B] p-4`}>
         <button type="button" onClick={onBack} disabled={submitting} className={formStyles.secondaryButton}>
           Volver
         </button>

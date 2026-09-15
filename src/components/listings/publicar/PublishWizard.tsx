@@ -84,7 +84,7 @@ export function PublishWizard({ userId }: PublishWizardProps) {
           <button
             type="button"
             onClick={() => router.push(`/listings/${published.listingId}`)}
-            className="rounded-full bg-white px-5 py-3 text-sm font-extrabold text-[#FF2E88] transition hover:bg-[#E8D7FF]"
+            className="rounded-full bg-white px-5 py-3 text-sm font-extrabold text-[#C2410C] transition hover:bg-[#27272A]"
           >
             Ver mi publicación
           </button>

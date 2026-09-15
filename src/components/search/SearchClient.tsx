@@ -309,6 +309,7 @@ export function SearchClient({ counts }: SearchClientProps) {
               <Link
                 key={type}
                 href={`/${type}`}
+                prefetch={false}
                 className="group flex items-center gap-3 rounded-sm border border-edge bg-surface-card/60 px-4 py-3.5 transition-colors hover:border-auto-accent/50 hover:bg-surface-alt focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent"
               >
                 <div className="category-icon-badge flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-auto-accent">

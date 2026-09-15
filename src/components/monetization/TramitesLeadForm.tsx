@@ -184,7 +184,7 @@ export function TramitesLeadForm({ className = '' }: { className?: string }) {
         <button
           type="submit"
           disabled={!formValid || sending}
-          className="w-full rounded-md bg-auto-accent px-3 py-2 text-sm font-semibold text-[#171130] transition duration-200 hover:bg-auto-accent-strong active:scale-[0.99] active:bg-auto-accent-strong disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent focus-visible:ring-offset-2"
+          className="w-full rounded-md bg-auto-accent px-3 py-2 text-sm font-semibold text-[#09090B] transition duration-200 hover:bg-auto-accent-strong active:scale-[0.99] active:bg-auto-accent-strong disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent focus-visible:ring-offset-2"
         >
           {sending ? 'Enviando…' : 'Quiero que me contacten'}
         </button>

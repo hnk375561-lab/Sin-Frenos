@@ -217,6 +217,7 @@ export default async function EntityTypePage({ params }: PageProps) {
                         <Link
                           key={group.slug}
                           href={`/fabricantes/${group.slug}`}
+                          prefetch={false}
                           className="rounded-full border border-edge px-3 py-1.5 text-sm text-neutral-500 transition-colors hover:border-auto-accent hover:text-auto-accent"
                         >
                           {group.label}

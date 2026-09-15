@@ -19,7 +19,7 @@ export function GalleryHero({ total, categoryCount }: GalleryHeroProps) {
     <section className="relative overflow-hidden border-b border-edge">
       <div className="absolute inset-0" aria-hidden="true">
         <HeroSceneSVG
-          variant="cyan"
+          variant="neutral"
           className="absolute inset-0 h-full w-full object-cover opacity-45"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-auto-dark/60 via-auto-dark/85 to-auto-dark" />

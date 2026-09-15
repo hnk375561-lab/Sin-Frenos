@@ -154,6 +154,7 @@ export function ArchiveHero({ vehicleCount, evidenceCoveragePct, searchExamples,
                     <Link
                       key={chip.href}
                       href={chip.href}
+                      prefetch={false}
                       className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink/40 hover:text-ink/70 transition-colors"
                     >
                       {chip.label}

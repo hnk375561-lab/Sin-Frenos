@@ -69,16 +69,16 @@ const STATUS_LABEL: Record<ListingRow['status'], string> = {
  * tres colores. */
 const STATUS_BADGE_CLASS: Record<ListingRow['status'], string> = {
   draft: 'border border-edge bg-surface-alt text-neutral-600',
-  pending_review: 'border border-[#23D9FF] bg-[#D9F9FF] text-[#075A70]',
-  published: 'border border-[#A7C900] bg-[#F1FFD0] text-[#435400]',
+  pending_review: 'border border-[#C2410C] bg-[#FFEDD5] text-[#166534]',
+  published: 'border border-[#166534] bg-[#DCFCE7] text-[#166534]',
   paused: 'border border-edge bg-surface-alt text-neutral-600',
-  sold: 'border border-[#FF5BA3] bg-[#FFE0ED] text-[#9C064B]',
+  sold: 'border border-[#C2410C] bg-[#FEE2E2] text-[#991B1B]',
   removed: 'border border-red-200 bg-red-50 text-red-700',
 }
 
 const cardClass = 'rounded-lg border border-edge bg-surface-card p-4 sm:p-5'
 const primaryButtonClass =
-  'rounded-md bg-auto-accent px-3 py-1.5 text-xs font-semibold text-[#171130] transition duration-200 hover:bg-auto-accent-strong active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50'
+  'rounded-md bg-auto-accent px-3 py-1.5 text-xs font-semibold text-[#09090B] transition duration-200 hover:bg-auto-accent-strong active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50'
 const secondaryButtonClass =
   'rounded-md border border-edge bg-transparent px-3 py-1.5 text-xs font-semibold text-neutral-700 transition duration-200 hover:bg-surface-card-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50'
 const dangerButtonClass =

@@ -36,7 +36,7 @@ export default function TestSupabasePage() {
       {loading && <p>Cargando…</p>}
 
       {error && (
-        <p style={{ color: '#c0392b' }}>
+        <p style={{ color: '#991B1B' }}>
           <strong>Error:</strong> {error}
         </p>
       )}

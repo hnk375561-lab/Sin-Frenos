@@ -132,7 +132,7 @@ export function ConsentBanner({
               </button>
               <button
                 onClick={() => decide('accepted')}
-                className="rounded-lg bg-auto-accent px-4 py-2.5 text-sm font-semibold text-[#171130] transition-colors hover:bg-auto-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent"
+                className="rounded-lg bg-auto-accent px-4 py-2.5 text-sm font-semibold text-[#09090B] transition-colors hover:bg-auto-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent"
               >
                 Aceptar
               </button>

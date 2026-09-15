@@ -82,7 +82,7 @@ export function WishlistExplorer({ entities, imageBySlug }: WishlistExplorerProp
         </p>
         <Link
           href="/vehiculos"
-          className="mt-2 inline-flex items-center rounded-lg bg-auto-accent px-4 py-2 text-sm font-semibold text-[#171130] transition duration-200 hover:bg-auto-accent-strong active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent"
+          className="mt-2 inline-flex items-center rounded-lg bg-auto-accent px-4 py-2 text-sm font-semibold text-[#09090B] transition duration-200 hover:bg-auto-accent-strong active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent"
         >
           Ver vehículos
         </Link>

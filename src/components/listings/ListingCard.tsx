@@ -66,9 +66,9 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
     <Link
       href={`/listings/${listing.id}`}
       prefetch={false}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#dce5e9] bg-white shadow-[0_8px_24px_rgba(24,42,52,0.06)] transition duration-200 hover:-translate-y-1 hover:border-[#ff9b82] hover:shadow-[0_18px_36px_rgba(24,42,52,0.12)] motion-reduce:transition-none motion-reduce:hover:transform-none"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#E4E4E7] bg-white shadow-[0_8px_24px_rgba(24,42,52,0.06)] transition duration-200 hover:-translate-y-1 hover:border-[#FDBA74] hover:shadow-[0_18px_36px_rgba(24,42,52,0.12)] motion-reduce:transition-none motion-reduce:hover:transform-none"
     >
-      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-[#e8eef0]">
+      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-[#F4F4F5]">
         {listing.coverUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- URL dinámica de Supabase Storage, fuera de dominios conocidos por next/image (mismo criterio que mis-publicaciones/page.tsx)
           <img
@@ -78,7 +78,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             loading="lazy"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-xs text-[#6C618B]">
+          <div className="flex h-full w-full items-center justify-center text-xs text-[#A1A1AA]">
             Sin foto
           </div>
         )}
@@ -96,16 +96,16 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
           {listing.conditionLabel}
         </span>
 
-        <p className="mt-1 line-clamp-2 text-base font-semibold tracking-[-0.02em] text-[#171130]">{listing.title}</p>
+        <p className="mt-1 line-clamp-2 text-base font-semibold tracking-[-0.02em] text-[#09090B]">{listing.title}</p>
 
-        {subtitle && <p className="truncate text-xs text-[#6C618B]">{subtitle}</p>}
+        {subtitle && <p className="truncate text-xs text-[#A1A1AA]">{subtitle}</p>}
 
-        <p className="mt-auto pt-3 text-base font-bold text-[#e35e3d]">
+        <p className="mt-auto pt-3 text-base font-bold text-[#C2410C]">
           {formatPrice(listing.priceAmount, listing.priceCurrency, listing.priceType)}
         </p>
 
         {meta.length > 0 && (
-          <p className="truncate text-xs text-[#6C618B]">{meta.join(' · ')}</p>
+          <p className="truncate text-xs text-[#A1A1AA]">{meta.join(' · ')}</p>
         )}
       </div>
     </Link>
