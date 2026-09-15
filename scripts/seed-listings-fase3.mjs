@@ -385,6 +385,7 @@ async function main() {
         condition_details: l.conditionDetails ?? {},
         has_title: l.hasTitle,
         title_status: l.hasTitle === false ? 'sin documentación al día' : null,
+        metadata: { source: 'seed-fase3', purpose: 'schema-validation' },
         status: 'published',
         published_at: new Date().toISOString(),
       })

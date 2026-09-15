@@ -51,6 +51,17 @@ export interface ListingSearchResult {
 const emptyResult: ListingSearchResult = { rows: [], hasMore: false, total: null }
 
 /**
+ * Solo las publicaciones reales llegan a superficies públicas. Las filas
+ * creadas por `seed-listings-fase3.mjs` quedan marcadas en metadata y se
+ * conservan para pruebas internas, pero nunca se presentan como inventario.
+ * El `is.null` mantiene compatibles las publicaciones históricas reales que
+ * todavía no tenían metadata de origen.
+ */
+function applyPublicInventoryFilter<T extends { or: (filters: string) => T }>(builder: T): T {
+  return builder.or('metadata->>source.is.null,metadata->>source.neq.seed-fase3')
+}
+
+/**
  * Busca listings publicados contra Postgres, combinando full-text
  * (`search_vector`, sección 4.7) con los filtros estructurados de la
  * sección 7. Solo `status = 'published'` — coincide con la policy RLS
@@ -71,6 +82,8 @@ export async function searchListings(
     .from('listings')
     .select('*', { count: 'exact' })
     .eq('status', 'published')
+
+  builder = applyPublicInventoryFilter(builder)
 
   if (filters.categoryId) {
     builder = builder.eq('category_id', filters.categoryId)
@@ -151,11 +164,15 @@ export async function getListingsForVehicleModel(
   vehicleModelSlug: string,
   limit = 3
 ): Promise<VehicleModelListingsResult> {
-  const { data, error, count } = await supabase
+  let builder = supabase
     .from('listings')
     .select('*', { count: 'exact' })
     .eq('status', 'published')
     .eq('vehicle_model_slug', vehicleModelSlug)
+
+  builder = applyPublicInventoryFilter(builder)
+
+  const { data, error, count } = await builder
     .order('published_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
     .limit(limit)
@@ -177,10 +194,14 @@ export async function getListingsForVehicleModel(
  * `status = 'published'` que el resto de este archivo.
  */
 export async function getRecentListings(limit = 4): Promise<ListingRow[]> {
-  const { data, error } = await supabase
+  let builder = supabase
     .from('listings')
     .select('*')
     .eq('status', 'published')
+
+  builder = applyPublicInventoryFilter(builder)
+
+  const { data, error } = await builder
     .order('published_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
     .limit(limit)
