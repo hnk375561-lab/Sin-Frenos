@@ -519,34 +519,6 @@ tabIndex={-1}
             )}
           </dl>
 
-          {item.trailerAppearances.length > 0 && (
-            <div className="mt-5 border-t border-edge pt-4">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">
-                Aparece en tráiler
-              </p>
-              <ul className="space-y-2">
-                {item.trailerAppearances.map((app) => (
-                  <li key={`${app.trailerSlug}-${app.sceneId}`}>
-                    <Link
-                      href={`/trailers/${app.trailerSlug}#${app.sceneId}`}
-                      prefetch={false}
-                      className="group flex items-start gap-2 rounded-lg border border-edge bg-surface-card/60 px-3 py-2 transition-colors hover:border-auto-accent/60"
-                    >
-                      <span className="scene-timestamp mt-0.5 shrink-0 font-mono text-[10px] font-semibold text-neutral-900">
-                        {app.timestamp}
-                      </span>
-                      <span className="text-xs text-neutral-500 transition-colors group-hover:text-neutral-900">
-                        <span className="font-medium text-neutral-900">{app.trailerTitle}</span>
-                        {' — '}
-                        {app.sceneTitle}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
           {item.tags && item.tags.length > 0 && (
             /* Mismo criterio que en la ficha de entidad: tags = metadata,
                no filtro/estado, así que van como texto separado por punto

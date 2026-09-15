@@ -36,14 +36,6 @@ const AI_ILLUSTRATION_KEYS = new Set<string>()
  * sin tocar este archivo).
  */
 
-export interface GalleryTrailerAppearance {
-  trailerSlug: string
-  trailerTitle: string
-  sceneId: string
-  sceneTitle: string
-  timestamp: string
-}
-
 export interface GalleryItem {
   id: string
   /** 'image' (default, retrocompatible) o 'video' — un asset de video embebido (hoy, YouTube). */
@@ -62,7 +54,6 @@ export interface GalleryItem {
   sourceNote?: string
   tags?: string[]
   featured?: boolean
-  trailerAppearances: GalleryTrailerAppearance[]
   /** Solo si kind === 'video': ID de embed de YouTube, para reproducir en el lightbox. */
   videoEmbedId?: string
   /** Solo si kind === 'video' directo: URL resuelta para el reproductor nativo. */
@@ -81,7 +72,7 @@ export interface GalleryItem {
  * propósito — si en el futuro se suma un asset de portada propio, entra
  * acá como una entrada nueva.
  */
-const KEY_ART: Array<Omit<GalleryItem, 'categorySlug' | 'categoryLabel' | 'trailerAppearances'>> = []
+const KEY_ART: Array<Omit<GalleryItem, 'categorySlug' | 'categoryLabel'>> = []
 
 const CATEGORY_LABELS: Partial<Record<EntityType, string>> = {
   [EntityType.VEHICLE]: 'Vehículos',
@@ -124,7 +115,6 @@ export async function getGalleryItems(): Promise<GalleryItem[]> {
         sourceNote: entity.evidence?.note,
         tags: entity.tags,
         featured: entity.featured,
-        trailerAppearances: [],
       })
     }
   }
@@ -134,7 +124,6 @@ export async function getGalleryItems(): Promise<GalleryItem[]> {
       ...art,
       categorySlug: 'key-art',
       categoryLabel: 'Key Art',
-      trailerAppearances: [],
     })
   }
 
@@ -167,7 +156,6 @@ export async function getGalleryItems(): Promise<GalleryItem[]> {
       sourceNote: asset.source.hotlinkNote,
       tags: asset.tags,
       featured: false,
-      trailerAppearances: [],
       videoEmbedId: rendered.embedId,
       videoSrc: rendered.videoSrc,
     })
