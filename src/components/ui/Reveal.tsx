@@ -39,7 +39,9 @@ export function Reveal({
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reducedMotion) {
-      setVisible(true)
+      // The reduced-motion CSS rule makes `.reveal` visible immediately.
+      // Avoid a synchronous state update inside this effect: it causes an
+      // unnecessary cascading render and is rejected by the hooks lint rule.
       return
     }
 
