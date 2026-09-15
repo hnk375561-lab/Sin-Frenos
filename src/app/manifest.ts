@@ -18,8 +18,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Fichas técnicas de autos y motos con specs reales, comparador lado a lado y buscador.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#0b0b0f',
-    theme_color: '#0b0b0f',
+    background_color: '#171130',
+    theme_color: '#171130',
     icons: [
       {
         src: '/images/ui/icon-192.png',

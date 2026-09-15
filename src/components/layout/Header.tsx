@@ -72,13 +72,13 @@ export function Header() {
   }, [])
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
-  const iconButtonClass = 'relative flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/70 transition hover:border-white/40 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8b6d]'
+  const iconButtonClass = 'relative flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/70 transition hover:border-white/40 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5BA3]'
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#10171c]/95 text-white shadow-[0_8px_30px_rgba(7,16,20,0.12)] backdrop-blur-xl" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#171130]/95 text-white shadow-[0_8px_30px_rgba(7,16,20,0.12)] backdrop-blur-xl" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       <div className="container-max flex min-h-[4.5rem] items-center justify-between gap-4">
         <Link href="/" className="group flex shrink-0 items-center gap-3 text-white no-style" aria-label={`${SITE_NAME}, inicio`}>
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ff6b47] text-sm font-bold tracking-[-0.08em] text-[#10171c] transition-transform duration-200 group-hover:rotate-[-6deg] motion-reduce:transition-none">SF</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FF2E88] text-sm font-bold tracking-[-0.08em] text-[#171130] transition-transform duration-200 group-hover:rotate-[-6deg] motion-reduce:transition-none">SF</span>
           <span className="hidden text-[1.05rem] font-semibold tracking-[-0.04em] sm:block">{SITE_NAME}</span>
         </Link>
 
@@ -92,12 +92,12 @@ export function Header() {
                 prefetch={false}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'relative py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8b6d]',
+                  'relative py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5BA3]',
                   active ? 'text-white' : 'text-white/60 hover:text-white'
                 )}
               >
                 {link.label}
-                {active && <span className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-[#ff8b6d]" aria-hidden="true" />}
+                {active && <span className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-[#FF5BA3]" aria-hidden="true" />}
               </Link>
             )
           })}
@@ -112,7 +112,7 @@ export function Header() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M20.8 8.9c0 5.4-8.8 10.1-8.8 10.1S3.2 14.3 3.2 8.9A4.2 4.2 0 0 1 11 6.5a4.2 4.2 0 0 1 7.8 2.4Z" />
             </svg>
-            {wishlistHydrated && wishlistCount > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ff6b47] px-1 text-[9px] font-bold text-[#10171c]">{wishlistCount > 99 ? '99+' : wishlistCount}</span>}
+            {wishlistHydrated && wishlistCount > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF2E88] px-1 text-[9px] font-bold text-[#171130]">{wishlistCount > 99 ? '99+' : wishlistCount}</span>}
           </Link>
           <ThemeToggle className={iconButtonClass} />
           {authLoading ? (
@@ -120,21 +120,21 @@ export function Header() {
           ) : user ? (
             <button type="button" onClick={() => signOut()} aria-label={`Cerrar sesión (${user.email})`} title={`Sesión iniciada como ${user.email}`} className={cn(iconButtonClass, 'hidden sm:flex')}>
               <UserIcon />
-              <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-[#7be0a7]" aria-hidden="true" />
+              <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-[#C7F000]" aria-hidden="true" />
             </button>
           ) : (
             <Link href={`/ingresar?next=${encodeURIComponent(pathname || '/')}`} aria-label="Ingresar" className={cn(iconButtonClass, 'hidden sm:flex')}><UserIcon /></Link>
           )}
-          <Link href="/publicar" prefetch={false} className="inline-flex rounded-full bg-[#ff6b47] px-3 py-2.5 text-xs font-bold text-[#10171c] transition hover:bg-[#ff8b6d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8b6d] focus-visible:ring-offset-2 focus-visible:ring-offset-[#10171c] sm:px-4 sm:text-sm">Publicar</Link>
+          <Link href="/publicar" prefetch={false} className="inline-flex rounded-full bg-[#FF2E88] px-3 py-2.5 text-xs font-bold text-[#171130] transition hover:bg-[#FF5BA3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5BA3] focus-visible:ring-offset-2 focus-visible:ring-offset-[#171130] sm:px-4 sm:text-sm">Publicar</Link>
           <button type="button" onClick={() => setMenuOpen((value) => !value)} aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={menuOpen} aria-controls="mobile-nav" className={cn(iconButtonClass, 'lg:hidden')}>
             {menuOpen ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg> : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>}
           </button>
         </div>
       </div>
 
-      <nav id="mobile-nav" aria-label="Navegación móvil" aria-hidden={!menuOpen} className={cn('overflow-hidden border-t border-white/10 bg-[#10171c] transition-[max-height,opacity] duration-200 lg:hidden', menuOpen ? 'max-h-[38rem] opacity-100' : 'pointer-events-none max-h-0 opacity-0')}>
+      <nav id="mobile-nav" aria-label="Navegación móvil" aria-hidden={!menuOpen} className={cn('overflow-hidden border-t border-white/10 bg-[#171130] transition-[max-height,opacity] duration-200 lg:hidden', menuOpen ? 'max-h-[38rem] opacity-100' : 'pointer-events-none max-h-0 opacity-0')}>
         <div className="container-max pb-5 pt-3">
-          <Link href="/publicar" prefetch={false} onClick={() => setMenuOpen(false)} className="mb-3 flex items-center justify-between rounded-2xl bg-[#ff6b47] px-4 py-3.5 text-sm font-semibold text-[#10171c]">Publicar un vehículo <span aria-hidden="true">↗</span></Link>
+          <Link href="/publicar" prefetch={false} onClick={() => setMenuOpen(false)} className="mb-3 flex items-center justify-between rounded-2xl bg-[#FF2E88] px-4 py-3.5 text-sm font-semibold text-[#171130]">Publicar un vehículo <span aria-hidden="true">↗</span></Link>
           <div className="grid grid-cols-2 gap-1">
             {[...NAV_LINKS, ...SECONDARY_LINKS].map((link) => (
               <Link key={link.href} href={link.href} prefetch={false} onClick={() => setMenuOpen(false)} aria-current={isActive(link.href) ? 'page' : undefined} className={cn('rounded-xl px-3 py-3 text-sm font-medium transition-colors', isActive(link.href) ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white')}>

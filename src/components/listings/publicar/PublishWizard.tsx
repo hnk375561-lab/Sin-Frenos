@@ -83,8 +83,8 @@ export function PublishWizard({ userId }: PublishWizardProps) {
         <div className="mt-7 flex flex-wrap justify-center gap-3">
           <button
             type="button"
-            onClick={() => router.push(`/listings/ver?id=${published.listingId}`)}
-            className="rounded-full bg-white px-5 py-3 text-sm font-extrabold text-[#0b7a75] transition hover:bg-[#dff2f0]"
+            onClick={() => router.push(`/listings/${published.listingId}`)}
+            className="rounded-full bg-white px-5 py-3 text-sm font-extrabold text-[#FF2E88] transition hover:bg-[#E8D7FF]"
           >
             Ver mi publicación
           </button>

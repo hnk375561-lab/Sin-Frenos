@@ -24,7 +24,7 @@ function CategoryCards() {
       <div className="marketplace-home-container">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
-            <p className="marketplace-eyebrow text-[#0b7a75]">Empezá por lo que buscás</p>
+            <p className="marketplace-eyebrow text-[#FF2E88]">Empezá por lo que buscás</p>
             <h2 id="marketplace-categories-heading" className="marketplace-section-title">Encontrá el vehículo para tu próximo paso.</h2>
           </div>
           <Link href="/listings" className="marketplace-text-link">Ver todas las publicaciones <span aria-hidden="true">→</span></Link>
@@ -60,7 +60,7 @@ function HowItWorks() {
     <section className="marketplace-process-section" aria-labelledby="how-heading">
       <div className="marketplace-home-container">
         <div className="marketplace-process-intro">
-          <p className="marketplace-eyebrow text-[#82d4ce]">Comprar o vender, sin vueltas</p>
+          <p className="marketplace-eyebrow text-[#23D9FF]">Comprar o vender, sin vueltas</p>
           <h2 id="how-heading" className="mt-4 max-w-3xl text-4xl font-semibold leading-[.98] tracking-[-.06em] text-white sm:text-6xl">Del primer vistazo al contacto.</h2>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-white/65">Todo lo que necesitás para encontrar una opción y avanzar. O para poner tu vehículo frente a la persona indicada.</p>
         </div>
@@ -68,7 +68,7 @@ function HowItWorks() {
           {steps.map(([number, title, description, icon]) => (
             <div key={number} className="marketplace-process-card">
               <div className="marketplace-process-icon" aria-hidden="true">{icon}</div>
-              <div className="mt-10 flex items-center gap-3"><span className="text-sm font-bold text-[#f47b5d]">{number}</span><span className="h-px flex-1 bg-white/15" /></div>
+              <div className="mt-10 flex items-center gap-3"><span className="text-sm font-bold text-[#FF5BA3]">{number}</span><span className="h-px flex-1 bg-white/15" /></div>
               <h3 className="mt-5 text-2xl font-semibold tracking-[-.04em] text-white">{title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-white/60">{description}</p>
             </div>
@@ -85,9 +85,9 @@ function FinancingBlock() {
       <div className="marketplace-home-container">
         <div className="grid gap-10 lg:grid-cols-[0.68fr_1.32fr] lg:items-start">
           <div className="pt-3">
-            <p className="marketplace-eyebrow text-[#0b7a75]">Hacé números antes de decidir</p>
+            <p className="marketplace-eyebrow text-[#FF2E88]">Hacé números antes de decidir</p>
             <h2 id="financing-heading" className="marketplace-section-title">¿Cuánto te queda por mes?</h2>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-[#536a73]">Una simulación rápida para saber qué opciones entran en tu presupuesto y seguir buscando con más claridad.</p>
+            <p className="mt-5 max-w-md text-base leading-relaxed text-[#4E446C]">Una simulación rápida para saber qué opciones entran en tu presupuesto y seguir buscando con más claridad.</p>
             <Link href="/financiamiento" className="marketplace-text-link mt-7 inline-flex">Ver guía de financiamiento <span aria-hidden="true">→</span></Link>
           </div>
           <div className="marketplace-financing-card">
@@ -103,7 +103,7 @@ function FinancingBlock() {
 
 function CatalogExit() {
   return (
-    <section className="border-t border-[#dce8e7] bg-[#f5f8f8] py-8" aria-label="Catálogo técnico">
+    <section className="border-t border-[#ECE7FA] bg-[#F6F3FF] py-8" aria-label="Catálogo técnico">
       <div className="marketplace-home-container flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-[#667780]">¿Buscás especificaciones de un modelo puntual?</p>
         <Link href="/vehiculos" className="marketplace-text-link">Explorar catálogo técnico <span aria-hidden="true">→</span></Link>
@@ -116,13 +116,13 @@ export default function Home() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(generateWebsiteJsonLd()) }} />
-      <div className="marketplace-home min-h-screen bg-[#f5f8f8]">
+      <div className="marketplace-home min-h-screen bg-[#F6F3FF]">
         <section className="marketplace-home-hero relative overflow-hidden">
           <div className="marketplace-home-container relative z-10 pb-16 pt-14 sm:pb-24 sm:pt-20 lg:pb-28 lg:pt-24">
             <div className="grid items-end gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
               <div>
-                <p className="marketplace-eyebrow text-[#82d4ce]">Marketplace automotor argentino</p>
-                <h1 className="mt-5 max-w-3xl text-5xl font-semibold leading-[0.96] tracking-[-0.07em] text-white sm:text-7xl lg:text-[6.5rem]">Comprá mejor.<br /><span className="text-[#f47b5d]">Vendé más fácil.</span></h1>
+                <p className="marketplace-eyebrow text-[#23D9FF]">Marketplace automotor argentino</p>
+                <h1 className="mt-5 max-w-3xl text-5xl font-semibold leading-[0.96] tracking-[-0.07em] text-white sm:text-7xl lg:text-[6.5rem]">Comprá mejor.<br /><span className="text-[#FF5BA3]">Vendé más fácil.</span></h1>
                 <p className="mt-7 max-w-xl text-lg leading-relaxed text-white/65">Encontrá autos, motos y camionetas publicados en Argentina. O publicá el tuyo y conectá con personas que ya están buscando.</p>
                 <div className="marketplace-home-search mt-8 max-w-2xl">
                   <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-white/55">¿Qué querés encontrar?</p>
@@ -135,9 +135,9 @@ export default function Home() {
               </div>
               <div className="hidden lg:block" aria-hidden="true">
                 <div className="marketplace-hero-stat-card">
-                  <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#82d4ce]">Una nueva forma de moverte</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#23D9FF]">Una nueva forma de moverte</span>
                   <p className="mt-8 text-4xl font-semibold leading-tight tracking-[-0.05em] text-white">Tu próximo vehículo empieza con una buena búsqueda.</p>
-                  <div className="mt-10 flex items-center gap-3 text-sm text-white/55"><span className="h-2 w-2 rounded-full bg-[#f47b5d]" /> Compra, venta y decisión en un solo lugar</div>
+                  <div className="mt-10 flex items-center gap-3 text-sm text-white/55"><span className="h-2 w-2 rounded-full bg-[#FF5BA3]" /> Compra, venta y decisión en un solo lugar</div>
                 </div>
               </div>
             </div>
@@ -154,7 +154,7 @@ export default function Home() {
             <p className="marketplace-eyebrow text-white/70">Tu vehículo puede ser el próximo</p>
             <h2 id="sell-heading" className="mt-4 text-4xl font-semibold tracking-[-0.06em] text-white sm:text-6xl">Publicá hoy. Empezá a recibir consultas.</h2>
             <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/75">Fotos, datos y contacto directo. Sin inventar ofertas: cuando publiques, tu vehículo aparece de verdad.</p>
-            <Link href="/publicar" prefetch={false} className="mt-8 inline-flex rounded-full bg-[#12212a] px-7 py-4 text-sm font-bold text-white transition hover:bg-[#1d3540] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#f05a3c]">Ser el primero en publicar <span aria-hidden="true">↗</span></Link>
+            <Link href="/publicar" prefetch={false} className="mt-8 inline-flex rounded-full bg-[#171130] px-7 py-4 text-sm font-bold text-white transition hover:bg-[#1d3540] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#FF2E88]">Ser el primero en publicar <span aria-hidden="true">↗</span></Link>
           </div>
         </section>
 

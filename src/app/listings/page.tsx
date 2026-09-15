@@ -216,8 +216,8 @@ function ListingsContent() {
   const locationsByProvincia = groupLocationsByProvincia(locations)
 
   return (
-    <main className="min-h-[70vh] bg-[#f4f6f7] pb-20">
-      <section className="bg-[#10171c] py-12 text-white sm:py-16">
+    <main className="min-h-[70vh] bg-[#F6F3FF] pb-20">
+      <section className="bg-[#171130] py-12 text-white sm:py-16">
         <div className="container-max">
           <p className="marketplace-eyebrow text-[#ff9b82]">Marketplace Sin Frenos</p>
           <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
@@ -235,7 +235,7 @@ function ListingsContent() {
       <div className="container-max -mt-5">
         <div className="rounded-3xl border border-[#dce5e9] bg-white p-4 shadow-[0_16px_40px_rgba(24,42,52,0.08)] sm:p-6">
           {referenceLoading ? (
-            <p className="text-sm text-[#62717a]">Preparando filtros…</p>
+            <p className="text-sm text-[#4E446C]">Preparando filtros…</p>
           ) : (
             <Filters
               categories={enabledCategories}
@@ -251,11 +251,11 @@ function ListingsContent() {
           <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="marketplace-eyebrow text-[#e35e3d]">Resultados</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[#13202a]">
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[#171130]">
                 {resultsLoading ? 'Buscando publicaciones…' : total != null ? `${total.toLocaleString('es-AR')} ${total === 1 ? 'publicación' : 'publicaciones'}` : 'Publicaciones'}
               </h2>
             </div>
-            <p className="text-sm text-[#71808a]">Contacto directo con el vendedor</p>
+            <p className="text-sm text-[#6C618B]">Contacto directo con el vendedor</p>
           </div>
 
           {resultsLoading ? (
@@ -264,8 +264,8 @@ function ListingsContent() {
             </div>
           ) : cards.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-[#cbd7dc] bg-white px-6 py-16 text-center">
-              <p className="text-lg font-semibold text-[#13202a]">Todavía no encontramos publicaciones con esos filtros.</p>
-              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-[#62717a]">Probá ampliar la búsqueda o sé el primero en publicar un vehículo para empezar a mover el marketplace.</p>
+              <p className="text-lg font-semibold text-[#171130]">Todavía no encontramos publicaciones con esos filtros.</p>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-[#4E446C]">Probá ampliar la búsqueda o sé el primero en publicar un vehículo para empezar a mover el marketplace.</p>
               <Link href="/publicar" className="marketplace-button marketplace-button-primary mt-6">Publicar mi vehículo <span aria-hidden="true">↗</span></Link>
             </div>
           ) : (
@@ -292,8 +292,8 @@ export default function ListingsPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-[70vh] bg-[#f4f6f7] px-4 py-16">
-          <div className="mx-auto max-w-5xl animate-pulse rounded-3xl bg-white p-8 text-sm text-[#71808a]">Preparando el marketplace…</div>
+        <main className="min-h-[70vh] bg-[#F6F3FF] px-4 py-16">
+          <div className="mx-auto max-w-5xl animate-pulse rounded-3xl bg-white p-8 text-sm text-[#6C618B]">Preparando el marketplace…</div>
         </main>
       }
     >

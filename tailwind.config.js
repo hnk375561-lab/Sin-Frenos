@@ -8,11 +8,11 @@ module.exports = {
     extend: {
       colors: {
         // Paleta "Archivo Automotor Verificado"
-        'paper': '#F4F1EA',
-        'ink': '#14110C',
-        'border': '#E4DFD3',
-        'oxide-red': '#B23A24',
-        'archive-green': '#2B4436',
+        'paper': '#F6F3FF',
+        'ink': '#171130',
+        'border': '#E0D6F2',
+        'oxide-red': '#FF2E88',
+        'archive-green': '#C7F000',
 
         // Paleta "auto-*" (Placa Técnica / dark mode) — convive con la
         // paleta "Archivo" (paper/ink/oxide-red) de arriba. Se restauran
@@ -21,46 +21,46 @@ module.exports = {
         // sobre foto, overlays oscuros, etc.) aunque no formen parte del
         // rediseño "Archivo Automotor" de la home. Ver commit 7d0afcb7
         // para el detalle histórico de esta paleta.
-        'auto-dark': '#0b0d10',
-        'auto-darker': '#050607',
-        'auto-surface': '#12151a',
-        'auto-border': '#242a32',
-        'auto-text': '#eef1f4',
-        'auto-text-secondary': '#9fa8b5',
-        'auto-accent': '#B23A24',
-        'auto-accent-strong': '#CC4A30',
-        'auto-accent-orange': '#3d84ff',
-        'auto-accent-warning': '#ffb703',
-        'auto-gold': '#c9a35f',
+        'auto-dark': '#171130',
+        'auto-darker': '#0D0A1D',
+        'auto-surface': '#271D4B',
+        'auto-border': '#413367',
+        'auto-text': '#F6F3FF',
+        'auto-text-secondary': '#B8B0D8',
+        'auto-accent': '#FF2E88',
+        'auto-accent-strong': '#FF5BA3',
+        'auto-accent-orange': '#23D9FF',
+        'auto-accent-warning': '#C7F000',
+        'auto-gold': '#23D9FF',
         
         // Colores neutrales derivados
         neutral: {
-          50: '#FAFAF8',
-          100: '#F5F3EF',
-          200: '#EBE8E0',
-          300: '#D9D4C8',
-          400: '#C4BDB0',
-          500: '#A89E8E',
-          600: '#8A8172',
-          700: '#6B6356',
-          800: '#4F4940',
-          900: '#36332E',
-          950: '#1A1917',
+          50: '#FCFAFF',
+          100: '#F0EBFF',
+          200: '#ECE7FA',
+          300: '#D8CDF7',
+          400: '#BCB1DB',
+          500: '#8E82B0',
+          600: '#6C618B',
+          700: '#4E446C',
+          800: '#342B51',
+          900: '#221A3D',
+          950: '#171130',
         },
         
         // Colores de superficie
-        'surface-page': '#F4F1EA',
-        'surface-alt': '#EBE8E0',
+        'surface-page': '#F6F3FF',
+        'surface-alt': '#ECE7FA',
         'surface-card': '#FFFFFF',
-        'surface-card-hover': '#F5F3EF',
+        'surface-card-hover': '#F0EBFF',
         'surface-elevated': '#FFFFFF',
         'surface-input': '#FFFFFF',
-        'surface-header': '#F4F1EA',
+        'surface-header': '#F6F3FF',
         'surface-drawer': '#FFFFFF',
         'surface-chip': '#FFFFFF',
-        'inverse': '#14110C',
-        'edge': '#E4DFD3',
-        'edge-strong': '#C4BDB0',
+        'inverse': '#171130',
+        'edge': '#E0D6F2',
+        'edge-strong': '#BCB1DB',
       },
       fontFamily: {
         sans: [

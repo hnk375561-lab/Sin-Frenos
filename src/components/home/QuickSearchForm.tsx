@@ -91,7 +91,7 @@ export function QuickSearchForm({ examples = DEFAULT_EXAMPLES }: QuickSearchForm
       role="search"
     >
       <svg
-        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#71808a]"
+        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#6C618B]"
         width="16"
         height="16"
         viewBox="0 0 24 24"
@@ -113,7 +113,7 @@ export function QuickSearchForm({ examples = DEFAULT_EXAMPLES }: QuickSearchForm
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
         aria-label={`Búsqueda rápida en ${SITE_NAME}. Atajo: tecla oblicua`}
-        className="w-full rounded-xl border border-white/10 bg-white py-3.5 pl-11 pr-24 text-sm text-[#13202a] shadow-sm placeholder:text-[#71808a] transition focus:border-[#ff8b6d] focus:outline-none focus:ring-2 focus:ring-[#ff8b6d]/25 sm:text-base"
+        className="w-full rounded-xl border border-white/10 bg-white py-3.5 pl-11 pr-24 text-sm text-[#171130] shadow-sm placeholder:text-[#6C618B] transition focus:border-[#FF5BA3] focus:outline-none focus:ring-2 focus:ring-[#FF5BA3]/25 sm:text-base"
       />
       {/* Indicador del atajo de teclado: se oculta solo mientras el input
           tiene contenido o foco (empty-values / has-[:focus]), y en mobile
@@ -122,13 +122,13 @@ export function QuickSearchForm({ examples = DEFAULT_EXAMPLES }: QuickSearchForm
           en momentos distintos. */}
       <kbd
         aria-hidden="true"
-        className="pointer-events-none absolute right-20 top-1/2 hidden -translate-y-1/2 items-center rounded-md border border-[#dce5e9] bg-[#f4f6f7] px-1.5 py-1 font-mono text-xs text-[#71808a] sm:flex"
+        className="pointer-events-none absolute right-20 top-1/2 hidden -translate-y-1/2 items-center rounded-md border border-[#dce5e9] bg-[#F6F3FF] px-1.5 py-1 font-mono text-xs text-[#6C618B] sm:flex"
       >
         /
       </kbd>
       <button
         type="submit"
-        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#ff6b47] px-3.5 py-2 text-xs font-semibold text-[#10171c] transition-[background-color,transform] duration-200 ease-out hover:bg-[#ff8b6d] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8b6d] focus-visible:ring-offset-2 sm:text-sm"
+        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#FF2E88] px-3.5 py-2 text-xs font-semibold text-[#171130] transition-[background-color,transform] duration-200 ease-out hover:bg-[#FF5BA3] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5BA3] focus-visible:ring-offset-2 sm:text-sm"
       >
         Buscar
       </button>

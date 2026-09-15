@@ -45,11 +45,11 @@ export function CommercialVehicleCard({ vehicle, image, priority = false }: Comm
   const price = priceLabel(vehicle)
 
   return (
-    <article className="commercial-vehicle-card group relative overflow-hidden rounded-2xl bg-[#10171c]">
+    <article className="commercial-vehicle-card group relative overflow-hidden rounded-2xl bg-[#171130]">
       <Link
         href={`/vehiculos/${vehicle.slug}`}
         prefetch={false}
-        className="block outline-none focus-visible:ring-2 focus-visible:ring-[#ff6542] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f6f7]"
+        className="block outline-none focus-visible:ring-2 focus-visible:ring-[#ff6542] focus-visible:ring-offset-2 focus-visible:ring-offset-[#F6F3FF]"
       >
         <div className="relative aspect-[4/5] overflow-hidden">
           {image ? (
@@ -63,7 +63,7 @@ export function CommercialVehicleCard({ vehicle, image, priority = false }: Comm
               className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.045] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
             />
           ) : (
-            <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_50%_35%,#34434b_0,#10171c_62%)]">
+            <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_50%_35%,#34434b_0,#171130_62%)]">
               <svg viewBox="0 0 120 80" className="w-2/3 text-white/20" fill="none" aria-hidden="true">
                 <path d="M13 51h94M23 51l7-18c1-3 4-5 7-5h45c4 0 7 2 9 6l6 17" stroke="currentColor" strokeWidth="3" />
                 <path d="M20 51v9h9m62-9v9h9" stroke="currentColor" strokeWidth="3" />
@@ -72,8 +72,8 @@ export function CommercialVehicleCard({ vehicle, image, priority = false }: Comm
               </svg>
             </div>
           )}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#080b0d] via-[#080b0d]/10 to-transparent" />
-          <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-[#10171c]/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/75 backdrop-blur-sm">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#171130] via-[#171130]/10 to-transparent" />
+          <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-[#171130]/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/75 backdrop-blur-sm">
             {vehicle.evidence?.level ? 'Ficha verificada' : 'Ficha técnica'}
           </div>
           <div className="absolute inset-x-4 bottom-4">
@@ -103,7 +103,7 @@ export function CommercialVehicleCard({ vehicle, image, priority = false }: Comm
         type={vehicle.type}
         slug={vehicle.slug}
         title={vehicle.title}
-        className="absolute right-3 top-3 z-10 border-white/20 bg-[#10171c]/55 text-white/80 backdrop-blur-sm hover:border-white/50 hover:bg-[#10171c]/80 hover:text-white"
+        className="absolute right-3 top-3 z-10 border-white/20 bg-[#171130]/55 text-white/80 backdrop-blur-sm hover:border-white/50 hover:bg-[#171130]/80 hover:text-white"
       />
     </article>
   )

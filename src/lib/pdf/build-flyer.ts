@@ -10,11 +10,11 @@ import { A4_HEIGHT, A4_WIDTH, PdfCursor, embedStandardFonts, hexToRgb, isWinAnsi
 // haber forma de cobrar sin backend, el cartel pasa a ser gratis.
 
 const COLORS = {
-  bg: '#12151a',
-  accent: '#ff6a1a',
-  text: '#eef1f4',
-  textSecondary: '#9fa8b5',
-  border: '#242a32',
+  bg: '#271D4B',
+  accent: '#FF2E88',
+  text: '#F6F3FF',
+  textSecondary: '#B8B0D8',
+  border: '#413367',
 }
 
 const FLYER_TEXT_FIELDS: Array<keyof FlyerData> = ['marca', 'modelo', 'anio', 'precio', 'km', 'contacto', 'ubicacion']
@@ -46,7 +46,7 @@ export async function buildFlyerPdf(data: FlyerData): Promise<Uint8Array> {
   const text = hexToRgb(COLORS.text)
   const textSecondary = hexToRgb(COLORS.textSecondary)
   const border = hexToRgb(COLORS.border)
-  const dark = hexToRgb('#12151a')
+  const dark = hexToRgb('#271D4B')
 
   const cursor = new PdfCursor(doc, page, 0)
 

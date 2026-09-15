@@ -286,7 +286,7 @@ export default function MisPublicacionesPage() {
 
                     <div className="mt-3 flex flex-wrap gap-2">
                       {listing.status === 'published' && (
-                        <Link href={`/listings/ver?id=${listing.id}`} className={secondaryButtonClass}>
+                        <Link href={`/listings/${listing.id}`} className={secondaryButtonClass}>
                           Ver publicación
                         </Link>
                       )}

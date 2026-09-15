@@ -62,9 +62,9 @@ function ConversationList({
   if (conversations.length === 0) {
     return (
       <div className={`${cardClass} text-center`}>
-        <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#dff2f0] text-2xl font-black text-[#0b7a75]" aria-hidden="true">↗</div>
-        <p className="mt-4 text-base font-extrabold text-[#12212a]">Tu bandeja está lista.</p>
-        <p className="mt-2 text-sm leading-relaxed text-[#62717a]">Contactá a un vendedor desde cualquier publicación para empezar una conversación real.</p>
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#E8D7FF] text-2xl font-black text-[#FF2E88]" aria-hidden="true">↗</div>
+        <p className="mt-4 text-base font-extrabold text-[#171130]">Tu bandeja está lista.</p>
+        <p className="mt-2 text-sm leading-relaxed text-[#4E446C]">Contactá a un vendedor desde cualquier publicación para empezar una conversación real.</p>
         <Link href="/listings" className="marketplace-auth-primary mt-5">Explorar publicaciones <span aria-hidden="true">→</span></Link>
       </div>
     )
@@ -79,24 +79,24 @@ function ConversationList({
             prefetch={false}
             className={`flex gap-3 rounded-lg border p-3 text-left transition duration-200 ${
               c.id === activeId
-                ? 'border-[#f05a3c] bg-[#fff0ed]'
-                : 'border-[#c7dcda] bg-white hover:border-[#0b7a75] hover:bg-[#eef8f7]'
+                ? 'border-[#FF2E88] bg-[#FFE0ED]'
+                : 'border-[#D8CDF7] bg-white hover:border-[#FF2E88] hover:bg-[#F0EBFF]'
             }`}
           >
-            <div className="h-14 w-20 shrink-0 overflow-hidden rounded-xl border border-[#c7dcda] bg-[#dff2f0]">
+            <div className="h-14 w-20 shrink-0 overflow-hidden rounded-xl border border-[#D8CDF7] bg-[#E8D7FF]">
               {c.listingCoverUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element -- URL dinámica de Supabase Storage, mismo criterio que ListingCard
                 <img src={c.listingCoverUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
               ) : null}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-extrabold text-[#12212a]">{c.listingTitle}</p>
-              <p className="truncate text-xs text-[#62717a]">
+              <p className="truncate text-sm font-extrabold text-[#171130]">{c.listingTitle}</p>
+              <p className="truncate text-xs text-[#4E446C]">
                 {c.isSeller ? 'Comprador: ' : 'Vendedor: '}
                 {c.otherUserDisplayName}
               </p>
               {c.lastMessagePreview && (
-                <p className="mt-1 truncate text-xs text-[#71858c]">{c.lastMessagePreview}</p>
+                <p className="mt-1 truncate text-xs text-[#6C618B]">{c.lastMessagePreview}</p>
               )}
             </div>
           </Link>
@@ -160,18 +160,18 @@ function ConversationThread({
 
   return (
     <div className={cardClass}>
-      <div className="mb-4 border-b border-[#dce8e7] pb-4">
-        <p className="text-lg font-extrabold tracking-[-.03em] text-[#12212a]">{conversation.listingTitle}</p>
-        <p className="text-xs text-[#62717a]">
+      <div className="mb-4 border-b border-[#ECE7FA] pb-4">
+        <p className="text-lg font-extrabold tracking-[-.03em] text-[#171130]">{conversation.listingTitle}</p>
+        <p className="text-xs text-[#4E446C]">
           Conversación con {conversation.otherUserDisplayName}
         </p>
-        <Link href={`/listings/ver?id=${conversation.listingId}`} className="text-xs font-bold text-[#0b7a75] underline">
+        <Link href={`/listings/${conversation.listingId}`} className="text-xs font-bold text-[#FF2E88] underline">
           Ver publicación
         </Link>
       </div>
 
       {loadingMessages ? (
-        <div className="h-32 animate-pulse rounded-2xl bg-[#eef8f7]" aria-label="Cargando mensajes…" />
+        <div className="h-32 animate-pulse rounded-2xl bg-[#F0EBFF]" aria-label="Cargando mensajes…" />
       ) : (
         <ul className="space-y-2">
           {messages.map((m) => {
@@ -244,7 +244,7 @@ function MensajesContent() {
   if (authLoading) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <div className="marketplace-message-card h-32 animate-pulse bg-[#eef8f7]" aria-label="Cargando mensajes…" />
+        <div className="marketplace-message-card h-32 animate-pulse bg-[#F0EBFF]" aria-label="Cargando mensajes…" />
       </main>
     )
   }
@@ -252,8 +252,8 @@ function MensajesContent() {
   if (!user) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <h1 className="text-4xl font-extrabold tracking-[-.06em] text-[#12212a]">Tus mensajes</h1>
-        <p className="mt-2 text-sm text-[#62717a]">Iniciá sesión para hablar con vendedores y seguir tus consultas.</p>
+        <h1 className="text-4xl font-extrabold tracking-[-.06em] text-[#171130]">Tus mensajes</h1>
+        <p className="mt-2 text-sm text-[#4E446C]">Iniciá sesión para hablar con vendedores y seguir tus consultas.</p>
         <Link href="/ingresar" className={`mt-4 inline-block ${formStyles.primaryButton}`}>
           Ingresar
         </Link>
@@ -266,8 +266,8 @@ function MensajesContent() {
   return (
     <main className="marketplace-message-page">
       <div className="marketplace-message-shell">
-      <p className="marketplace-eyebrow text-[#0b7a75]">Contacto directo</p>
-      <h1 className="mt-2 text-4xl font-extrabold tracking-[-.06em] text-[#12212a]">Tus mensajes</h1>
+      <p className="marketplace-eyebrow text-[#FF2E88]">Contacto directo</p>
+      <h1 className="mt-2 text-4xl font-extrabold tracking-[-.06em] text-[#171130]">Tus mensajes</h1>
       {error && <p className={`${formStyles.errorText} mt-2`}>{error}</p>}
 
       <div className="marketplace-message-grid">
@@ -301,7 +301,7 @@ export default function MensajesPage() {
   return (
     <Suspense
       fallback={
-        <main className="marketplace-message-page"><div className="marketplace-message-shell"><div className="marketplace-message-card h-40 animate-pulse bg-[#eef8f7]" aria-label="Cargando mensajes…" /></div></main>
+        <main className="marketplace-message-page"><div className="marketplace-message-shell"><div className="marketplace-message-card h-40 animate-pulse bg-[#F0EBFF]" aria-label="Cargando mensajes…" /></div></main>
       }
     >
       <MensajesContent />

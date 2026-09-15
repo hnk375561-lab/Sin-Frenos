@@ -77,12 +77,12 @@ export function NewsletterSignupForm({
           onChange={(e) => setEmail(e.target.value)}
           placeholder="tu@email.com"
           aria-label="Tu email"
-          className="w-full rounded-xl border border-white/15 bg-white/10 px-3 py-3 text-sm text-white placeholder:text-white/35 focus:border-[#82d4ce] focus:outline-none sm:w-64"
+          className="w-full rounded-xl border border-white/15 bg-white/10 px-3 py-3 text-sm text-white placeholder:text-white/35 focus:border-[#23D9FF] focus:outline-none sm:w-64"
         />
         <button
           type="submit"
           disabled={!isValidEmail}
-          className="inline-flex items-center justify-center rounded-full bg-[#f05a3c] px-5 py-3 text-sm font-bold text-white transition-transform duration-200 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f47b5d] focus-visible:ring-offset-2"
+          className="inline-flex items-center justify-center rounded-full bg-[#FF2E88] px-5 py-3 text-sm font-bold text-white transition-transform duration-200 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5BA3] focus-visible:ring-offset-2"
         >
           Sumarme
         </button>
