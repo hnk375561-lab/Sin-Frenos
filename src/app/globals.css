@@ -907,3 +907,67 @@ a:not(.no-style) {
   .marketplace-category-card:hover { transform: none; }
   .marketplace-listing-skeleton { animation: none; }
 }
+
+/* === MARKETPLACE PHASE 2: BELOW-HERO SYSTEM === */
+.marketplace-category-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.marketplace-category-card {
+  min-height: 25rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 1.75rem;
+  padding: 1.5rem;
+  color: #fff;
+  position: relative;
+  isolation: isolate;
+  transition: transform 220ms var(--ease-premium), box-shadow 220ms var(--ease-premium), filter 220ms var(--ease-premium);
+}
+.marketplace-category-card::before {
+  content: '';
+  position: absolute;
+  inset: auto -15% -24% 18%;
+  height: 62%;
+  border-radius: 50%;
+  background: rgba(255,255,255,.14);
+  transform: rotate(-12deg);
+  z-index: -1;
+  transition: transform 320ms var(--ease-premium);
+}
+.marketplace-category-card:hover { transform: translateY(-8px) rotate(-.6deg); box-shadow: 0 26px 50px rgba(18,33,42,.2); filter: saturate(1.08); }
+.marketplace-category-card:hover::before { transform: rotate(-12deg) scale(1.16) translateY(-8%); }
+.marketplace-category-card-autos { grid-column: span 2; min-height: 30rem; background: linear-gradient(145deg, #0b7a75, #075d5a); }
+.marketplace-category-card-motos { background: linear-gradient(145deg, #f05a3c, #c8442a); }
+.marketplace-category-card-camionetas { background: linear-gradient(145deg, #27526a, #173b4d); }
+.marketplace-category-card-utilitarios { background: linear-gradient(145deg, #6f4a9d, #47306f); }
+.marketplace-category-card-top { display: flex; justify-content: space-between; font-size: .75rem; font-weight: 800; letter-spacing: .16em; opacity: .8; }
+.marketplace-category-silhouette { margin-top: auto; margin-bottom: 2rem; font-size: clamp(3rem, 8vw, 7rem); line-height: .8; font-weight: 950; letter-spacing: -.12em; opacity: .24; }
+.marketplace-category-button { display: inline-flex; width: fit-content; align-items: center; gap: .55rem; border: 1px solid rgba(255,255,255,.42); border-radius: 9999px; padding: .75rem 1rem; font-size: .8rem; font-weight: 800; background: rgba(0,0,0,.12); transition: background-color 180ms ease, border-color 180ms ease; }
+.marketplace-category-card:hover .marketplace-category-button { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.75); }
+.marketplace-process-section { padding-block: 5.5rem; background: #12212a; }
+.marketplace-process-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.marketplace-process-card { min-height: 22rem; border: 1px solid rgba(255,255,255,.14); border-radius: 1.5rem; padding: 1.5rem; background: linear-gradient(145deg, rgba(255,255,255,.1), rgba(255,255,255,.035)); }
+.marketplace-process-icon { display: flex; width: 4.5rem; height: 4.5rem; align-items: center; justify-content: center; border-radius: 1.25rem; background: #f05a3c; color: #fff; font-size: 2.2rem; font-weight: 900; box-shadow: 0 12px 25px rgba(240,90,60,.25); }
+.marketplace-financing-section { padding-block: 5.5rem; background: #dff2f0; }
+.marketplace-financing-card { border: 1px solid #b8d6d3; border-radius: 2rem; padding: 1rem; background: #eef8f7; box-shadow: 0 24px 55px rgba(18,33,42,.12); }
+.marketplace-financing-card > div { box-shadow: none; background: transparent; }
+.marketplace-calculator-range { height: .5rem; appearance: none; border-radius: 9999px; background: linear-gradient(90deg, #f05a3c 0%, #f05a3c var(--range-progress, 20%), #c7dcda var(--range-progress, 20%), #c7dcda 100%); accent-color: #f05a3c; }
+.marketplace-calculator-range::-webkit-slider-thumb { width: 1.35rem; height: 1.35rem; appearance: none; border: 3px solid #fff; border-radius: 50%; background: #f05a3c; box-shadow: 0 3px 10px rgba(18,33,42,.25); }
+.marketplace-calculator-range::-moz-range-thumb { width: 1.1rem; height: 1.1rem; border: 3px solid #fff; border-radius: 50%; background: #f05a3c; box-shadow: 0 3px 10px rgba(18,33,42,.25); }
+.marketplace-footer { padding: 5rem 0 3rem; background: #102a31; color: #fff; }
+.marketplace-footer-container { width: min(100% - 2rem, 80rem); margin-inline: auto; }
+.marketplace-footer-main { display: grid; grid-template-columns: 1.35fr .85fr .85fr; gap: 3rem; padding-bottom: 4rem; }
+.marketplace-footer-mark { display: flex; width: 2.25rem; height: 2.25rem; align-items: center; justify-content: center; border-radius: .7rem; background: #f05a3c; font-weight: 900; color: #fff; }
+.marketplace-footer-kicker { margin-bottom: 1rem; color: #82d4ce; font-size: .7rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.marketplace-footer-actions, .marketplace-footer-explore { display: flex; flex-direction: column; align-items: flex-start; gap: .85rem; }
+.marketplace-footer-action-link { color: #fff; font-size: 1.15rem; font-weight: 750; letter-spacing: -.02em; transition: color 180ms ease, transform 180ms ease; }
+.marketplace-footer-action-link:hover { color: #f47b5d; transform: translateX(4px); }
+.marketplace-footer-explore a { color: rgba(255,255,255,.6); font-size: .9rem; transition: color 180ms ease; }
+.marketplace-footer-explore a:hover, .marketplace-footer-fine-print a:hover { color: #82d4ce; }
+.marketplace-footer-lower { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; border-top: 1px solid rgba(255,255,255,.13); padding-top: 2rem; }
+.marketplace-footer-fine-print { display: flex; flex-wrap: wrap; gap: .5rem 1.15rem; max-width: 48rem; }
+.marketplace-footer-fine-print a { color: rgba(255,255,255,.4); font-size: .75rem; transition: color 180ms ease; }
+.marketplace-footer-top { display: inline-flex; align-items: center; gap: .5rem; border: 1px solid rgba(255,255,255,.2); border-radius: 9999px; padding: .7rem 1rem; color: rgba(255,255,255,.7); font-size: .8rem; font-weight: 700; transition: border-color 180ms ease, color 180ms ease; }
+.marketplace-footer-top:hover { border-color: #82d4ce; color: #fff; }
+.marketplace-footer-legal { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid rgba(255,255,255,.08); padding-top: 1.5rem; color: rgba(255,255,255,.35); font-size: .7rem; line-height: 1.5; }
+@media (max-width: 900px) { .marketplace-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .marketplace-category-card-autos { grid-column: span 2; } .marketplace-footer-main { grid-template-columns: 1fr 1fr; } .marketplace-footer-brand { grid-column: span 2; } }
+@media (max-width: 640px) { .marketplace-category-grid, .marketplace-process-grid { grid-template-columns: 1fr; } .marketplace-category-card-autos { grid-column: auto; min-height: 25rem; } .marketplace-process-section, .marketplace-financing-section { padding-block: 3.5rem; } .marketplace-footer-main { grid-template-columns: 1fr; gap: 2.5rem; } .marketplace-footer-brand { grid-column: auto; } .marketplace-footer-lower, .marketplace-footer-legal { align-items: flex-start; flex-direction: column; } .marketplace-footer-container { width: min(100% - 1.25rem, 80rem); } }

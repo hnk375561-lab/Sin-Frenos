@@ -12,36 +12,35 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const MARKETPLACE_CATEGORIES = [
-  { label: 'Autos', value: 'autos', description: 'Sedanes, hatchbacks y deportivos' },
-  { label: 'Motos', value: 'motos', description: 'Urbanas, clásicas y de aventura' },
-  { label: 'Camionetas', value: 'camionetas', description: 'Pick-ups y SUVs para todos los días' },
-  { label: 'Utilitarios', value: 'utilitarios', description: 'Trabajo, carga y movilidad profesional' },
+  { label: 'Autos', value: 'autos', description: 'Sedanes, hatchbacks y deportivos', mark: '01', featured: true },
+  { label: 'Motos', value: 'motos', description: 'Urbanas, clásicas y de aventura', mark: '02', featured: false },
+  { label: 'Camionetas', value: 'camionetas', description: 'Pick-ups y SUVs para todos los días', mark: '03', featured: false },
+  { label: 'Utilitarios', value: 'utilitarios', description: 'Trabajo, carga y movilidad profesional', mark: '04', featured: false },
 ]
 
 function CategoryCards() {
   return (
-    <section className="marketplace-home-section bg-white" aria-labelledby="marketplace-categories-heading">
+    <section className="marketplace-home-section marketplace-category-section bg-white" aria-labelledby="marketplace-categories-heading">
       <div className="marketplace-home-container">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
-            <p className="marketplace-eyebrow text-[#0b7a75]">Buscá por categoría</p>
+            <p className="marketplace-eyebrow text-[#0b7a75]">Empezá por lo que buscás</p>
             <h2 id="marketplace-categories-heading" className="marketplace-section-title">Encontrá el vehículo para tu próximo paso.</h2>
           </div>
           <Link href="/listings" className="marketplace-text-link">Ver todas las publicaciones <span aria-hidden="true">→</span></Link>
         </div>
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="marketplace-category-grid mt-10">
           {MARKETPLACE_CATEGORIES.map((category) => (
             <Link
               key={category.value}
               href={`/listings?categoria=${category.value}`}
-              className="marketplace-category-card group"
+              className={`marketplace-category-card marketplace-category-card-${category.value} group ${category.featured ? 'marketplace-category-card-featured' : ''}`}
             >
-              <span className="marketplace-category-icon" aria-hidden="true">
-                {category.value === 'motos' ? 'M' : category.value === 'camionetas' ? '4×4' : category.value === 'utilitarios' ? '▣' : 'A'}
-              </span>
-              <span className="mt-8 block text-xl font-semibold tracking-[-0.03em] text-[#12212a]">{category.label}</span>
-              <span className="mt-2 block text-sm leading-relaxed text-[#667780]">{category.description}</span>
-              <span className="mt-6 block text-sm font-semibold text-[#0b7a75] transition-transform group-hover:translate-x-1 motion-reduce:transition-none" aria-hidden="true">Explorar →</span>
+              <span className="marketplace-category-card-top"><span>{category.mark}</span><span aria-hidden="true">↗</span></span>
+              <span className="marketplace-category-silhouette" aria-hidden="true">{category.value === 'motos' ? 'MOTO' : category.value === 'camionetas' ? '4×4' : category.value === 'utilitarios' ? 'VAN' : 'AUTO'}</span>
+              <span className="mt-auto block text-2xl font-semibold tracking-[-0.05em]">{category.label}</span>
+              <span className="mt-2 block max-w-xs text-sm leading-relaxed opacity-75">{category.description}</span>
+              <span className="marketplace-category-button mt-6">Explorar {category.label.toLowerCase()} <span aria-hidden="true">→</span></span>
             </Link>
           ))}
         </div>
@@ -52,24 +51,26 @@ function CategoryCards() {
 
 function HowItWorks() {
   const steps = [
-    ['01', 'Buscá', 'Filtrá por tipo, ubicación, condición o presupuesto.'],
-    ['02', 'Compará', 'Mirá opciones y hablá directo con quien publica.'],
-    ['03', 'Publicá', 'Subí tu vehículo y llegá a quienes ya están buscando.'],
+    ['01', 'Buscá', 'Filtrá por tipo, ubicación, condición o presupuesto.', '⌕'],
+    ['02', 'Compará', 'Mirá opciones y hablá directo con quien publica.', '≋'],
+    ['03', 'Publicá', 'Subí tu vehículo y llegá a quienes ya están buscando.', '↗'],
   ]
 
   return (
-    <section className="marketplace-home-section bg-[#f5f8f8]" aria-labelledby="how-heading">
+    <section className="marketplace-process-section" aria-labelledby="how-heading">
       <div className="marketplace-home-container">
-        <div className="max-w-xl">
-          <p className="marketplace-eyebrow text-[#0b7a75]">Así funciona</p>
-          <h2 id="how-heading" className="marketplace-section-title">Del primer vistazo al contacto, sin vueltas.</h2>
+        <div className="marketplace-process-intro">
+          <p className="marketplace-eyebrow text-[#82d4ce]">Comprar o vender, sin vueltas</p>
+          <h2 id="how-heading" className="mt-4 max-w-3xl text-4xl font-semibold leading-[.98] tracking-[-.06em] text-white sm:text-6xl">Del primer vistazo al contacto.</h2>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-white/65">Todo lo que necesitás para encontrar una opción y avanzar. O para poner tu vehículo frente a la persona indicada.</p>
         </div>
-        <div className="mt-10 grid gap-8 border-t border-[#dce8e7] pt-8 sm:grid-cols-3">
-          {steps.map(([number, title, description]) => (
-            <div key={number}>
-              <span className="text-sm font-bold tracking-[0.16em] text-[#f05a3c]">{number}</span>
-              <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em] text-[#12212a]">{title}</h3>
-              <p className="mt-2 max-w-xs text-sm leading-relaxed text-[#667780]">{description}</p>
+        <div className="marketplace-process-grid mt-12">
+          {steps.map(([number, title, description, icon]) => (
+            <div key={number} className="marketplace-process-card">
+              <div className="marketplace-process-icon" aria-hidden="true">{icon}</div>
+              <div className="mt-10 flex items-center gap-3"><span className="text-sm font-bold text-[#f47b5d]">{number}</span><span className="h-px flex-1 bg-white/15" /></div>
+              <h3 className="mt-5 text-2xl font-semibold tracking-[-.04em] text-white">{title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-white/60">{description}</p>
             </div>
           ))}
         </div>
@@ -80,16 +81,16 @@ function HowItWorks() {
 
 function FinancingBlock() {
   return (
-    <section className="marketplace-home-section bg-white" aria-labelledby="financing-heading">
+    <section className="marketplace-financing-section" aria-labelledby="financing-heading">
       <div className="marketplace-home-container">
-        <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:items-start">
-          <div>
-            <p className="marketplace-eyebrow text-[#0b7a75]">Antes de cerrar</p>
+        <div className="grid gap-10 lg:grid-cols-[0.68fr_1.32fr] lg:items-start">
+          <div className="pt-3">
+            <p className="marketplace-eyebrow text-[#0b7a75]">Hacé números antes de decidir</p>
             <h2 id="financing-heading" className="marketplace-section-title">¿Cuánto te queda por mes?</h2>
-            <p className="mt-4 max-w-md text-base leading-relaxed text-[#667780]">Simulá una cuota para ordenar tu búsqueda. Es una referencia inicial: después confirmá las condiciones con tu entidad financiera.</p>
-            <Link href="/financiamiento" className="marketplace-text-link mt-6 inline-flex">Ver guía de financiamiento <span aria-hidden="true">→</span></Link>
+            <p className="mt-5 max-w-md text-base leading-relaxed text-[#536a73]">Una simulación rápida para saber qué opciones entran en tu presupuesto y seguir buscando con más claridad.</p>
+            <Link href="/financiamiento" className="marketplace-text-link mt-7 inline-flex">Ver guía de financiamiento <span aria-hidden="true">→</span></Link>
           </div>
-          <div className="rounded-3xl border border-[#dce8e7] bg-[#f5f8f8] p-5 sm:p-8">
+          <div className="marketplace-financing-card">
             <Suspense fallback={<FinancingCalculatorSkeleton />}>
               <FinancingCalculator />
             </Suspense>

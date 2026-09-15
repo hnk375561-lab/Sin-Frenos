@@ -28,7 +28,7 @@ import { trackNewsletterSignup } from '@/lib/analytics-events'
  */
 export function NewsletterSignupForm({
   className = '',
-  heading = '¿Querés enterarte de nuevas fichas y guías?',
+  heading = 'Recibí nuevas publicaciones, oportunidades y precios cerca tuyo',
   trackingSource = 'footer',
 }: {
   className?: string
@@ -48,7 +48,7 @@ export function NewsletterSignupForm({
 
     const subject = encodeURIComponent('Quiero sumarme al newsletter de Sin Frenos')
     const body = encodeURIComponent(
-      `Hola, quiero recibir novedades de fichas técnicas y guías.\n\nMi email: ${email.trim()}\n(origen: ${trackingSource})`
+      `Hola, quiero recibir nuevas publicaciones y oportunidades de vehículos.\n\nMi email: ${email.trim()}\n(origen: ${trackingSource})`
     )
     window.location.href = `mailto:uruspotcdu@gmail.com?subject=${subject}&body=${body}`
     setSent(true)
@@ -68,7 +68,7 @@ export function NewsletterSignupForm({
 
   return (
     <div className={className}>
-      <p className="mb-2 font-mono text-[10px] uppercase tracking-wide text-neutral-400">{heading}</p>
+      <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-white/60">{heading}</p>
       <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <input
           type="email"
@@ -77,17 +77,17 @@ export function NewsletterSignupForm({
           onChange={(e) => setEmail(e.target.value)}
           placeholder="tu@email.com"
           aria-label="Tu email"
-          className="w-full rounded-lg border border-edge bg-surface-card px-3 py-2 text-sm text-neutral-900 focus:border-auto-accent focus:outline-none sm:w-64"
+          className="w-full rounded-xl border border-white/15 bg-white/10 px-3 py-3 text-sm text-white placeholder:text-white/35 focus:border-[#82d4ce] focus:outline-none sm:w-64"
         />
         <button
           type="submit"
           disabled={!isValidEmail}
-          className="inline-flex items-center justify-center rounded-lg bg-auto-accent px-4 py-2 text-sm font-semibold text-white transition-transform duration-200 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-auto-accent focus-visible:ring-offset-1"
+          className="inline-flex items-center justify-center rounded-full bg-[#f05a3c] px-5 py-3 text-sm font-bold text-white transition-transform duration-200 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f47b5d] focus-visible:ring-offset-2"
         >
           Sumarme
         </button>
       </form>
-      <p className="mt-1.5 text-[11px] text-neutral-400">Sin spam. Solo fichas y guías nuevas, cuando haya.</p>
+      <p className="mt-1.5 text-[11px] text-white/40">Sin spam. Solo inventario y oportunidades relevantes.</p>
     </div>
   )
 }

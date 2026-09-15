@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { calculateFinancing } from '@/lib/financing'
 import { Card, CardBody } from '@/components/ui/Card'
 import { cn } from '@/lib/utils'
@@ -46,7 +47,7 @@ function ResultRow({ label, value, emphasis }: { label: string; value: string; e
       <dd
         className={cn(
           'font-mono tabular-nums text-neutral-900',
-          emphasis ? 'text-lg font-bold text-oxide-red' : 'text-sm font-medium'
+          emphasis ? 'text-4xl font-black tracking-[-0.06em] text-[#f05a3c] sm:text-5xl' : 'text-sm font-medium text-[#536a73]'
         )}
       >
         {value}
@@ -139,18 +140,18 @@ export function FinancingCalculator() {
 
   return (
     <Card className="shadow-sm">
-      <CardBody className="space-y-6">
+      <CardBody className="marketplace-calculator-body space-y-7">
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-wide text-neutral-400">
+            <span className="mb-2 block text-xs font-bold uppercase tracking-[0.14em] text-[#536a73]">
               Precio del vehículo
             </span>
-            <div className="flex overflow-hidden rounded-sm border border-edge focus-within:border-oxide-red">
+            <div className="flex overflow-hidden rounded-xl border border-[#c7dcda] bg-white focus-within:border-[#0b7a75]">
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
                 aria-label="Moneda"
-                className="border-r border-edge bg-surface-card px-2 text-sm text-neutral-900 focus:outline-none"
+                className="border-r border-[#c7dcda] bg-white px-3 text-sm font-bold text-[#12212a] focus:outline-none focus:ring-2 focus:ring-[#82d4ce]"
               >
                 {CURRENCIES.map((c) => (
                   <option key={c} value={c}>
@@ -163,14 +164,14 @@ export function FinancingCalculator() {
                 inputMode="decimal"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                className="w-full bg-surface-card px-3 py-2 text-sm text-neutral-900 focus:outline-none"
+                className="w-full bg-white px-3 py-3 text-base font-semibold text-[#12212a] focus:outline-none"
                 placeholder="30000"
               />
             </div>
           </label>
 
           <label className="block">
-            <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-wide text-neutral-400">
+            <span className="mb-2 block text-xs font-bold uppercase tracking-[0.14em] text-[#536a73]">
               Tasa de interés anual (%)
             </span>
             <input
@@ -178,15 +179,16 @@ export function FinancingCalculator() {
               inputMode="decimal"
               value={annualRatePercent}
               onChange={(e) => setAnnualRatePercent(e.target.value)}
-              className="w-full rounded-sm border border-edge bg-surface-card px-3 py-2 text-sm text-neutral-900 transition duration-200 focus:border-oxide-red focus:outline-none focus-visible:ring-2 focus-visible:ring-oxide-red"
               placeholder="12"
+              aria-label="Tasa de interés anual"
+              className="w-full rounded-xl border border-[#c7dcda] bg-white px-3 py-3 text-base font-semibold text-[#12212a] transition duration-200 focus:border-[#0b7a75] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#82d4ce]"
             />
           </label>
 
           <label className="block">
-            <span className="mb-1.5 flex items-baseline justify-between font-mono text-[10px] uppercase tracking-wide text-neutral-400">
+            <span className="mb-2 flex items-baseline justify-between text-xs font-bold uppercase tracking-[0.14em] text-[#536a73]">
               <span>Entrega</span>
-              <span className="text-neutral-900">{downPaymentPercent}%</span>
+              <span className="text-base font-black text-[#f05a3c]">{downPaymentPercent}%</span>
             </span>
             <input
               type="range"
@@ -195,18 +197,18 @@ export function FinancingCalculator() {
               step={5}
               value={downPaymentPercent}
               onChange={(e) => setDownPaymentPercent(Number(e.target.value))}
-              className="w-full accent-oxide-red"
+              className="marketplace-calculator-range w-full"
             />
           </label>
 
           <label className="block">
-            <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-wide text-neutral-400">
+            <span className="mb-2 block text-xs font-bold uppercase tracking-[0.14em] text-[#536a73]">
               Plazo
             </span>
             <select
               value={termMonths}
               onChange={(e) => setTermMonths(Number(e.target.value))}
-              className="w-full rounded-sm border border-edge bg-surface-card px-3 py-2 text-sm text-neutral-900 transition duration-200 focus:border-oxide-red focus:outline-none focus-visible:ring-2 focus-visible:ring-oxide-red"
+              className="w-full rounded-xl border border-[#c7dcda] bg-white px-3 py-3 text-base font-semibold text-[#12212a] transition duration-200 focus:border-[#0b7a75] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#82d4ce]"
             >
               {TERM_OPTIONS.map((m) => (
                 <option key={m} value={m}>
@@ -218,7 +220,7 @@ export function FinancingCalculator() {
         </div>
 
         {result ? (
-          <dl className="space-y-1 border-t border-dashed border-edge-strong pt-4">
+          <dl className="space-y-2 border-t border-[#dce8e7] pt-5">
             <ResultRow label="Cuota mensual estimada" value={formatMoney(result.monthlyPayment, currency)} emphasis />
             <ResultRow label="Entrega" value={formatMoney(result.downPayment, currency)} />
             <ResultRow label="Monto financiado" value={formatMoney(result.financedAmount, currency)} />
@@ -232,8 +234,14 @@ export function FinancingCalculator() {
         )}
 
         {result && (
-          <div className="space-y-3 rounded-sm border border-edge bg-surface-card/50 p-4">
-            <p className="font-mono text-[10px] uppercase tracking-wide text-neutral-400">
+          <Link href="/listings" className="inline-flex w-full items-center justify-center rounded-full bg-[#f05a3c] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#d9472f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f47b5d] focus-visible:ring-offset-2">
+            Buscar vehículos dentro de este presupuesto <span aria-hidden="true" className="ml-2">→</span>
+          </Link>
+        )}
+
+        {result && (
+          <div className="space-y-3 rounded-2xl border border-[#c7dcda] bg-white p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#0b7a75]">
               ¿Querés ayuda para conseguir esta financiación?
             </p>
             <p className="text-sm text-neutral-500">
@@ -247,7 +255,7 @@ export function FinancingCalculator() {
                 onChange={(e) => setLeadName(e.target.value)}
                 placeholder="Tu nombre"
                 aria-label="Tu nombre"
-                className="w-full rounded-sm border border-edge bg-surface-card px-3 py-2 text-sm text-neutral-900 transition duration-200 focus:border-oxide-red focus:outline-none focus-visible:ring-2 focus-visible:ring-oxide-red"
+                className="w-full rounded-xl border border-[#c7dcda] bg-white px-3 py-3 text-sm text-[#12212a] transition duration-200 focus:border-[#0b7a75] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#82d4ce]"
               />
               <input
                 type="tel"
@@ -255,7 +263,7 @@ export function FinancingCalculator() {
                 onChange={(e) => setLeadPhone(e.target.value)}
                 placeholder="Tu WhatsApp (ej. 3445123456)"
                 aria-label="Tu WhatsApp"
-                className="w-full rounded-sm border border-edge bg-surface-card px-3 py-2 text-sm text-neutral-900 transition duration-200 focus:border-oxide-red focus:outline-none focus-visible:ring-2 focus-visible:ring-oxide-red"
+                className="w-full rounded-xl border border-[#c7dcda] bg-white px-3 py-3 text-sm text-[#12212a] transition duration-200 focus:border-[#0b7a75] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#82d4ce]"
               />
             </div>
             {leadReady && whatsappUrl ? (
@@ -264,7 +272,7 @@ export function FinancingCalculator() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleLeadSubmit}
-                className="inline-flex w-full items-center justify-center rounded-sm bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition duration-200 hover:bg-emerald-700 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 sm:w-auto"
+                className="inline-flex w-full items-center justify-center rounded-full bg-[#0b7a75] px-5 py-3 text-sm font-bold text-white transition duration-200 hover:bg-[#075d5a] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#82d4ce] focus-visible:ring-offset-2 sm:w-auto"
               >
                 Enviar por WhatsApp
                 <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">

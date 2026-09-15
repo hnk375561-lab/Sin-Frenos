@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { EntityType } from '@/types'
-import { Reveal } from '@/components/ui/Reveal'
 import { SITE_NAME } from '@/config/site'
 import { NewsletterSignupForm } from '@/components/monetization/NewsletterSignupForm'
 import { SupportButton } from '@/components/monetization/SupportButton'
@@ -12,232 +11,59 @@ export function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="relative border-t border-edge bg-ink pt-14 pb-[8.25rem] md:pb-14">
-      {/* pb móvil extra: el anuncio ancla sticky (solo ≤md) flota sobre el
-          pie del viewport y sin este colchón el último bloque del footer
-          quedaba tapado al llegar al final del scroll. En md+ el ancla no
-          existe y el padding vuelve al normal. */}
-      <div className="section-divider absolute inset-x-0 top-0" aria-hidden="true" />
-      <div className="mx-auto max-w-[96rem] px-4 sm:px-6 lg:px-8 xl:px-12">
-        <Reveal className="grid gap-10 md:grid-cols-3">
-          {/* About */}
-          <div>
-            <div className="mb-4 flex items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-oxide-red">
-                <span className="font-display text-[10px] font-bold text-white">{SITE_NAME.charAt(0)}</span>
-              </div>
-              <h3 className="font-display text-lg font-semibold text-paper">{SITE_NAME}</h3>
+    <footer className="marketplace-footer">
+      <div className="marketplace-footer-container">
+        <div className="marketplace-footer-main">
+          <div className="marketplace-footer-brand">
+            <div className="flex items-center gap-3">
+              <div className="marketplace-footer-mark" aria-hidden="true">S</div>
+              <h2 className="text-2xl font-bold tracking-[-0.05em] text-white">{SITE_NAME}</h2>
             </div>
-            <p className="max-w-xs text-sm leading-relaxed text-neutral-500">
-              Buscá, compará y publicá vehículos. Fichas técnicas con fuentes y herramientas para decidir mejor.
-            </p>
-            <NewsletterSignupForm className="mt-6 max-w-xs" trackingSource="footer" />
-            <SupportButton className="mt-4" />
+            <p className="mt-5 max-w-sm text-base leading-relaxed text-white/60">El lugar directo para comprar, vender y encontrar tu próximo vehículo en Argentina.</p>
+            <NewsletterSignupForm className="mt-8 max-w-md" trackingSource="footer" heading="Recibí nuevas publicaciones y oportunidades cerca tuyo" />
+            <SupportButton className="mt-5" />
           </div>
 
-          {/* Quick Links */}
+          <div className="marketplace-footer-actions">
+            <p className="marketplace-footer-kicker">Acciones principales</p>
+            <Link href="/listings" className="marketplace-footer-action-link">Comprar un vehículo <span aria-hidden="true">→</span></Link>
+            <Link href="/publicar" prefetch={false} className="marketplace-footer-action-link">Vender mi vehículo <span aria-hidden="true">↗</span></Link>
+            <Link href="/financiamiento" className="marketplace-footer-action-link">Calcular financiamiento <span aria-hidden="true">→</span></Link>
+          </div>
+
+          <div className="marketplace-footer-explore">
+            <p className="marketplace-footer-kicker">Explorar</p>
+            <Link href={`/${EntityType.VEHICLE}`}>Vehículos</Link>
+            <Link href={`/${EntityType.MANUFACTURER}`}>Fabricantes</Link>
+            <Link href={`/${EntityType.GUIDE}`}>Guías de compra</Link>
+            <Link href={`/${EntityType.NEWS}`}>Noticias</Link>
+            <Link href="/comparar">Comparar modelos</Link>
+            <Link href="/favoritos">Favoritos</Link>
+          </div>
+        </div>
+
+        <div className="marketplace-footer-lower">
           <div>
-            <h3 className="eyebrow mb-4 text-xs font-semibold uppercase text-oxide-red">Explorar</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link
-                  href={`/${EntityType.VEHICLE}`}
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Vehículos
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href={`/${EntityType.MANUFACTURER}`}
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Fabricantes
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href={`/${EntityType.GUIDE}`}
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Guías de compra
-                </Link>
-              </li>
-              {/* P2-11 (auditoría UX, sept 2026): Noticias no aparecía en
-                  ningún punto de navegación pese a tener contenido real
-                  publicado (3 artículos) — solo era alcanzable escribiendo
-                  la URL a mano. No entra al header (sigue reservado a las
-                  6 secciones núcleo), pero un link en el footer alcanza
-                  para que deje de ser un callejón invisible. */}
-              <li>
-                <Link
-                  href={`/${EntityType.NEWS}`}
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Noticias
-                </Link>
-              </li>
-            </ul>
+            <p className="marketplace-footer-kicker">Información y ayuda</p>
+            <div className="marketplace-footer-fine-print">
+              <Link href="/tramites-vehiculo">Trámites</Link>
+              <Link href="/anunciate">Anunciate acá</Link>
+              <Link href="/licencia-datos">Licencia de datos</Link>
+              <Link href="/concesionarias-concepcion-del-uruguay">Directorio</Link>
+              <Link href="/privacidad">Privacidad</Link>
+              <Link href="/terminos">Términos de uso</Link>
+              <a href="mailto:uruspotcdu@gmail.com">Contacto</a>
+            </div>
           </div>
-
-          {/* Secciones */}
-          <div>
-            <h3 className="eyebrow mb-4 text-xs font-semibold uppercase text-oxide-red">Secciones</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link
-                  href="/buscar"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Búsqueda
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/galeria"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Galería
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/comparar"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Comparar
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/mapa"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Mapa
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/favoritos"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Favoritos
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/financiamiento"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Financiamiento
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/vender-tu-auto"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Vendé tu auto
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/tramites-vehiculo"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Trámites (transferencia/patentamiento)
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/anunciate"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Anunciate acá
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/licencia-datos"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Licencia de datos (B2B)
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/concesionarias-concepcion-del-uruguay"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Directorio Concepción del Uruguay
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/privacidad"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Privacidad
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terminos"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Términos de Uso
-                </Link>
-              </li>
-              <li>
-                <a
-                  href="mailto:uruspotcdu@gmail.com"
-                  className="link-underline text-neutral-500 transition-colors hover:text-oxide-red"
-                >
-                  Contacto
-                </a>
-              </li>
-            </ul>
-          </div>
-        </Reveal>
-
-        {/* Volver arriba — acción terminal del pie de página. El FAB
-            global (BackToTop) cubre el "durante el scroll"; esta es la
-            alternativa anclada y con texto para la persona que llegó al
-            final del contenido y (sobre todo en desktop, donde el FAB es
-            compacto y sin label) prefiere una acción explícita de cierre. */}
-        <Reveal delay={100} className="mt-12 flex justify-center">
-          <button
-            type="button"
-            onClick={() => smoothScrollTo(0)}
-            aria-label="Volver arriba"
-            className="tap-scale inline-flex items-center gap-2 rounded-full border border-paper/15 bg-paper/5 px-4 py-2.5 text-xs font-medium text-neutral-400 transition-colors hover:border-oxide-red/60 hover:bg-paper/10 hover:text-oxide-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxide-red"
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="m18 15-6-6-6 6" />
-            </svg>
-            Volver arriba
+          <button type="button" onClick={() => smoothScrollTo(0)} className="marketplace-footer-top" aria-label="Volver arriba">
+            Volver arriba <span aria-hidden="true">↑</span>
           </button>
-        </Reveal>
+        </div>
 
-        {/* Disclaimer + Copyright */}
-        <Reveal delay={150} className="relative mt-10 space-y-3 pt-8 text-center text-neutral-400">
-          <div className="section-divider absolute inset-x-0 top-0" aria-hidden="true" />
-          <p className="mx-auto max-w-2xl text-xs leading-relaxed">
-            {SITE_NAME} es un proyecto editorial independiente. Las marcas y nombres de fabricantes mencionados
-            pertenecen a sus respectivos dueños y se citan aquí con fines informativos y de comparación técnica.
-          </p>
-          <p className="font-mono text-xs tracking-wide">© {currentYear} {SITE_NAME}.</p>
-        </Reveal>
+        <div className="marketplace-footer-legal">
+          <p>{SITE_NAME} es un marketplace automotor independiente. Las marcas mencionadas pertenecen a sus respectivos dueños.</p>
+          <p>© {currentYear} {SITE_NAME}.</p>
+        </div>
       </div>
     </footer>
   )
