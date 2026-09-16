@@ -52,7 +52,6 @@
     "seed:listings-fase3:cleanup": "node scripts/seed-listings-fase3.mjs --cleanup"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.39.1",
     "clsx": "^2.1.1",
     "framer-motion": "^13.3.0",

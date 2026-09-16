@@ -19,7 +19,7 @@
 
 'use client'
 
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -42,26 +42,19 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
-export const supabase = createBrowserClient(
+// Este sitio es un export estático sin servidor que pueda intercambiar un
+// verifier PKCE. El magic link puede abrirse en cualquier navegador o
+// webview, por eso usamos implicit flow y dejamos que Supabase procese los
+// tokens del hash con detectSessionInUrl.
+export const supabase = createClient(
   supabaseUrl || 'https://placeholder.invalid',
   supabaseAnonKey || 'placeholder-anon-key',
   {
     auth: {
-      // PKCE (el default de @supabase/ssr) requiere que el code_verifier
-      // generado al pedir el magic link siga en el localStorage del MISMO
-      // navegador/perfil que abre el link del mail. En la práctica, el
-      // usuario pide el link desde un navegador y lo abre desde la app de
-      // mail (que dispara el navegador por defecto del sistema, no
-      // necesariamente el mismo perfil) — ahí no hay verifier guardado,
-      // `exchangeCodeForSession` rechaza la promesa sin pasar por el
-      // `.then()` de abajo (no hay `.catch()`), y el usuario queda
-      // pegado en `/ingresar/?code=...` para siempre sin ver ningún
-      // error. Con flujo implícito el magic link ya trae el token en el
-      // fragment de la URL (`#access_token=...`) y `detectSessionInUrl`
-      // (true por defecto) lo procesa solo al iniciar el cliente, sin
-      // depender de nada guardado localmente — funciona sin importar en
-      // qué navegador se abra.
       flowType: 'implicit',
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
     },
   }
 )
