@@ -25,6 +25,16 @@
  */
 
 export const PREMIUM_REPORT_PRICE_ARS = 990
+
+/**
+ * Link de pago hosteado de Mercado Pago (creado a mano en el panel de MP,
+ * sin backend propio — ver docs/monetizacion-plan.md sección 2.13, "Opción
+ * A"). Sin verificación automática: el flujo es "pagar → confirmar acá
+ * mismo que se pagó → descargar", sistema de honestidad. Si Mercado Pago
+ * requirió fecha de vencimiento al crearlo, hay que renovarlo antes de esa
+ * fecha y actualizar este valor.
+ */
+export const PREMIUM_REPORT_PAYMENT_LINK = 'https://mpago.la/2KHmfn2'
 export const PREMIUM_REPORT_MIN_VEHICLES = 2
 export const PREMIUM_REPORT_MAX_VEHICLES = 5
 
