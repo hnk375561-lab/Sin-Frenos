@@ -14,8 +14,7 @@ export function Footer() {
   return (
     <footer className="marketplace-footer">
       <div className="marketplace-footer-container">
-        <div className="marketplace-footer-main">
-          <div className="marketplace-footer-brand">
+        <div className="marketplace-footer-brand">
             <div className="flex items-center gap-3">
               <div className="marketplace-footer-mark" aria-hidden="true">S</div>
               <h2 className="text-2xl font-bold tracking-[-0.05em] text-white">{SITE_NAME}</h2>
@@ -27,40 +26,46 @@ export function Footer() {
               <Link href="/guias" className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/80 transition-[border-color,color] duration-200 hover:border-white/50 hover:text-white">Ver guías de compra</Link>
             </div>
             <SupportButton className="mt-5" />
-          </div>
-
-          <div className="marketplace-footer-actions">
-            <p className="marketplace-footer-kicker">Acciones principales</p>
-            <Link href="/listings" className="marketplace-footer-action-link">Comprar un vehículo <span aria-hidden="true">→</span></Link>
-            <Link href="/publicar" prefetch={false} className="marketplace-footer-action-link">Vender mi vehículo <span aria-hidden="true">↗</span></Link>
-            <Link href="/financiamiento" className="marketplace-footer-action-link">Calcular financiamiento <span aria-hidden="true">→</span></Link>
-          </div>
-
-          <div className="marketplace-footer-explore">
-            <p className="marketplace-footer-kicker">Explorar</p>
-            <Link href={`/${EntityType.VEHICLE}`}>Vehículos</Link>
-            <Link href={`/${EntityType.MANUFACTURER}`}>Fabricantes</Link>
-            <Link href={`/${EntityType.GUIDE}`}>Guías de compra</Link>
-            <Link href={`/${EntityType.NEWS}`}>Noticias</Link>
-            <Link href="/comparar">Comparar modelos</Link>
-            <Link href="/favoritos">Favoritos</Link>
-          </div>
         </div>
+
+        <nav className="marketplace-footer-nav" aria-label="Navegación del pie de página">
+          <div className="marketplace-footer-column">
+            <p className="marketplace-footer-kicker">Explorar</p>
+            <Link href={`/${EntityType.VEHICLE}`}>Catálogo completo</Link>
+            <Link href={`/${EntityType.MANUFACTURER}`}>Marcas populares</Link>
+            <Link href="/comparar">Comparador de vehículos</Link>
+            <Link href={`/${EntityType.GUIDE}`}>Guías de compra</Link>
+          </div>
+          <div className="marketplace-footer-column">
+            <p className="marketplace-footer-kicker">Vender</p>
+            <Link href="/publicar" prefetch={false}>Publicar mi vehículo</Link>
+            <Link href="/vender-tu-auto">Valuación de autos</Link>
+            <Link href="/vehiculos">Historial de precios</Link>
+            <Link href="/guias/vender-auto-usado-argentina">Consejos de venta</Link>
+          </div>
+          <div className="marketplace-footer-column">
+            <p className="marketplace-footer-kicker">Comunidad</p>
+            <Link href={`/${EntityType.NEWS}`}>Blog / Noticias</Link>
+            <Link href="/quienes-somos">Testimonios</Link>
+            <a href="mailto:uruspotcdu@gmail.com">Contacto directo</a>
+            <a href="mailto:uruspotcdu@gmail.com?subject=Soporte%20técnico">Soporte técnico</a>
+          </div>
+          <div className="marketplace-footer-column">
+            <p className="marketplace-footer-kicker">Legal</p>
+            <Link href="/privacidad">Privacidad</Link>
+            <Link href="/terminos">Términos y condiciones</Link>
+            <Link href="/licencia-datos">Licencia de datos</Link>
+            <Link href="/tramites-vehiculo">Trámites</Link>
+          </div>
+        </nav>
 
         <div className="marketplace-footer-lower">
           <div>
-            <p className="marketplace-footer-kicker">Información y ayuda</p>
-            <div className="marketplace-footer-fine-print">
-              <Link href="/tramites-vehiculo">Trámites</Link>
-              <Link href="/anunciate">Anunciate acá</Link>
-              <Link href="/licencia-datos">Licencia de datos</Link>
-              <Link href="/concesionarias-concepcion-del-uruguay">Directorio</Link>
-              <Link href="/privacidad">Privacidad</Link>
-              <Link href="/terminos">Términos de uso</Link>
-              <Link href="/reglas-de-publicacion">Reglas de publicación</Link>
-              <Link href="/quienes-somos">Quiénes somos</Link>
-              <Link href="/cuenta">Mi cuenta y derechos ARCO</Link>
-              <a href="mailto:uruspotcdu@gmail.com">Contacto</a>
+            <p className="marketplace-footer-kicker">Seguinos</p>
+            <div className="marketplace-footer-socials">
+              <a href="https://www.instagram.com/" target="_blank" rel="noreferrer">Instagram</a>
+              <a href="https://www.youtube.com/" target="_blank" rel="noreferrer">YouTube</a>
+              <a href="mailto:uruspotcdu@gmail.com">Email</a>
             </div>
           </div>
           <button type="button" onClick={() => smoothScrollTo(0)} className="marketplace-footer-top" aria-label="Volver arriba">

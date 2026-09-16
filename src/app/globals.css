@@ -1054,7 +1054,11 @@ a:not(.no-style):not([class*="text-"]) {
 .marketplace-calculator-range::-moz-range-thumb { width: 1.1rem; height: 1.1rem; border: 3px solid #fff; border-radius: 50%; background: #C2410C; box-shadow: 0 3px 10px rgba(9,9,11,.25); }
 .marketplace-footer { padding: 5rem 0 3rem; background: #09090B; color: #fff; }
 .marketplace-footer-container { width: min(100% - 2rem, 80rem); margin-inline: auto; }
-.marketplace-footer-main { display: grid; grid-template-columns: 1.35fr .85fr .85fr; gap: 3rem; padding-bottom: 4rem; }
+.marketplace-footer-main { padding-bottom: 2rem; }
+.marketplace-footer-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2rem; border-top: 1px solid rgba(255,255,255,.13); padding: 3rem 0 4rem; }
+.marketplace-footer-column { display: flex; flex-direction: column; align-items: flex-start; gap: .85rem; }
+.marketplace-footer-column a, .marketplace-footer-column button { color: rgba(255,255,255,.62); font-size: .9rem; text-align: left; transition: color var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard); }
+.marketplace-footer-column a:hover, .marketplace-footer-column button:hover { color: #fff; transform: translateX(4px); }
 .marketplace-footer-mark { display: flex; width: 2.25rem; height: 2.25rem; align-items: center; justify-content: center; border-radius: .7rem; background: #C2410C; font-weight: 900; color: #fff; }
 .marketplace-footer-kicker { margin-bottom: 1rem; color: #C2410C; font-size: .7rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
 .marketplace-footer-actions, .marketplace-footer-explore { display: flex; flex-direction: column; align-items: flex-start; gap: .85rem; }
@@ -1063,13 +1067,16 @@ a:not(.no-style):not([class*="text-"]) {
 .marketplace-footer-explore a { color: rgba(255,255,255,.6); font-size: .9rem; transition: color var(--dur-fast) var(--ease-standard); }
 .marketplace-footer-explore a:hover, .marketplace-footer-fine-print a:hover { color: #C2410C; }
 .marketplace-footer-lower { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; border-top: 1px solid rgba(255,255,255,.13); padding-top: 2rem; }
+.marketplace-footer-socials { display: flex; flex-wrap: wrap; gap: .5rem 1.15rem; }
+.marketplace-footer-socials a { color: rgba(255,255,255,.62); font-size: .8rem; transition: color var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard); }
+.marketplace-footer-socials a:hover { color: #fff; transform: translateY(-2px); }
 .marketplace-footer-fine-print { display: flex; flex-wrap: wrap; gap: .5rem 1.15rem; max-width: 48rem; }
 .marketplace-footer-fine-print a { color: rgba(255,255,255,.4); font-size: .75rem; transition: color var(--dur-fast) var(--ease-standard); }
 .marketplace-footer-top { display: inline-flex; align-items: center; gap: .5rem; border: 1px solid rgba(255,255,255,.2); border-radius: 9999px; padding: .7rem 1rem; color: rgba(255,255,255,.7); font-size: .8rem; font-weight: 700; transition: border-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard); }
 .marketplace-footer-top:hover { border-color: #C2410C; color: #fff; }
 .marketplace-footer-legal { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid rgba(255,255,255,.08); padding-top: 1.5rem; color: rgba(255,255,255,.35); font-size: .7rem; line-height: 1.5; }
-@media (max-width: 900px) { .marketplace-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .marketplace-category-card-autos { grid-column: span 2; } .marketplace-footer-main { grid-template-columns: 1fr 1fr; } .marketplace-footer-brand { grid-column: span 2; } }
-@media (max-width: 640px) { .marketplace-category-grid, .marketplace-process-grid { grid-template-columns: 1fr; } .marketplace-category-card-autos { grid-column: auto; min-height: 25rem; } .marketplace-process-section, .marketplace-financing-section { padding-block: 3.5rem; } .marketplace-footer-main { grid-template-columns: 1fr; gap: 2.5rem; } .marketplace-footer-brand { grid-column: auto; } .marketplace-footer-lower, .marketplace-footer-legal { align-items: flex-start; flex-direction: column; } .marketplace-footer-container { width: min(100% - 1.25rem, 80rem); } }
+@media (max-width: 900px) { .marketplace-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .marketplace-category-card-autos { grid-column: span 2; } .marketplace-footer-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .marketplace-category-grid, .marketplace-process-grid { grid-template-columns: 1fr; } .marketplace-category-card-autos { grid-column: auto; min-height: 25rem; } .marketplace-process-section, .marketplace-financing-section { padding-block: 3.5rem; } .marketplace-footer-nav { grid-template-columns: 1fr 1fr; gap: 2rem 1rem; padding-block: 2.5rem 3.5rem; } .marketplace-footer-lower, .marketplace-footer-legal { align-items: flex-start; flex-direction: column; } .marketplace-footer-container { width: min(100% - 1.25rem, 80rem); } }
 
 /* === MARKETPLACE PHASE 3: PRODUCT JOURNEY === */
 .marketplace-auth-page { position: relative; min-height: 75vh; display: grid; place-items: center; overflow: hidden; padding: 4rem 1rem; background: #09090B; }

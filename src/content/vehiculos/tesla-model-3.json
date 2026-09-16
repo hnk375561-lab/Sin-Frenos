@@ -52,10 +52,10 @@
   "manufacturer": "Tesla",
   "class": "Sedán",
   "performance": {
-    "speed": "Alta (225 km/h)",
-    "acceleration": "Muy alta (0-100 km/h en 3.3s en versión Performance)"
+    "speed": "201 km/h",
+    "acceleration": "0-100 km/h en 6.1 s"
   },
-  "power": "283 hp (Versión RWD acceso) / hasta 464 CV en variantes superiores",
+  "power": "283 CV (208 kW, versión RWD 60 kWh)",
   "price": "Desde 33.365 € hasta 57.490 € (PVP referencia España y mercado europeo)",
   "priceStructured": {
     "type": "range",
@@ -64,12 +64,16 @@
     "max": 57490,
     "raw": "Desde 33.365 € hasta 57.490 € (PVP referencia España y mercado europeo)"
   },
-  "consumo": "13,0 kWh/100 km (Ciclo WLTP oficial)",
-  "dimensiones": "4719 mm largo x 1849 mm ancho x 1440 mm alto, distancia entre ejes 2875 mm",
+  "consumo": "13,2 kWh/100 km (WLTP)",
+  "autonomia": "513 km (WLTP, carga completa)",
+  "tipoBateria": "Litio-ferrofosfato (LFP)",
+  "capacidadBateria": "60 kWh brutos / 57,3 kWh utilizables",
+  "dimensiones": "4720 mm largo x 1850 mm ancho x 1441 mm alto",
   "evidence": {
     "level": "respaldado",
-    "secondarySource": "https://www.diariomotor.com/coche/tesla-model-3",
-    "note": "Datos verificados a partir de especificaciones oficiales de Tesla y portales especializados europeos sobre el rediseño Highland y sus autonomías de hasta 660 km WLTP.",
+    "primarySource": "https://www.tesla.com/ownersmanual/model3/en_cn/GUID-56562137-FC31-4110-A13C-9A9FC6657BF0.html",
+    "secondarySource": "https://www.auto-data.net/es/tesla-model-3-highland-facelift-2023-60-kwh-283hp-49902",
+    "note": "Configuración identificada: Model 3 Highland RWD 60 kWh, producida desde septiembre de 2023. Los valores de batería, autonomía, consumo, desempeño, dimensiones y peso corresponden a esta versión y no a Long Range o Performance.",
     "limitations": [
       "El consumo real varía según el estilo de conducción, uso de climatización y condiciones climáticas",
       "Los precios y rangos de autonomía pueden diferir sustancialmente según los aranceles y la homologación de cada región fuera de Europa"
@@ -82,11 +86,11 @@
   },
   "transmision": "Automática 1-velocidad",
   "traccion": "RWD/AWD (depende versión)",
-  "peso": "1752 kg",
+  "peso": "1765 kg",
   "tipoMotor": "Motor eléctrico síncrono de imanes permanentes AC",
-  "potenciaKW": "208 kW (RWD base)",
+  "potenciaKW": "208 kW",
   "capacidadTanque": null,
-  "tiempoRecorrido": "3.3s (0-100 km/h en versión Performance)",
+  "tiempoRecorrido": "6.1 s (0-100 km/h)",
   "anoProduccion": "2023-presente",
   "mercados": [
     "Europa",

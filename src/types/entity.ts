@@ -159,6 +159,9 @@ export interface Vehicle extends BaseEntity {
    *  `null`/ausente en fichas que todavía no pasaron por la migración. */
   priceStructured?: PriceStructured | null
   consumo?: string | null
+  autonomia?: string | null
+  tipoBateria?: string | null
+  capacidadBateria?: string | null
   dimensiones?: string | null
   transmision?: string | null
   traccion?: string | null
