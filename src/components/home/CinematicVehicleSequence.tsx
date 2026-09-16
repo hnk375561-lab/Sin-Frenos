@@ -233,8 +233,8 @@ export function CinematicVehicleSequence({ vehicles }: { vehicles: SequenceVehic
   }
 
   if (reducedMotion || compact) {
-    return <section ref={rootRef} className="relative border-b border-edge bg-auto-dark text-auto-text" style={{ height: `${Math.max(1, vehicles.length) * 82}vh` }} aria-labelledby="sequence-heading-static">
-      <div className="sticky top-0 flex min-h-[620px] h-screen items-center overflow-hidden">
+    return <section ref={rootRef} className="relative border-b border-edge bg-auto-dark text-auto-text" style={{ height: `${Math.max(1, vehicles.length) * 82}svh` }} aria-labelledby="sequence-heading-static">
+      <div className="sticky top-0 flex min-h-[620px] h-[100svh] items-center overflow-hidden">
         <div className="container-max grid w-full gap-8 py-20 lg:grid-cols-[0.55fr_1.45fr] lg:items-end">
           <div className="max-w-sm"><p className="eyebrow text-orange-300">{SECTION_LABEL}</p><h2 id="sequence-heading-static" className="mt-5 text-4xl font-bold tracking-tight text-white sm:text-5xl">El archivo también se mira.</h2><p className="mt-5 text-base leading-relaxed text-zinc-300">Una selección de vehículos reales, elegidos por categoría y fotografía.</p></div>
           <Link href={`/vehiculos/${activeVehicle.slug}`} prefetch={false} className="group relative block overflow-hidden border border-white/15 bg-zinc-900 focus-visible:outline-white"><img src={activeVehicle.imageSrc} alt={activeVehicle.imageAlt} fetchPriority="high" decoding="async" className="aspect-[16/9] w-full object-cover transition-opacity duration-500" /><div className="flex items-baseline justify-between gap-4 border-t border-white/15 px-1 py-4 text-white"><div><p className="font-mono text-xs text-orange-300">{activeVehicle.category}</p><h3 className="mt-1 text-2xl font-bold sm:text-4xl">{activeVehicle.title}</h3></div><span className="font-mono text-xs text-zinc-400">Abrir ficha ↗</span></div></Link>
@@ -243,8 +243,8 @@ export function CinematicVehicleSequence({ vehicles }: { vehicles: SequenceVehic
     </section>
   }
 
-  return <section ref={rootRef} className="relative border-b border-edge bg-auto-dark text-auto-text" style={{ height: `${Math.max(1, vehicles.length) * 100}vh` }} aria-labelledby="sequence-heading" onPointerMove={handlePointerMove} onPointerLeave={() => { pointerApi.current?.x(0); pointerApi.current?.y(0) }}>
-    <div ref={stageRef} className="sticky top-0 flex h-screen min-h-[680px] items-center overflow-hidden" style={{ perspective: '1200px' }}>
+  return <section ref={rootRef} className="relative border-b border-edge bg-auto-dark text-auto-text" style={{ height: `${Math.max(1, vehicles.length) * 100}svh` }} aria-labelledby="sequence-heading" onPointerMove={handlePointerMove} onPointerLeave={() => { pointerApi.current?.x(0); pointerApi.current?.y(0) }}>
+    <div ref={stageRef} className="sticky top-0 flex h-[100svh] min-h-[680px] items-center overflow-hidden" style={{ perspective: '1200px' }}>
       <div className="container-max relative z-10 grid w-full gap-10 py-20 lg:grid-cols-[0.52fr_1.48fr] lg:items-end">
         <div className="order-2 max-w-sm pb-3 lg:order-1">
           <p className="eyebrow text-orange-300">{SECTION_LABEL}</p>
@@ -267,7 +267,7 @@ export function CinematicVehicleSequence({ vehicles }: { vehicles: SequenceVehic
                   const height = `${100 / grid.rows}%`
                   return <div key={motion.id} ref={(node) => { tileRefs.current[motion.id] = node }} className="absolute overflow-hidden bg-no-repeat" style={{ left, top, width, height, backgroundImage: `url(${vehicle.imageSrc})`, backgroundSize: `${grid.cols * 100}% ${grid.rows * 100}%`, backgroundPosition: `${grid.cols === 1 ? 0 : (motion.col / (grid.cols - 1)) * 100}% ${grid.rows === 1 ? 0 : (motion.row / (grid.rows - 1)) * 100}%`, transform: 'translate3d(0,0,0)', opacity: vehicleIndex === 0 ? 1 : 0 }} />
                 })}
-                <figcaption className="pointer-events-none absolute -bottom-12 left-0 z-30 flex w-full items-baseline justify-between gap-4 text-white sm:-bottom-14"><span className="text-2xl font-bold tracking-tight sm:text-4xl">{vehicle.title}</span><span className="font-mono text-xs text-zinc-400">{vehicle.category}</span></figcaption>
+                <figcaption className="pointer-events-none absolute bottom-4 left-4 right-4 z-30 flex items-baseline justify-between gap-4 text-white sm:bottom-5 sm:left-6 sm:right-6"><span className="max-w-[70%] text-2xl font-bold tracking-tight drop-shadow-[0_2px_14px_rgba(0,0,0,.45)] sm:text-4xl">{vehicle.title}</span><span className="font-mono text-xs text-zinc-300 drop-shadow-[0_2px_10px_rgba(0,0,0,.45)]">{vehicle.category}</span></figcaption>
               </figure>
             })}
           </div>

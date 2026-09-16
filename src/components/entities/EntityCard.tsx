@@ -358,7 +358,7 @@ export function EntityCard({
                   {brand && <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-ink/60">{brand}</p>}
                   <h3 className="line-clamp-2 font-serif text-base font-semibold leading-tight text-ink sm:text-lg">{model}</h3>
                   {specs.length > 0 && <p className="mt-2 truncate font-mono text-[10px] text-ink/60">{specs.map((spec) => spec.value).join(' · ')}</p>}
-                  {progressiveSpec && <p className="mt-2 font-mono text-[10px] text-ink/70 opacity-0 translate-y-2 motion-safe:transition-all motion-safe:duration-200 motion-safe:delay-75 group-hover/card:opacity-100 group-hover/card:translate-y-0 group-has-[:focus-visible]/card:opacity-100 group-has-[:focus-visible]/card:translate-y-0 [@media(hover:none)]:opacity-70 [@media(hover:none)]:translate-y-0">{progressiveSpec}</p>}
+                  {progressiveSpec && <p className="mt-2 font-mono text-[10px] text-ink/70 opacity-0 translate-y-2 motion-safe:transition-[opacity,transform] motion-safe:duration-200 motion-safe:delay-75 group-hover/card:opacity-100 group-hover/card:translate-y-0 group-has-[:focus-visible]/card:opacity-100 group-has-[:focus-visible]/card:translate-y-0 [@media(hover:none)]:opacity-70 [@media(hover:none)]:translate-y-0">{progressiveSpec}</p>}
                 </div>
                 {evidenceStamp && <span className={cn('shrink-0 border px-2 py-1 font-mono text-[9px] uppercase tracking-wider motion-safe:transition-transform motion-safe:duration-150 group-hover/card:rotate-3 group-hover/card:scale-110 group-has-[:focus-visible]/card:rotate-3 group-has-[:focus-visible]/card:scale-110', evidenceStamp.className)}>{evidenceStamp.icon} {evidenceStamp.shortLabel}</span>}
               </div>
@@ -498,7 +498,7 @@ export function EntityCard({
                     </p>
                   )}
                   {progressiveSpec && (
-                    <p className="font-mono text-[10px] text-white/80 opacity-0 translate-y-2 motion-safe:transition-all motion-safe:duration-200 motion-safe:delay-75 group-hover/card:opacity-100 group-hover/card:translate-y-0 group-has-[:focus-visible]/card:opacity-100 group-has-[:focus-visible]/card:translate-y-0 [@media(hover:none)]:opacity-70 [@media(hover:none)]:translate-y-0">
+                    <p className="font-mono text-[10px] text-white/80 opacity-0 translate-y-2 motion-safe:transition-[opacity,transform] motion-safe:duration-200 motion-safe:delay-75 group-hover/card:opacity-100 group-hover/card:translate-y-0 group-has-[:focus-visible]/card:opacity-100 group-has-[:focus-visible]/card:translate-y-0 [@media(hover:none)]:opacity-70 [@media(hover:none)]:translate-y-0">
                       {progressiveSpec}
                     </p>
                   )}
