@@ -21,6 +21,14 @@
 
 export const FLYER_PRICE_ARS = 690
 
+/**
+ * Link de pago hosteado de Mercado Pago (mismo mecanismo que
+ * `PREMIUM_REPORT_PAYMENT_LINK` en premium-report.ts — ver
+ * docs/monetizacion-plan.md sección 2.16, "Opción A"). Sin verificación
+ * automática: flujo "pagar → confirmar acá mismo que se pagó → descargar".
+ */
+export const FLYER_PAYMENT_LINK = 'https://mpago.la/1BsNaWv'
+
 export interface FlyerData {
   marca: string
   modelo: string
