@@ -71,10 +71,10 @@
 
 /* === TIPOGRAFÍA === */
 :root {
-  --font-sans: var(--font-inter), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* --font-sans, --font-display, and --font-mono are supplied by the
+     next/font variable classes on <html>. Do not redeclare them here: doing
+     so on :root overrides those classes and silently falls back to Times. */
   --font-serif: Georgia, 'Times New Roman', serif;
-  --font-display: var(--font-space-grotesk), Georgia, 'Times New Roman', serif;
-  --font-mono: var(--font-jetbrains-mono), 'Fira Code', 'Courier New', monospace;
 
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-premium: cubic-bezier(0.2, 0.8, 0.2, 1);

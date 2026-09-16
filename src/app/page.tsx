@@ -10,7 +10,7 @@ import { HomeDiscovery } from '@/components/home/HomeDiscovery'
 import { EntityCard } from '@/components/entities/EntityCard'
 import { Reveal } from '@/components/ui/Reveal'
 import { ArchiveHero } from '@/components/home/ArchiveHero'
-import { CinematicVehicleSequence, type SequenceVehicle } from '@/components/home/CinematicVehicleSequence'
+import type { EditorialVehicle } from '@/components/home/EditorialVehicleHero'
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateHomepageMetadata()
@@ -46,7 +46,7 @@ export default async function Home() {
   const featuredVehicle = featured[0] ?? vehicles.find((vehicle) => vehicle.featured) ?? vehicles[0]
   const featuredImage = featuredVehicle ? imageBySlug[`vehiculos/${featuredVehicle.slug}`] : null
   const evidenceCoveragePct = computeEvidenceCoveragePct(vehicles)
-  const cinematicVehicles: SequenceVehicle[] = categories
+  const cinematicVehicles: EditorialVehicle[] = categories
     .filter(({ group }) => group !== 'Otros')
     .flatMap(({ group }) => {
       const candidates = vehicles
@@ -90,9 +90,8 @@ export default async function Home() {
           evidenceCoveragePct={evidenceCoveragePct}
           searchExamples={vehicles.slice(0, 4).map((vehicle) => vehicle.title)}
           categoryChips={heroCategoryChips}
+          vehicles={cinematicVehicles}
         />
-
-        <CinematicVehicleSequence vehicles={cinematicVehicles} />
 
         <section className="border-b border-edge bg-surface-card py-12 sm:py-16" aria-labelledby="categories-heading">
           <div className="container-max">
