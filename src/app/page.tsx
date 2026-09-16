@@ -46,7 +46,7 @@ export default async function Home() {
                 <p className="eyebrow text-orange-300">Archivo automotor · datos que se pueden consultar</p>
                 <h1 className="mt-6 max-w-4xl font-display text-5xl font-bold leading-[.94] tracking-[-.06em] sm:text-7xl lg:text-[6.8rem]">El mundo de los vehículos, <span className="text-orange-300">para explorar.</span></h1>
                 <p className="mt-7 max-w-2xl text-lg leading-relaxed text-white/70">Fichas técnicas, relaciones reales y comparaciones para entender qué hay detrás de cada modelo.</p>
-                <div className="mt-8 max-w-2xl"><QuickSearchForm examples={['Toyota Corolla', 'SUV compacto', 'motos trail', 'vehículos de más de 300 hp']} /></div>
+                <div className="mt-8 max-w-2xl"><QuickSearchForm examples={vehicles.slice(0, 4).map((vehicle) => vehicle.title)} /></div>
                 <div className="mt-6 flex flex-wrap gap-3 text-sm"><Link href="/explorar" className="rounded-full bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-700">Empezar a explorar →</Link><Link href="/comparar" className="rounded-full border border-white/30 px-5 py-3 font-semibold text-white transition hover:border-white">Comparar vehículos</Link></div>
               </div>
               <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/15 bg-white/10">
