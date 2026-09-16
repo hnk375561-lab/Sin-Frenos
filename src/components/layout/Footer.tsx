@@ -61,11 +61,9 @@ export function Footer() {
 
         <div className="marketplace-footer-lower">
           <div>
-            <p className="marketplace-footer-kicker">Seguinos</p>
+            <p className="marketplace-footer-kicker">Contacto</p>
             <div className="marketplace-footer-socials">
-              <a href="https://www.instagram.com/" target="_blank" rel="noreferrer">Instagram</a>
-              <a href="https://www.youtube.com/" target="_blank" rel="noreferrer">YouTube</a>
-              <a href="mailto:uruspotcdu@gmail.com">Email</a>
+              <a href="mailto:uruspotcdu@gmail.com">uruspotcdu@gmail.com</a>
             </div>
           </div>
           <button type="button" onClick={() => smoothScrollTo(0)} className="marketplace-footer-top" aria-label="Volver arriba">
