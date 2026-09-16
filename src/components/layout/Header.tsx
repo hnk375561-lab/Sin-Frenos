@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/hooks/useAuth'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { CommandPalette } from '@/components/search/CommandPalette'
 import { useModalFocus } from '@/lib/hooks/useModalFocus'
+import { useUserAvatar } from '@/lib/hooks/useUserAvatar'
 
 const NAV_LINKS = [
   { href: '/listings', label: 'Comprar' },
@@ -44,6 +45,17 @@ function UserIcon() {
   )
 }
 
+function AvatarMark({ svg, label }: { svg?: string; label: string }) {
+  if (!svg) return <UserIcon />
+  return (
+    <span
+      className="h-7 w-7 overflow-hidden rounded-full border border-white/25 bg-white/10 shadow-inner"
+      aria-label={label}
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  )
+}
+
 export function Header() {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -51,6 +63,7 @@ export function Header() {
   const mobileNavRef = useRef<HTMLElement | null>(null)
   const { count: wishlistCount, hydrated: wishlistHydrated } = useWishlist()
   const { user, loading: authLoading, signOut } = useAuth()
+  const avatar = useUserAvatar(user, authLoading)
 
   useEffect(() => {
     if (!menuOpen) return
@@ -131,12 +144,14 @@ export function Header() {
           {authLoading ? (
             <span className={cn(iconButtonClass, 'hidden cursor-default opacity-40 sm:flex')} aria-hidden="true"><UserIcon /></span>
           ) : user ? (
-            <button type="button" onClick={() => signOut()} aria-label={`Cerrar sesión (${user.email})`} title={`Sesión iniciada como ${user.email}`} className={cn(iconButtonClass, 'hidden sm:flex')}>
-              <UserIcon />
+            <button type="button" onClick={() => signOut()} aria-label={`Cerrar sesión (${user.email ?? 'cuenta'})`} title={`Sesión iniciada como ${user.email ?? 'cuenta'}`} className={cn(iconButtonClass, 'hidden sm:flex')}>
+              <AvatarMark svg={avatar?.svg} label="Avatar de tu cuenta" />
               <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-[#166534]" aria-hidden="true" />
             </button>
           ) : (
-            <Link href={`/ingresar?next=${encodeURIComponent(pathname || '/')}`} aria-label="Ingresar" className={cn(iconButtonClass, 'hidden sm:flex')}><UserIcon /></Link>
+            <Link href={`/ingresar?next=${encodeURIComponent(pathname || '/')}`} aria-label="Ingresar" className={cn(iconButtonClass, 'hidden sm:flex')}>
+              <AvatarMark svg={avatar?.svg} label="Avatar de visitante" />
+            </Link>
           )}
           <Link href="/publicar" prefetch={false} className="inline-flex rounded-full bg-[#C2410C] px-3 py-2.5 text-xs font-bold text-white transition hover:bg-[#7C2D12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F97316] focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] sm:px-4 sm:text-sm">Publicar</Link>
           <button type="button" onClick={() => setMenuOpen((value) => !value)} aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={menuOpen} aria-controls="mobile-nav" className={cn(iconButtonClass, 'lg:hidden')}>
