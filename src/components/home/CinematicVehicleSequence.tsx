@@ -83,9 +83,28 @@ export function CinematicVehicleSequence({ vehicles }: { vehicles: SequenceVehic
   const [activeIndex, setActiveIndex] = useState(0)
   const [reducedMotion, setReducedMotion] = useState(false)
   const [compact, setCompact] = useState(false)
+  const [imageRatios, setImageRatios] = useState<Record<string, number>>({})
 
   const motionByVehicle = useMemo(() => Object.fromEntries(vehicles.map((vehicle) => [vehicle.slug, createTileMotion(vehicle, grid)])), [vehicles, grid])
   const mountedVehicles = vehicles.filter((_, index) => Math.abs(index - activeIndex) <= 1)
+
+  useEffect(() => {
+    let cancelled = false
+    const pending = vehicles.map((vehicle) => new Promise<[string, number] | null>((resolve) => {
+      const image = new window.Image()
+      image.onload = () => resolve(image.naturalWidth && image.naturalHeight ? [vehicle.slug, image.naturalWidth / image.naturalHeight] : null)
+      image.onerror = () => resolve(null)
+      image.src = vehicle.imageSrc
+    }))
+    Promise.all(pending).then((results) => {
+      if (cancelled) return
+      setImageRatios((current) => ({
+        ...current,
+        ...Object.fromEntries(results.filter((result): result is [string, number] => Boolean(result))),
+      }))
+    })
+    return () => { cancelled = true }
+  }, [vehicles])
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -265,7 +284,12 @@ export function CinematicVehicleSequence({ vehicles }: { vehicles: SequenceVehic
                   const top = `${(motion.row / grid.rows) * 100}%`
                   const width = `${100 / grid.cols}%`
                   const height = `${100 / grid.rows}%`
-                  return <div key={motion.id} ref={(node) => { tileRefs.current[motion.id] = node }} className="absolute overflow-hidden bg-no-repeat" style={{ left, top, width, height, backgroundImage: `url(${vehicle.imageSrc})`, backgroundSize: `${grid.cols * 100}% ${grid.rows * 100}%`, backgroundPosition: `${grid.cols === 1 ? 0 : (motion.col / (grid.cols - 1)) * 100}% ${grid.rows === 1 ? 0 : (motion.row / (grid.rows - 1)) * 100}%`, transform: 'translate3d(0,0,0)', opacity: vehicleIndex === 0 ? 1 : 0 }} />
+                  const sourceAspect = imageRatios[vehicle.slug] ?? 16 / 10
+                  const containerAspect = 16 / 10
+                  const coverWidth = Math.max(1, sourceAspect / containerAspect)
+                  const coverHeight = Math.max(1, containerAspect / sourceAspect)
+                  const backgroundSize = `${grid.cols * coverWidth * 100}% ${grid.rows * coverHeight * 100}%`
+                  return <div key={motion.id} ref={(node) => { tileRefs.current[motion.id] = node }} className="absolute overflow-hidden bg-no-repeat" style={{ left, top, width, height, backgroundImage: `url(${vehicle.imageSrc})`, backgroundSize, backgroundPosition: `${grid.cols === 1 ? 0 : (motion.col / (grid.cols - 1)) * 100}% ${grid.rows === 1 ? 0 : (motion.row / (grid.rows - 1)) * 100}%`, transform: 'translate3d(0,0,0)', opacity: vehicleIndex === 0 ? 1 : 0 }} />
                 })}
                 <figcaption className="pointer-events-none absolute bottom-4 left-4 right-4 z-30 flex items-baseline justify-between gap-4 text-white sm:bottom-5 sm:left-6 sm:right-6"><span className="max-w-[70%] text-2xl font-bold tracking-tight drop-shadow-[0_2px_14px_rgba(0,0,0,.45)] sm:text-4xl">{vehicle.title}</span><span className="font-mono text-xs text-zinc-300 drop-shadow-[0_2px_10px_rgba(0,0,0,.45)]">{vehicle.category}</span></figcaption>
               </figure>
