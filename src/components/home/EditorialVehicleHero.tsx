@@ -229,7 +229,7 @@ export function EditorialVehicleHero({
             </div>
 
             <div className="relative flex min-h-[52svh] items-center justify-center self-center lg:min-h-0 lg:justify-end">
-              <div className="relative aspect-[1.08/1] w-full max-w-[48rem] overflow-hidden bg-[#25221f] sm:aspect-[1.15/1] lg:aspect-[1.12/1]">
+              <div className="relative aspect-[3/2] w-full max-w-[48rem] overflow-hidden bg-[#25221f]">
                 {sequence.map((vehicle, index) => (
                   <div
                     key={vehicle.slug}
@@ -248,7 +248,7 @@ export function EditorialVehicleHero({
                       fetchPriority={index === 0 ? 'high' : undefined}
                       loading={index === 0 ? 'eager' : 'lazy'}
                       decoding="async"
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-contain"
                     />
                     <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02)_38%,rgba(0,0,0,0.58)_100%)]" aria-hidden="true" />
                     <div data-vehicle-caption className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 sm:inset-x-7 sm:bottom-7">

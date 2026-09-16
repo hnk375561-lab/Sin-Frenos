@@ -33,6 +33,57 @@ function computeEvidenceCoveragePct(vehicles: Vehicle[]): number | null {
   return Math.round((withSource / vehicles.length) * 100)
 }
 
+const HERO_COMPLETENESS_FIELDS = [
+  'especificacionesMotor',
+  'especificacionesTransmision',
+  'especificacionesSuspension',
+  'especificacionesRuedas',
+  'especificacionesDireccion',
+  'performanceData',
+  'safety',
+  'equipamiento',
+  'colores',
+  'variants',
+] as const
+
+/** Rechazos editoriales revisados sobre las fotografías actuales. */
+const HERO_PHOTO_REJECTIONS: Record<string, string> = {
+  'nissan-gt-r': 'personas y evento alrededor del vehículo',
+  'tesla-model-3': 'concentración con fondo visualmente saturado',
+  'alfa-romeo-giulia': 'vehículo policial de flota',
+  'toyota-hilux': 'vehículo de bomberos con librea de servicio',
+  'aprilia-rsv4': 'número de carrera y encuadre de competición',
+}
+
+function heroCompletenessScore(vehicle: Vehicle): number {
+  return HERO_COMPLETENESS_FIELDS.reduce((score, field) => {
+    const value = (vehicle as Vehicle & Record<string, unknown>)[field]
+    if (Array.isArray(value)) return score + (value.length > 0 ? 1 : 0)
+    if (value && typeof value === 'object') return score + (Object.keys(value).length > 0 ? 1 : 0)
+    return score
+  }, 0)
+}
+
+function heroUsdPrice(vehicle: Vehicle): number {
+  if (vehicle.priceStructured?.currency !== 'USD') return 0
+  return vehicle.priceStructured.amount ?? vehicle.priceStructured.max ?? 0
+}
+
+function rankHeroCandidates(
+  vehicles: Vehicle[],
+  group: string,
+  imageBySlug: Record<string, { src: string; alt: string } | null>
+): Vehicle[] {
+  return vehicles
+    .filter((vehicle) => getVehicleCategory(vehicle.class) === group && imageBySlug[`vehiculos/${vehicle.slug}`] && !HERO_PHOTO_REJECTIONS[vehicle.slug])
+    .sort((a, b) =>
+      Number(Boolean(b.featured)) - Number(Boolean(a.featured)) ||
+      heroUsdPrice(b) - heroUsdPrice(a) ||
+      heroCompletenessScore(b) - heroCompletenessScore(a) ||
+      a.title.localeCompare(b.title, 'es')
+    )
+}
+
 export default async function Home() {
   const [vehiclesRaw, counts, featuredRaw] = await Promise.all([
     getEntitiesByType(EntityType.VEHICLE),
@@ -56,9 +107,7 @@ export default async function Home() {
   const cinematicVehicles: EditorialVehicle[] = categories
     .filter(({ group }) => group !== 'Otros')
     .flatMap(({ group }) => {
-      const candidates = vehicles
-        .filter((vehicle) => getVehicleCategory(vehicle.class) === group && imageBySlug[`vehiculos/${vehicle.slug}`])
-        .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)))
+      const candidates = rankHeroCandidates(vehicles, group, imageBySlug)
       const vehicle = candidates[0]
       const image = vehicle ? imageBySlug[`vehiculos/${vehicle.slug}`] : null
       if (!vehicle || !image?.src) return []
