@@ -1,19 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import { isValidFlyerData, type FlyerData } from '@/lib/for-sale-flyer'
+import { isValidFlyerData, FLYER_PRICE_ARS, FLYER_PAYMENT_LINK, type FlyerData } from '@/lib/for-sale-flyer'
 import { trackPremiumReportCheckoutStarted } from '@/lib/analytics-events'
+
+const WHATSAPP_NUMBER = '5493445511081'
 
 /**
  * Formulario del "cartel de venta" — ver `src/lib/for-sale-flyer.ts` para
  * el modelo de negocio histórico.
  *
- * Migración a GitHub Pages: antes, "Pagar y descargar" hacía POST a
- * `/api/for-sale-flyer/create-preference` y redirigía a Mercado Pago; el
- * PDF salía recién de `/api/for-sale-flyer/pdf` tras confirmar el pago.
- * Sin servidor no hay forma de cobrar (necesita
- * `MERCADOPAGO_ACCESS_TOKEN`), así que el cartel pasa a ser gratis y el
- * PDF se genera directo en el navegador con `buildFlyerPdf`.
+ * Cobro real (16/09/2026): mismo mecanismo que `PremiumReportButton.tsx`
+ * — sin backend, el cobro se resuelve con un link de pago hosteado de
+ * Mercado Pago (`FLYER_PAYMENT_LINK`), sin verificación automática. La
+ * persona completa el formulario, paga, y recién ahí confirma para
+ * generar el PDF (sistema de honestidad).
  */
 export function ForSaleFlyerForm({ className = '' }: { className?: string }) {
   const [data, setData] = useState<FlyerData>({
@@ -25,6 +26,7 @@ export function ForSaleFlyerForm({ className = '' }: { className?: string }) {
     contacto: '',
     ubicacion: '',
   })
+  const [step, setStep] = useState<'form' | 'confirm'>('form')
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -34,13 +36,18 @@ export function ForSaleFlyerForm({ className = '' }: { className?: string }) {
     setData((prev) => ({ ...prev, [key]: value }))
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handlePaySubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (disabled || status === 'loading') return
+    if (disabled) return
+    trackPremiumReportCheckoutStarted({ slugs: [`flyer:${data.marca}-${data.modelo}`], label: 'cartel-venta' })
+    window.open(FLYER_PAYMENT_LINK, '_blank', 'noopener,noreferrer')
+    setStep('confirm')
+  }
+
+  async function handleDownloadClick() {
+    if (status === 'loading') return
     setStatus('loading')
     setErrorMessage(null)
-
-    trackPremiumReportCheckoutStarted({ slugs: [`flyer:${data.marca}-${data.modelo}`], label: 'cartel-venta' })
 
     try {
       const [{ buildFlyerPdf, findUnencodableFlyerField }, { downloadPdfBytes }] = await Promise.all([
@@ -51,7 +58,7 @@ export function ForSaleFlyerForm({ className = '' }: { className?: string }) {
       const unencodableField = await findUnencodableFlyerField(data)
       if (unencodableField) {
         setStatus('error')
-        setErrorMessage(`El campo "${unencodableField}" tiene un caracter que el cartel no puede imprimir (ej. emoji). Sacalo e intentá de nuevo.`)
+        setErrorMessage(`El campo "${unencodableField}" tiene un caracter que el cartel no puede imprimir (ej. emoji). Sacalo, volvé al formulario e intentá de nuevo.`)
         return
       }
 
@@ -64,10 +71,46 @@ export function ForSaleFlyerForm({ className = '' }: { className?: string }) {
     }
   }
 
+  const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    `Hola, pagué el cartel de venta (${data.marca} ${data.modelo}) y tuve un problema para descargarlo.`
+  )}`
+
+  if (step === 'confirm') {
+    return (
+      <div className={`rounded-lg border border-edge bg-surface-card p-4 ${className}`}>
+        <p className="mb-3 text-sm font-semibold text-neutral-900">
+          🖼️ Cartel de venta — {data.marca} {data.modelo}
+        </p>
+        <button
+          type="button"
+          onClick={handleDownloadClick}
+          disabled={status === 'loading'}
+          className="w-full rounded-md bg-auto-accent px-3 py-2 text-sm font-semibold text-[#09090B] transition-colors hover:bg-auto-accent-strong disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {status === 'loading' ? 'Generando PDF…' : 'Ya pagué, descargar cartel'}
+        </button>
+        {errorMessage && <p role="alert" className="mt-1.5 text-xs text-red-400">{errorMessage}</p>}
+        <p className="mt-2 text-center text-[11px] text-neutral-400">
+          Se abrió Mercado Pago en otra pestaña. Confirmá el pago y descargá tu cartel acá.{' '}
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="underline hover:text-auto-accent-strong">
+            ¿Problema con el pago? Escribinos por WhatsApp
+          </a>
+        </p>
+        <button
+          type="button"
+          onClick={() => setStep('form')}
+          className="mt-2 w-full text-center text-[11px] text-neutral-400 underline"
+        >
+          Volver y editar los datos del cartel
+        </button>
+      </div>
+    )
+  }
+
   return (
-    <form onSubmit={handleSubmit} className={`rounded-lg border border-edge bg-surface-card p-4 ${className}`}>
+    <form onSubmit={handlePaySubmit} className={`rounded-lg border border-edge bg-surface-card p-4 ${className}`}>
       <p className="mb-3 text-sm font-semibold text-neutral-900">
-        🖼️ Generá un cartel de venta profesional (PDF, gratis)
+        🖼️ Generá un cartel de venta profesional (PDF, ARS {FLYER_PRICE_ARS})
       </p>
       <div className="grid grid-cols-2 gap-2">
         <input
@@ -127,14 +170,13 @@ export function ForSaleFlyerForm({ className = '' }: { className?: string }) {
       </div>
       <button
         type="submit"
-        disabled={disabled || status === 'loading'}
+        disabled={disabled}
         className="mt-3 w-full rounded-md bg-auto-accent px-3 py-2 text-sm font-semibold text-[#09090B] transition-colors hover:bg-auto-accent-strong disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {status === 'loading' ? 'Generando PDF…' : 'Descargar cartel (gratis)'}
+        Pagar cartel (ARS {FLYER_PRICE_ARS})
       </button>
-      {errorMessage && <p role="alert" className="mt-1.5 text-xs text-red-400">{errorMessage}</p>}
       <p className="mt-2 text-center text-[11px] text-neutral-400">
-        El PDF se genera en tu navegador. No mandamos tus datos a ningún servidor.
+        Se abre Mercado Pago en otra pestaña. Volvé acá para confirmar el pago y descargar tu cartel — se genera en tu navegador, no mandamos tus datos a ningún servidor.
       </p>
     </form>
   )
