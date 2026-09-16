@@ -83,7 +83,7 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
   },
   verification: {
-    google: 'pb7e68bu_z5ptG8TL4fg2eoGK7gyXEaFkM6U3buM-LA',
+    google: ['pb7e68bu_z5ptG8TL4fg2eoGK7gyXEaFkM6U3buM-LA', 'Sx05ayWrRIpJHoEOCE4WL-Ddi1bPVLrKr3CyRzMX7eM'],
   },
   other: process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID
     ? { 'google-adsense-account': process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID }
@@ -167,7 +167,7 @@ export default async function RootLayout({
             __html: "(function(){try{var k='sinfrenos:theme';var p=localStorage.getItem(k);var dark=p==='dark'||((!p||p==='system')&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(dark){document.documentElement.classList.add('dark')}}catch(e){}})();",
           }}
         />
-        <a
+        
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-auto-dark focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
         >
