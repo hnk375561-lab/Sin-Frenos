@@ -40,7 +40,15 @@ interface ArchiveHeroProps {
  * catálogo (siguen existiendo, solo bajaron de jerarquía); no se aplicó
  * un rebrand visual completo — decisión explícita, ver doc maestro.
  */
-export function ArchiveHero({ vehicleCount, evidenceCoveragePct, searchExamples, categoryChips }: ArchiveHeroProps) {
+export function ArchiveHero({ vehicleCount, evidenceCoveragePct, searchExamples, categoryChips }: Omit<ArchiveHeroProps, 'featuredVehicles'>) {
+  // `featuredVehicles` se recibe pero no se usa acá: el lado derecho
+  // (`HeroSidePanel`) es 100% marketplace y hace su propio fetch de
+  // listings reales del catálogo directamente contra Supabase (ver
+  // comentario en `HeroSidePanel.tsx`) — nunca cae a vehículos del
+  // catálogo como fallback. Se deja la prop en `ArchiveHeroProps` por si
+  // se reintroduce un fallback de catálogo más adelante, pero se omite
+  // explícitamente acá (`Omit`) en vez de aceptarla y no usarla en
+  // silencio, para que quede claro que es un no-op a propósito.
   return (
     <section className="relative min-h-screen bg-paper overflow-hidden">
       {/* Fondo con textura sutil de papel + luz cenital suave, para que

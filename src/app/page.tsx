@@ -4,19 +4,31 @@ import { EntityType, type Vehicle } from '@/types'
 import { generateHomepageMetadata, generateWebsiteJsonLd, serializeJsonLd } from '@/lib/seo'
 import { getEntitiesByType, getEntityCountsByType, getFeaturedEntities } from '@/lib/entities'
 import { getEntityImageMap } from '@/lib/media'
-import { getBidirectionalRelationCount } from '@/lib/relations'
 import { getVehicleCategory, computeCategoryOptions } from '@/lib/vehicle-category'
-import { QuickSearchForm } from '@/components/home/QuickSearchForm'
 import { HomeDiscovery } from '@/components/home/HomeDiscovery'
 import { EntityCard } from '@/components/entities/EntityCard'
 import { Reveal } from '@/components/ui/Reveal'
+import { ArchiveHero } from '@/components/home/ArchiveHero'
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateHomepageMetadata()
 }
 
-function formatNumber(value: number): string {
-  return value.toLocaleString('es-AR')
+/**
+ * % de fichas del catálogo con al menos una fuente citada (primaria o
+ * secundaria) — reconexión del hero marketplace-first (`ArchiveHero.tsx`,
+ * ver comentario ahí) a `page.tsx`. No existía antes ninguna función que
+ * calculara esto (auditoría del 15/09/2026, prop `evidenceCoveragePct`
+ * estaba declarada pero nunca se le pasaba un valor real); se calcula acá
+ * en vez de en `src/lib/evidence.ts` porque es una agregación puntual de
+ * este componente, no una utilidad de evidencia reutilizable.
+ */
+function computeEvidenceCoveragePct(vehicles: Vehicle[]): number | null {
+  if (vehicles.length === 0) return null
+  const withSource = vehicles.filter(
+    (vehicle) => !!(vehicle.evidence?.primarySource || vehicle.evidence?.secondarySource)
+  ).length
+  return Math.round((withSource / vehicles.length) * 100)
 }
 
 export default async function Home() {
@@ -29,37 +41,35 @@ export default async function Home() {
   const featured = featuredRaw as Vehicle[]
   const imageBySlug = getEntityImageMap(vehicles)
   const categories = computeCategoryOptions(vehicles, 2).slice(0, 6)
-  const relationCount = await Promise.all(vehicles.map((vehicle) => getBidirectionalRelationCount(vehicle)))
-  const totalRelations = relationCount.reduce((sum, value) => sum + value, 0) / 2
   const featuredVehicle = featured[0] ?? vehicles.find((vehicle) => vehicle.featured) ?? vehicles[0]
   const featuredImage = featuredVehicle ? imageBySlug[`vehiculos/${featuredVehicle.slug}`] : null
+  const evidenceCoveragePct = computeEvidenceCoveragePct(vehicles)
+  const heroCategoryChips = categories.slice(0, 4).map(({ group, count }) => ({
+    label: group,
+    count,
+    href: `/categorias/${group.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`,
+  }))
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(generateWebsiteJsonLd()) }} />
       <main className="min-h-screen bg-surface-page">
-        <section className="relative overflow-hidden border-b border-edge bg-inverse py-20 text-white sm:py-28">
-          <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.12)_1px,transparent_1px)] [background-size:56px_56px]" aria-hidden="true" />
-          <div className="container-max relative">
-            <div className="grid gap-14 lg:grid-cols-[1.15fr_.85fr] lg:items-end">
-              <div>
-                <p className="eyebrow text-orange-300">Archivo automotor · datos que se pueden consultar</p>
-                <h1 className="mt-6 max-w-4xl font-display text-5xl font-bold leading-[.94] tracking-[-.06em] sm:text-7xl lg:text-[6.8rem]">El mundo de los vehículos, <span className="text-orange-300">para explorar.</span></h1>
-                <p className="mt-7 max-w-2xl text-lg leading-relaxed text-white/70">Fichas técnicas, relaciones reales y comparaciones para entender qué hay detrás de cada modelo.</p>
-                <div className="mt-8 max-w-2xl"><QuickSearchForm examples={vehicles.slice(0, 4).map((vehicle) => vehicle.title)} /></div>
-                <div className="mt-6 flex flex-wrap gap-3 text-sm"><Link href="/explorar" className="rounded-full bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-700">Empezar a explorar →</Link><Link href="/comparar" className="rounded-full border border-white/30 px-5 py-3 font-semibold text-white transition hover:border-white">Comparar vehículos</Link></div>
-              </div>
-              <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/15 bg-white/10">
-                {[
-                  [formatNumber(counts[EntityType.VEHICLE]), 'vehículos documentados', '/vehiculos'],
-                  [formatNumber(counts[EntityType.MANUFACTURER]), 'fabricantes', '/fabricantes'],
-                  [formatNumber(Math.round(totalRelations)), 'relaciones reales', '/explorar'],
-                  [formatNumber(counts[EntityType.GUIDE]), 'guías para seguir', '/guias'],
-                ].map(([value, label, href]) => <Link key={label} href={href} className="bg-white/[.06] p-5 transition hover:bg-white/[.12]"><span className="block font-mono text-3xl font-bold text-orange-300 sm:text-4xl">{value}</span><span className="mt-2 block text-xs uppercase tracking-[.12em] text-white/60">{label}</span></Link>)}
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Reconexión (15/09/2026, auditoría de monetización): `ArchiveHero`
+            + `HeroSidePanel` estaban completos en el repo desde el commit
+            `50f6383` pero `page.tsx` nunca los importó — dos heroes
+            compitiendo sin usar, ver hallazgo de la auditoría. Este
+            reemplaza al hero catalog-first anterior (removido íntegro,
+            no comentado, para no dejar un tercer bloque muerto en el
+            archivo) por la versión marketplace-first que el propio código
+            ya documentaba como decisión tomada. `evidenceCoveragePct` no
+            tenía ninguna función que lo calculara; se agrega
+            `computeEvidenceCoveragePct` arriba para eso. */}
+        <ArchiveHero
+          vehicleCount={counts[EntityType.VEHICLE]}
+          evidenceCoveragePct={evidenceCoveragePct}
+          searchExamples={vehicles.slice(0, 4).map((vehicle) => vehicle.title)}
+          categoryChips={heroCategoryChips}
+        />
 
         <section className="border-b border-edge bg-surface-card py-12 sm:py-16" aria-labelledby="categories-heading">
           <div className="container-max">
