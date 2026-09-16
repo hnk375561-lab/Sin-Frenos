@@ -16,6 +16,8 @@
     }
   ],
   "featured": false,
+  "homepageCurated": "premium",
+  "homepageCuratedOrder": 3,
   "manufacturer": "Lamborghini",
   "class": "SUV deportivo",
   "power": "800 CV / 588 kW combinados (motor V8 4.0L biturbo + motor eléctrico) — Urus SE",

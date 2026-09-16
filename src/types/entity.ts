@@ -65,6 +65,8 @@ export interface BaseEntity {
   seoTitle?: string
   seoDescription?: string
   featured?: boolean
+  homepageCurated?: 'premium' | null
+  homepageCuratedOrder?: number | null
   evidence?: Evidence
   image?: ImageProvenance
 }

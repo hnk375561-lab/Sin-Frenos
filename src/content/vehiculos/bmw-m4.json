@@ -46,6 +46,8 @@
     }
   ],
   "featured": true,
+  "homepageCurated": "premium",
+  "homepageCuratedOrder": 2,
   "manufacturer": "BMW",
   "class": "Deportivo",
   "power": "510 hp (503 hp SAE)",

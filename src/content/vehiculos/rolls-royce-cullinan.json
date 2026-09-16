@@ -9,6 +9,8 @@
     "rolls-royce"
   ],
   "featured": false,
+  "homepageCurated": "premium",
+  "homepageCuratedOrder": 4,
   "manufacturer": "Rolls-Royce",
   "class": "SUV de ultralujo",
   "power": "571 hp",
