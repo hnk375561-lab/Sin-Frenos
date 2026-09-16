@@ -22,6 +22,10 @@ export function Footer() {
             </div>
             <p className="mt-5 max-w-sm text-base leading-relaxed text-white/60">El lugar directo para comprar, vender y encontrar tu próximo vehículo en Argentina.</p>
             <NewsletterSignupForm className="mt-8 max-w-md" trackingSource="footer" heading="Recibí nuevas publicaciones y oportunidades cerca tuyo" />
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link href="/vehiculos" className="rounded-full bg-auto-accent px-4 py-2 text-sm font-semibold text-white transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-auto-accent-strong active:scale-[.98]">Explorar todas las marcas</Link>
+              <Link href="/guias" className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/80 transition-[border-color,color] duration-200 hover:border-white/50 hover:text-white">Ver guías de compra</Link>
+            </div>
             <SupportButton className="mt-5" />
           </div>
 

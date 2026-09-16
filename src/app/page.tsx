@@ -7,7 +7,7 @@ import { getEntityImageMap } from '@/lib/media'
 import { getVehicleCategory, computeCategoryOptions } from '@/lib/vehicle-category'
 import imageLoader from '@/lib/image-loader'
 import { HomeDiscovery } from '@/components/home/HomeDiscovery'
-import { EntityCard } from '@/components/entities/EntityCard'
+import { EntityImage } from '@/components/entities/EntityImage'
 import { Reveal } from '@/components/ui/Reveal'
 import { ArchiveHero } from '@/components/home/ArchiveHero'
 import type { EditorialVehicle } from '@/components/home/EditorialVehicleHero'
@@ -84,6 +84,21 @@ function rankHeroCandidates(
     )
 }
 
+const PREMIUM_HOME_SLUGS = [
+  'ferrari-296-gtb',
+  'lamborghini-urus',
+  'porsche-911-carrera',
+  'aston-martin-db12',
+  'mclaren-artura',
+  'bmw-m4',
+]
+
+function displaySpec(value: unknown, fallback = 'No documentado'): string {
+  if (typeof value === 'string' && value.trim()) return value.trim()
+  if (typeof value === 'number') return String(value)
+  return fallback
+}
+
 export default async function Home() {
   const [vehiclesRaw, counts, featuredRaw] = await Promise.all([
     getEntitiesByType(EntityType.VEHICLE),
@@ -103,6 +118,11 @@ export default async function Home() {
   ].slice(0, 6)
   const featuredVehicle = featured[0] ?? vehicles.find((vehicle) => vehicle.featured) ?? vehicles[0]
   const featuredImage = featuredVehicle ? imageBySlug[`vehiculos/${featuredVehicle.slug}`] : null
+  const premiumVehicles = PREMIUM_HOME_SLUGS
+    .map((slug) => vehicles.find((vehicle) => vehicle.slug === slug))
+    .filter((vehicle): vehicle is Vehicle => Boolean(vehicle))
+    .filter((vehicle) => Boolean(imageBySlug[`vehiculos/${vehicle.slug}`]?.src))
+    .slice(0, 4)
   const evidenceCoveragePct = computeEvidenceCoveragePct(vehicles)
   const cinematicVehicles: EditorialVehicle[] = categories
     .filter(({ group }) => group !== 'Otros')
@@ -160,9 +180,9 @@ export default async function Home() {
 
         <HomeDiscovery vehicles={vehicles} imageBySlug={imageBySlug} />
 
-        {featuredVehicle && <section className="border-b border-edge py-16 sm:py-24" aria-labelledby="featured-heading"><div className="container-max"><Reveal direction="chapter"><p className="eyebrow text-auto-accent">04 · Una ficha para mirar en profundidad</p><div className="mt-4 grid gap-8 lg:grid-cols-[1.1fr_.9fr] lg:items-center"><div className="overflow-hidden rounded-2xl border border-edge bg-surface-card">{featuredImage?.src ? <img src={featuredImage.src} alt={featuredVehicle.title} className="aspect-[16/10] w-full object-cover transition-transform duration-700 hover:scale-[1.03]" /> : <div className="flex aspect-[16/10] items-center justify-center text-muted">Imagen no documentada</div>}</div><div><h2 id="featured-heading" className="text-4xl font-bold tracking-tight text-strong sm:text-6xl">{featuredVehicle.title}</h2><p className="mt-4 text-lg leading-relaxed text-body">{featuredVehicle.description}</p><div className="mt-6 grid grid-cols-2 gap-3">{[["Fabricante", featuredVehicle.manufacturer], ["Categoría", getVehicleCategory(featuredVehicle.class)], ["Potencia", featuredVehicle.power], ["Año", String(featuredVehicle.anoLanzamiento ?? 'No documentado')]].map(([label, value]) => <div key={label} className="rounded-lg border border-edge bg-surface-card p-3"><span className="block font-mono text-[10px] uppercase tracking-wider text-muted">{label}</span><span className="mt-1 block text-sm font-semibold text-strong">{value || 'No documentado'}</span></div>)}</div><Link href={`/vehiculos/${featuredVehicle.slug}`} className="mt-7 inline-flex rounded-full bg-auto-accent px-5 py-3 font-semibold text-white hover:bg-auto-accent-strong">Abrir ficha completa →</Link></div></div></Reveal></div></section>}
+        {featuredVehicle && <section className="border-b border-edge py-16 sm:py-24" aria-labelledby="featured-heading"><div className="container-max"><Reveal direction="chapter"><p className="eyebrow text-auto-accent">04 · Una ficha para mirar en profundidad</p><p className="mt-3 max-w-2xl text-body">Datos de desempeño, autonomía, propulsión y dimensiones en una sola lectura. La imagen y los datos se resuelven desde la misma ficha editorial.</p><div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_.9fr] lg:items-start"><div className="overflow-hidden rounded-2xl border border-edge bg-surface-card"><EntityImage entity={featuredVehicle} image={featuredImage} variant="portrait" priority /></div><div><h2 id="featured-heading" className="text-4xl font-bold tracking-tight text-strong sm:text-6xl">{featuredVehicle.title}</h2><p className="mt-4 text-lg leading-relaxed text-body">{featuredVehicle.description}</p><div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">{[["Fabricante", featuredVehicle.manufacturer], ["Categoría", getVehicleCategory(featuredVehicle.class)], ["Potencia", featuredVehicle.power], ["0–100 km/h", featuredVehicle.performance?.acceleration], ["Velocidad máx.", featuredVehicle.performance?.speed], ["Autonomía / consumo", featuredVehicle.consumo], ["Transmisión", featuredVehicle.transmision], ["Dimensiones", featuredVehicle.dimensiones], ["Año", String(featuredVehicle.anoLanzamiento ?? 'No documentado')]].map(([label, value]) => <div key={label} className="rounded-lg border border-edge bg-surface-card p-3"><span className="block font-mono text-[10px] uppercase tracking-wider text-muted">{label}</span><span className="mt-1 block text-sm font-semibold text-strong">{displaySpec(value)}</span></div>)}</div><Link href={`/vehiculos/${featuredVehicle.slug}`} className="mt-7 inline-flex rounded-full bg-auto-accent px-5 py-3 font-semibold text-white transition-[transform,background-color] duration-200 hover:bg-auto-accent-strong hover:-translate-y-0.5 active:scale-[.98]">Abrir ficha completa →</Link></div></div></Reveal></div></section>}
 
-        <section className="border-b border-edge bg-surface-card py-16" aria-labelledby="featured-grid-heading"><div className="container-max"><div className="flex items-end justify-between gap-5"><div><p className="eyebrow text-auto-accent">05 · El archivo sigue creciendo</p><h2 id="featured-grid-heading" className="mt-3 text-3xl font-bold text-strong">Más vehículos para descubrir.</h2></div><Link href="/vehiculos" className="link-underline font-semibold text-auto-accent">Todo el catálogo →</Link></div><div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{featured.slice(0, 4).map((vehicle, index) => <Reveal key={vehicle.slug} index={index}><EntityCard entity={vehicle} image={imageBySlug[`vehiculos/${vehicle.slug}`]} priority={index < 2} /></Reveal>)}</div></div></section>
+        <section className="border-b border-edge bg-surface-card py-16 sm:py-20" aria-labelledby="featured-grid-heading"><div className="container-max"><div className="flex flex-wrap items-end justify-between gap-5"><div><p className="eyebrow text-auto-accent">05 · Curaduría premium</p><h2 id="featured-grid-heading" className="mt-3 text-3xl font-bold text-strong sm:text-5xl">Potencia, diseño y carácter.</h2><p className="mt-3 max-w-2xl text-body">Una selección de modelos premium con fotografía local verificada y datos técnicos para comparar sin ruido.</p></div><Link href="/vehiculos" className="link-underline font-semibold text-auto-accent">Todo el catálogo →</Link></div><div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{premiumVehicles.map((vehicle, index) => <Reveal key={vehicle.slug} index={index}><article className="group overflow-hidden rounded-2xl border border-edge bg-surface-page"><Link href={`/vehiculos/${vehicle.slug}`} className="block"><EntityImage entity={vehicle} image={imageBySlug[`vehiculos/${vehicle.slug}`]} variant="thumbnail" priority={index < 2} /><div className="p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-mono text-[10px] uppercase tracking-[.16em] text-auto-accent">{vehicle.manufacturer}</p><h3 className="mt-1 text-xl font-bold text-strong">{vehicle.title}</h3></div><span className="text-lg text-auto-accent transition-transform duration-200 group-hover:translate-x-1">↗</span></div><p className="mt-2 text-sm font-semibold text-body">{displaySpec(vehicle.price)}</p><dl className="mt-4 grid grid-cols-2 gap-2 border-t border-edge pt-3">{[["Potencia", vehicle.power], ["0–100", vehicle.performance?.acceleration], ["Máxima", vehicle.performance?.speed], ["Caja", vehicle.transmision]].map(([label, value]) => <div key={label}><dt className="font-mono text-[9px] uppercase tracking-wider text-muted">{label}</dt><dd className="mt-1 line-clamp-2 text-xs font-medium text-strong">{displaySpec(value)}</dd></div>)}</dl></div></Link></article></Reveal>)}</div></div></section>
       </main>
     </>
   )
