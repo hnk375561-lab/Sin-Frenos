@@ -1161,3 +1161,94 @@ a:not(.no-style):not([class*="text-"]) {
     background-position: 50% 0;
   }
 }
+
+/* === EDITORIAL HERO: LOW-VIEWPORT SAFETY ===
+   The sticky stage may remain viewport-sized when it fits, but it must grow
+   with its content on short browser windows. Critical text and the vehicle
+   visual are never clipped by the stage; only the image frame clips its own
+   animated layers. */
+.editorial-vehicle-hero__stage,
+.editorial-vehicle-hero__content {
+  min-height: max(calc(100svh - 4.5rem), 44rem);
+}
+
+.editorial-vehicle-hero__grid {
+  align-items: center;
+}
+
+@media (max-height: 800px) and (min-width: 768px) {
+  .editorial-vehicle-hero__stage,
+  .editorial-vehicle-hero__content {
+    min-height: max(calc(100svh - 4.5rem), 40rem);
+  }
+
+  .editorial-vehicle-hero__content {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .editorial-vehicle-hero__grid {
+    align-items: start;
+    gap: 1.5rem;
+  }
+
+  .editorial-vehicle-hero__grid > :first-child {
+    align-self: start;
+    padding-bottom: 0;
+  }
+
+  .editorial-vehicle-hero__grid > :last-child {
+    align-self: start;
+    min-height: 24rem;
+  }
+
+  .editorial-vehicle-hero__grid h1 {
+    font-size: clamp(2.75rem, 5vw, 5.25rem);
+  }
+
+  .editorial-vehicle-hero__grid p {
+    margin-top: 1rem;
+  }
+
+  .editorial-vehicle-hero__grid .mt-8 {
+    margin-top: 1.25rem;
+  }
+
+  .editorial-vehicle-hero__grid .mt-10 {
+    margin-top: 1.5rem;
+  }
+}
+
+@media (max-height: 680px) and (min-width: 768px) {
+  .editorial-vehicle-hero__stage,
+  .editorial-vehicle-hero__content {
+    min-height: 38rem;
+  }
+
+  .editorial-vehicle-hero__visual {
+    min-height: 20rem;
+  }
+
+  .editorial-vehicle-hero__content {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .editorial-vehicle-hero__stage,
+  .editorial-vehicle-hero__content {
+    min-height: max(calc(100svh - 4rem), 48rem);
+  }
+
+  .editorial-vehicle-hero__grid {
+    align-items: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editorial-vehicle-hero__stage,
+  .editorial-vehicle-hero__content {
+    scroll-margin-top: 4.5rem;
+  }
+}

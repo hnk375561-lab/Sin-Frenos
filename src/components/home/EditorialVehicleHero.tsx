@@ -176,16 +176,16 @@ export function EditorialVehicleHero({
   return (
     <section
       ref={rootRef}
-      className="relative overflow-clip bg-[#11100f] font-sans text-white"
+      className="editorial-vehicle-hero relative overflow-visible bg-[#11100f] font-sans text-white"
       style={{ minHeight: `${Math.max(1, sequence.length) * 82}vh` }}
       aria-labelledby="archive-hero-title"
     >
-      <div ref={stageRef} className="sticky top-0 min-h-[calc(100svh-4.5rem)] overflow-hidden">
+      <div ref={stageRef} className="editorial-vehicle-hero__stage sticky top-0 min-h-[calc(100svh-4.5rem)] overflow-visible">
         <div className="absolute inset-0 bg-[#11100f]" aria-hidden="true" />
         <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(90deg,rgba(17,16,15,0.98)_0%,rgba(17,16,15,0.78)_34%,rgba(17,16,15,0.12)_66%,rgba(17,16,15,0.46)_100%)]" aria-hidden="true" />
 
-        <div className="container-max relative z-10 flex min-h-[calc(100svh-4.5rem)] flex-col justify-between py-8 sm:py-10 lg:py-12">
-          <div className="grid flex-1 items-center gap-10 lg:grid-cols-[0.76fr_1.24fr] lg:gap-8">
+        <div className="editorial-vehicle-hero__content container-max relative z-10 flex min-h-[calc(100svh-4.5rem)] flex-col justify-between py-8 sm:py-10 lg:py-12">
+          <div className="editorial-vehicle-hero__grid grid min-h-fit flex-1 items-center gap-10 lg:grid-cols-[0.76fr_1.24fr] lg:gap-8">
             <div className="relative z-20 max-w-xl self-center pb-4 lg:pb-16">
               <div className="mb-8 flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.24em] text-white/50 sm:text-xs">
                 <span className="h-px w-8 bg-[#d65a22]" aria-hidden="true" />
@@ -228,7 +228,7 @@ export function EditorialVehicleHero({
               </div>
             </div>
 
-            <div className="relative flex min-h-[52svh] items-center justify-center self-center lg:min-h-0 lg:justify-end">
+            <div className="editorial-vehicle-hero__visual relative flex min-h-[clamp(22rem,52svh,38rem)] items-center justify-center self-center lg:min-h-0 lg:justify-end">
               <div className="relative aspect-[3/2] w-full max-w-[48rem] overflow-hidden bg-[#25221f]">
                 {sequence.map((vehicle, index) => (
                   <div
