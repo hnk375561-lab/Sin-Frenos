@@ -6,6 +6,7 @@ import { SITE_NAME } from '@/config/site'
 import { NewsletterSignupForm } from '@/components/monetization/NewsletterSignupForm'
 import { SupportButton } from '@/components/monetization/SupportButton'
 import { smoothScrollTo } from '@/lib/scroll/smooth-scroll'
+import { ProviderIdentityBlock } from '@/components/legal/ProviderIdentityBlock'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -52,6 +53,9 @@ export function Footer() {
               <Link href="/concesionarias-concepcion-del-uruguay">Directorio</Link>
               <Link href="/privacidad">Privacidad</Link>
               <Link href="/terminos">Términos de uso</Link>
+              <Link href="/reglas-de-publicacion">Reglas de publicación</Link>
+              <Link href="/quienes-somos">Quiénes somos</Link>
+              <Link href="/cuenta">Mi cuenta y derechos ARCO</Link>
               <a href="mailto:uruspotcdu@gmail.com">Contacto</a>
             </div>
           </div>
@@ -61,6 +65,7 @@ export function Footer() {
         </div>
 
         <div className="marketplace-footer-legal">
+          <ProviderIdentityBlock compact />
           <p>{SITE_NAME} es un marketplace automotor independiente. Las marcas mencionadas pertenecen a sus respectivos dueños.</p>
           <p>© {currentYear} {SITE_NAME}.</p>
         </div>

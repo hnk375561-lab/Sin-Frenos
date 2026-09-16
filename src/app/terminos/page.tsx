@@ -1,119 +1,22 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Reveal } from '@/components/ui/Reveal'
+import { ProviderIdentityBlock } from '@/components/legal/ProviderIdentityBlock'
 import { SITE_NAME, SITE_URL } from '@/config/site'
+import { LEGAL_VERSIONS } from '@/lib/legal-consent'
 
-export const metadata: Metadata = {
-  title: `Términos de Uso | ${SITE_NAME}`,
-  description: `Términos de uso de ${SITE_NAME}: condiciones para usar el sitio y su contenido.`,
-  metadataBase: new URL(SITE_URL),
-  alternates: { canonical: `${SITE_URL}/terminos` },
-  robots: { index: true, follow: true },
-}
+export const metadata: Metadata = { title: `Términos de Uso | ${SITE_NAME}`, description: `Términos del archivo editorial y marketplace de ${SITE_NAME}.`, alternates: { canonical: `${SITE_URL}/terminos` } }
 
 export default function TermsPage() {
-  return (
-    <div className="container-narrow py-16 sm:py-20">
-      <Reveal direction="chapter">
-        <p className="eyebrow-pop eyebrow mb-4 text-xs font-semibold uppercase text-auto-accent-strong">
-          Legal
-        </p>
-        <h1 className="mb-8 text-3xl font-bold text-neutral-900 sm:text-4xl">
-          Términos de Uso
-        </h1>
-      </Reveal>
-
-      <Reveal delay={100} className="stagger prose-legal max-w-none space-y-8 text-neutral-500/80">
-        <p className="text-sm text-neutral-400">
-          Última actualización: agosto de 2026
-        </p>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">1. Aceptación</h2>
-          <p>
-            Al usar {SITE_NAME} ({SITE_URL}) aceptás estos términos. Si no estás de
-            acuerdo, te pedimos que no uses el sitio.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">2. Naturaleza del sitio</h2>
-          <p>
-            {SITE_NAME} es un proyecto editorial independiente dedicado a fichas
-            técnicas y comparación de autos y motos. No está asociado,
-            respaldado ni patrocinado por ninguna marca, fabricante o
-            concesionaria mencionada en el sitio. Los nombres, logos y marcas
-            de los vehículos citados son propiedad de sus respectivos
-            fabricantes y se mencionan únicamente con fines informativos.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">3. Contenido del sitio</h2>
-          <p>
-            El contenido editorial (textos, fichas técnicas, comparativas,
-            organización de la información) es original y de nuestra autoría,
-            elaborado a partir de especificaciones públicas del fabricante y
-            prensa especializada, citando la fuente cuando corresponde. Las
-            imágenes utilizadas son de stock libre de derechos o fotografía
-            propia — no usamos material oficial de marca sin licencia. Si sos
-            titular de derechos sobre algún material y querés que lo
-            retiremos, escribinos a{' '}
-            <a
-              href="mailto:uruspotcdu@gmail.com"
-              className="link-underline text-auto-accent-strong transition-colors hover:text-auto-accent"
-            >
-              uruspotcdu@gmail.com
-            </a>{' '}
-            y lo resolvemos rápido.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">4. Uso permitido</h2>
-          <p>
-            Podés navegar y compartir enlaces al sitio libremente. No está
-            permitido reproducir el contenido editorial de forma masiva sin
-            autorización, ni usar el sitio para actividades ilegales o que
-            afecten su funcionamiento normal.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">5. Precisión de la información</h2>
-          <p>
-            Documentamos especificaciones técnicas, precios y datos de
-            vehículos a partir de fuentes públicas del fabricante y prensa
-            especializada. Cada ficha indica su fuente y fecha de
-            actualización. Los precios y specs pueden variar según el mercado
-            y el momento de consulta; no garantizamos que todo el contenido
-            esté siempre actualizado.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">6. Publicidad y monetización</h2>
-          <p>
-            El sitio puede mostrar publicidad de terceros (como Google AdSense)
-            o enlaces de afiliados para sostener su mantenimiento. Esto no
-            implica que respaldemos los productos o servicios anunciados.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">7. Contacto</h2>
-          <p>
-            Para consultas, reportes de errores o solicitudes de retiro de
-            contenido, escribinos a{' '}
-            <a
-              href="mailto:uruspotcdu@gmail.com"
-              className="link-underline text-auto-accent-strong transition-colors hover:text-auto-accent"
-            >
-              uruspotcdu@gmail.com
-            </a>
-            .
-          </p>
-        </section>
-      </Reveal>
-    </div>
-  )
+  return <main className="container-narrow py-16 sm:py-20"><Reveal direction="chapter"><p className="eyebrow mb-4 text-xs font-semibold uppercase text-auto-accent-strong">Legal · {LEGAL_VERSIONS.terms}</p><h1 className="mb-8 text-3xl font-bold text-neutral-900 sm:text-4xl">Términos de Uso</h1></Reveal><Reveal delay={100} className="stagger prose-legal max-w-none space-y-7 text-neutral-600"><p className="text-sm text-neutral-400">Versión vigente: {LEGAL_VERSIONS.terms}. Última actualización: septiembre de 2026.</p><ProviderIdentityBlock />
+<section><h2>1. Aceptación</h2><p>Al navegar, crear una cuenta o publicar aceptás estos términos. La creación de cuenta requiere una aceptación afirmativa y persistida de esta versión y de la Política de Privacidad.</p></section>
+<section><h2>2. Naturaleza del sitio</h2><p>{SITE_NAME} mantiene un archivo técnico editorial y un marketplace. El archivo reúne fichas, guías y comparativas independientes; las marcas pertenecen a sus titulares.</p></section>
+<section><h2>3. El marketplace</h2><p>El marketplace es un espacio que conecta compradores y vendedores. {SITE_NAME} no es vendedor ni comprador, no recibe ni custodia fondos, no garantiza propiedad, titularidad, documentación, estado, kilometraje, legalidad o autenticidad de un vehículo, y no es parte de la compraventa.</p><p>Si comprás un vehículo robado, adulterado o distinto del anuncio, la responsabilidad frente a la operación corresponde a las personas que participaron de ella; el sitio no garantiza ni responde por la transacción de terceros, sin perjuicio de atender reportes y obligaciones legales aplicables.</p></section>
+<section><h2>4. Cuentas de usuario</h2><p>Una persona debe usar una sola cuenta y proporcionar información correcta. El acceso se realiza mediante un enlace enviado al email; cada usuario debe custodiar ese acceso. Debés tener al menos 18 años para crear una cuenta y operar en el marketplace. Podemos suspender cuentas por fraude, incumplimiento, abuso, reportes fundados o uso ilícito.</p></section>
+<section><h2>5. Reglas de publicación</h2><p>Las publicaciones deben cumplir las <Link className="link-underline text-auto-accent-strong" href="/reglas-de-publicacion">Reglas de publicación</Link>. Su incumplimiento puede causar el retiro del anuncio o la suspensión de la cuenta.</p></section>
+<section><h2>6. Reportes y moderación</h2><p>Cualquier visitante puede reportar una publicación. Los reportes pueden ser revisados por moderadores humanos; una decisión puede apelarse por email. Los reportes maliciosos o repetidamente falsos también incumplen estos términos.</p></section>
+<section><h2>7. Mensajería y contacto</h2><p>La plataforma facilita el contacto, pero no responde por lo que las partes acuerden fuera del sitio. Verificá documentación, reunite en condiciones seguras y completá cualquier pago bajo tu propia responsabilidad.</p></section>
+<section><h2>8. Contenido editorial, publicidad y precisión</h2><p>El contenido editorial se prepara con fuentes públicas y puede quedar desactualizado. La publicidad o afiliación no implica respaldo. Los usuarios conservan responsabilidad por el contenido que suben y deben contar con derechos para usar sus fotos y textos.</p></section>
+<section><h2>9. Limitación de responsabilidad</h2><p>En la medida permitida por la normativa aplicable, {SITE_NAME} no responde por pérdidas derivadas de operaciones entre usuarios, información falsa de terceros, indisponibilidad temporal, daños indirectos o conducta de otros usuarios. Esta limitación no elimina derechos inderogables de consumidores ni responsabilidad que legalmente no pueda excluirse.</p></section>
+<section><h2>10. Contacto</h2><p>Para consultas, reportes o apelaciones escribí a <a className="link-underline text-auto-accent-strong" href="mailto:uruspotcdu@gmail.com">uruspotcdu@gmail.com</a>. Para derechos sobre tus datos podés usar <Link className="link-underline text-auto-accent-strong" href="/cuenta">/cuenta</Link>.</p></section></Reveal></main>
 }

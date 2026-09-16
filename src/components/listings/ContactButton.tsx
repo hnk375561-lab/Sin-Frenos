@@ -125,6 +125,9 @@ export function ContactButton({
         El vendedor va a ver tu nombre de cuenta y este mensaje al entrar a Sin Frenos. No compartimos tu
         email ni tu teléfono.
       </p>
+      <p className="mt-2 text-xs text-neutral-500">
+        Los mensajes son privados entre vos y la otra persona, salvo que se reporte la conversación para revisión de moderación.
+      </p>
     </form>
   )
 }

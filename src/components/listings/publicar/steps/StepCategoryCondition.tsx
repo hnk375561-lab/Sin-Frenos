@@ -13,6 +13,7 @@ import {
   severityBadgeBaseClass,
   severityBadgeClasses,
 } from '@/components/listings/publicar/formStyles'
+import Link from 'next/link'
 
 /**
  * Paso 1 del wizard (sección 6: "Categoría + condición (selects grandes
@@ -78,6 +79,9 @@ export function StepCategoryCondition({ draft, onChange, onNext }: StepCategoryC
       <p className={formStyles.stepDescription}>
         Elegí la categoría y la condición real del vehículo — acá podés publicar tal como está,
         incluso si tiene fallas o no arranca.
+      </p>
+      <p className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
+        Antes de continuar, revisá las <Link className="font-semibold underline" href="/reglas-de-publicacion">Reglas de publicación</Link>. Solo podés ofrecer vehículos reales, documentables y con fotos propias o autorizadas.
       </p>
 
       {loading ? (

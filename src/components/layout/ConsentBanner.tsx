@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Script from 'next/script'
 import { useModalFocus } from '@/lib/hooks/useModalFocus'
+import Link from 'next/link'
 
 const STORAGE_KEY = 'sinfrenos-cookie-consent'
 // Nota: la key anterior ('gta6zona-cookie-consent') era un resabio del
@@ -121,7 +122,7 @@ export function ConsentBanner({
           <div className="container-max flex flex-col items-center justify-between gap-3 sm:flex-row">
             <p className="text-sm text-neutral-500">
               Usamos cookies analíticas y, cuando estén activos, anuncios personalizados, para financiar y
-              mejorar el sitio. Podés aceptarlas o rechazarlas — el sitio funciona igual en ambos casos.
+              mejorar el sitio. <Link href="/privacidad" className="underline underline-offset-2">Leé más en nuestra Política de Privacidad</Link>. Podés aceptarlas o rechazarlas — el sitio funciona igual en ambos casos.
             </p>
             <div className="flex shrink-0 gap-3">
               <button

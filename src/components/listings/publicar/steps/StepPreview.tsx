@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import {
   getVehicleCategories,
   getVehicleConditions,
@@ -10,6 +11,8 @@ import {
 import { createListing } from '@/lib/listings/create'
 import type { ListingDraft } from '@/lib/listings/types'
 import { formStyles, severityBadgeBaseClass, severityBadgeClasses } from '@/components/listings/publicar/formStyles'
+import { supabase } from '@/lib/supabase/client'
+import { recordLegalConsent } from '@/lib/legal-consent'
 
 /**
  * Paso 8 del wizard (sección 6: "Preview + publicar. Estado inicial:
@@ -46,6 +49,7 @@ export function StepPreview({ draft, onChange, onBack, userId, onPublished }: St
   const [condition, setCondition] = useState<VehicleConditionOption | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
+  const [contentPolicyAccepted, setContentPolicyAccepted] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -63,7 +67,21 @@ export function StepPreview({ draft, onChange, onBack, userId, onPublished }: St
 
   async function handlePublish() {
     setErrors([])
+    if (!contentPolicyAccepted) {
+      setErrors(['Aceptá las Reglas de publicación para continuar.'])
+      return
+    }
     setSubmitting(true)
+
+    const { error: consentError } = await recordLegalConsent(supabase, userId, 'content', {
+      listing_stage: 'preview',
+      age_represented: true,
+    })
+    if (consentError) {
+      setSubmitting(false)
+      setErrors([`No se pudo registrar tu aceptación de las reglas: ${consentError.message}`])
+      return
+    }
 
     const result = await createListing(draft, userId)
 
@@ -189,6 +207,19 @@ export function StepPreview({ draft, onChange, onBack, userId, onPublished }: St
         públicamente — es fricción mínima de confianza, no una sanción. Las siguientes se
         publican directo.
       </p>
+
+      <label className="mt-4 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+        <input
+          type="checkbox"
+          checked={contentPolicyAccepted}
+          onChange={(event) => setContentPolicyAccepted(event.target.checked)}
+          required
+          className="mt-0.5 h-4 w-4 shrink-0"
+        />
+        <span>
+          Confirmo que leí y acepto las <Link className="font-semibold underline" href="/reglas-de-publicacion">Reglas de publicación</Link>, que el vehículo es real y que tengo autorización para ofrecerlo y usar sus fotos.
+        </span>
+      </label>
 
       {errors.length > 0 && (
         <ul className="mt-3 space-y-1">

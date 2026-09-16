@@ -1,102 +1,17 @@
 import type { Metadata } from 'next'
-import { Reveal } from '@/components/ui/Reveal'
+import Link from 'next/link'
+import { ProviderIdentityBlock } from '@/components/legal/ProviderIdentityBlock'
 import { SITE_NAME, SITE_URL } from '@/config/site'
+import { LEGAL_VERSIONS } from '@/lib/legal-consent'
+import { DATA_RETENTION_POLICY } from '@/lib/data-retention-policy'
 
-export const metadata: Metadata = {
-  title: `Política de Privacidad | ${SITE_NAME}`,
-  description: `Política de privacidad de ${SITE_NAME}: qué datos recopilamos, cómo los usamos y qué opciones tenés.`,
-  metadataBase: new URL(SITE_URL),
-  alternates: { canonical: `${SITE_URL}/privacidad` },
-  robots: { index: true, follow: true },
-}
+export const metadata: Metadata = { title: `Política de Privacidad | ${SITE_NAME}`, description: `Cómo trata datos ${SITE_NAME} en su archivo técnico y marketplace.`, alternates: { canonical: `${SITE_URL}/privacidad` } }
+
+const localStorageKeys = ['sinfrenos:theme', 'sinfrenos:wishlist', 'sinfrenos:vehicle-compare', 'sinfrenos:favorites', 'sinfrenos-cookie-consent']
 
 export default function PrivacyPage() {
-  return (
-    <div className="container-narrow py-16 sm:py-20">
-      <Reveal direction="chapter">
-        <p className="eyebrow-pop eyebrow mb-4 text-xs font-semibold uppercase text-auto-accent-strong">
-          Legal
-        </p>
-        <h1 className="mb-8 text-3xl font-bold text-neutral-900 sm:text-4xl">
-          Política de Privacidad
-        </h1>
-      </Reveal>
-
-      <Reveal delay={100} className="stagger prose-legal max-w-none space-y-8 text-neutral-500/80">
-        <p className="text-sm text-neutral-400">
-          Última actualización: agosto de 2026
-        </p>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">1. Quiénes somos</h2>
-          <p>
-            {SITE_NAME} ({SITE_URL}) es un sitio editorial independiente dedicado a
-            fichas técnicas y comparación de autos y motos. Esta política explica
-            qué datos recopilamos cuando visitás el sitio y cómo los usamos.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">2. Datos que recopilamos</h2>
-          <p>
-            Usamos Google Analytics para entender cómo se usa el sitio (páginas
-            visitadas, tiempo de permanencia, ubicación aproximada por país/ciudad,
-            tipo de dispositivo y navegador). Estos datos son agregados y no te
-            identifican personalmente.
-          </p>
-          <p>
-            El sitio puede mostrar anuncios de Google AdSense cuando dan el consentimiento
-            en el banner de cookies (el mismo que gatea Google Analytics). Sin ese
-            consentimiento, ningún script de anuncios se carga. AdSense puede usar sus
-            propias cookies para mostrar anuncios relevantes cuando el consentimiento
-            está dado.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">3. Cookies</h2>
-          <p>
-            El sitio puede usar cookies técnicas (necesarias para el funcionamiento)
-            y cookies analíticas (Google Analytics). Podés bloquear o eliminar
-            cookies desde la configuración de tu navegador; algunas funciones del
-            sitio podrían verse afectadas.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">4. Terceros</h2>
-          <p>
-            No vendemos ni compartimos datos personales con terceros con fines
-            comerciales propios. Los únicos terceros que procesan datos son
-            proveedores de servicios (como Google Analytics) bajo sus propias
-            políticas de privacidad.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">5. Tus derechos</h2>
-          <p>
-            Podés solicitar información sobre los datos que tenemos asociados a tu
-            visita, o pedir que dejemos de procesarlos, escribiéndonos a{' '}
-            <a
-              href="mailto:uruspotcdu@gmail.com"
-              className="link-underline text-auto-accent-strong transition-colors hover:text-auto-accent"
-            >
-              uruspotcdu@gmail.com
-            </a>
-            .
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-neutral-900">6. Cambios a esta política</h2>
-          <p>
-            Podemos actualizar esta política cuando cambien nuestras prácticas
-            (por ejemplo, al sumar publicidad o nuevos servicios). La fecha de
-            última actualización siempre figura arriba.
-          </p>
-        </section>
-      </Reveal>
-    </div>
-  )
+  return <main className="container-narrow py-16 sm:py-20"><p className="eyebrow mb-4 text-xs font-semibold uppercase text-auto-accent-strong">Legal · {LEGAL_VERSIONS.privacy}</p><h1 className="mb-8 text-3xl font-bold text-neutral-900 sm:text-4xl">Política de Privacidad</h1><div className="space-y-8 text-neutral-600"><p className="text-sm text-neutral-400">Versión vigente: {LEGAL_VERSIONS.privacy}. Última actualización: septiembre de 2026.</p><ProviderIdentityBlock />
+<section><h2 className="text-xl font-semibold text-neutral-900">Parte A · Archivo técnico</h2><p>El archivo de fichas, fabricantes, guías, noticias y comparativas puede usar métricas agregadas de Google Analytics y publicidad de Google AdSense únicamente después de la decisión del banner. Se procesan páginas visitadas, dispositivo, navegador y ubicación aproximada según las políticas de Google.</p></section>
+<section><h2 className="text-xl font-semibold text-neutral-900">Parte B · Marketplace y cuenta</h2><h3 className="mt-4 font-semibold text-neutral-900">B.1 Cuenta</h3><p>Al solicitar un magic link se usa tu email y la sesión de Supabase Auth. La infraestructura de Supabase puede procesar IP, user-agent y registros técnicos como proveedor de hosting, autenticación y base de datos. Consultá también la <a className="underline" href="https://supabase.com/legal/dpa">documentación DPA de Supabase</a>.</p><h3 className="mt-4 font-semibold text-neutral-900">B.2 Perfil</h3><p>La tabla <code>profiles</code> puede contener display_name, avatar_url, phone, seller_type, is_verified y contadores. La tabla <code>seller_profiles</code> puede contener business_name, cuit y verified. Las vistas públicas solo exponen campos permitidos; phone, email y datos privados quedan restringidos al titular según RLS.</p><h3 className="mt-4 font-semibold text-neutral-900">B.3 Publicaciones</h3><p>La tabla <code>listings</code> contiene datos del vehículo, ubicación, condición, precio, descripción, fotos en <code>listing_media</code> y preferencia de contacto. Los anuncios publicados son visibles públicamente; los borrados o asociados a cuentas eliminadas dejan de exponerse en vistas públicas.</p><h3 className="mt-4 font-semibold text-neutral-900">B.4 Mensajería y reportes</h3><p><code>conversations</code> y <code>conversation_messages</code> permiten comunicación entre emisor y receptor. Los mensajes son privados entre las partes, salvo que una conversación sea reportada: el equipo de moderación puede acceder al contenido necesario para revisar el reporte. <code>listing_reports</code> guarda motivo, detalle, denunciante y estado; <code>moderation_actions</code> registra acciones administrativas.</p><h3 className="mt-4 font-semibold text-neutral-900">B.5 Navegador</h3><ul className="list-disc space-y-1 pl-6">{localStorageKeys.map((key) => <li key={key}><code>{key}</code>: preferencia técnica o selección de favoritos/comparación/consentimiento; se puede borrar desde la configuración del navegador. No contiene el contenido de mensajes.</li>)}</ul><p className="mt-2">También se usa sessionStorage para descartar anuncios y restaurar scroll; se borra al limpiar los datos de sesión del navegador.</p><h3 className="mt-4 font-semibold text-neutral-900">B.6 Bases del tratamiento</h3><p>Consentimiento para analítica, anuncios y newsletter; ejecución de la relación solicitada para autenticación, publicaciones y contacto; e interés legítimo para prevenir fraude, moderar reportes y mantener seguridad.</p><h3 className="mt-4 font-semibold text-neutral-900">B.7 Conservación</h3><p>Los anuncios activos se revisan después de {DATA_RETENTION_POLICY.activeListingReviewAfterDays} días sin actualización. Los anuncios eliminados o vencidos se conservan hasta {DATA_RETENTION_POLICY.deletedListingHardDeleteAfterDays} días para operación y reportes. Los mensajes se conservan {DATA_RETENTION_POLICY.messagesAfterClosedListingMonths} meses después del cierre, o hasta resolver un reporte más {DATA_RETENTION_POLICY.reportedMessageAfterResolutionDays} días. Los consentimientos se conservan mientras exista la cuenta como evidencia. En cuentas eliminadas, la eliminación de PII se programa a los {DATA_RETENTION_POLICY.deletedAccountPiiHardDeleteAfterDays} días, con anonimización de métricas agregadas.</p><h3 className="mt-4 font-semibold text-neutral-900">B.8 Derechos ARCO</h3><p>Podés consultar, corregir, cancelar u oponerte al tratamiento desde <Link className="underline" href="/cuenta">/cuenta</Link>. Si perdiste acceso al email, escribí a <a className="underline" href="mailto:uruspotcdu@gmail.com">uruspotcdu@gmail.com</a>.</p><h3 className="mt-4 font-semibold text-neutral-900">B.9 Terceros</h3><p>Supabase presta hosting, Auth y base de datos; Google presta Analytics y AdSense cuando corresponde. Cafecito solo recibe la navegación si hacés click en su enlace externo.</p><h3 className="mt-4 font-semibold text-neutral-900">B.10 AAIP</h3><p>La base de datos puede estar sujeta a registro ante la Agencia de Acceso a la Información Pública. La verificación y registro son una acción administrativa del operador, no una función del código. Su estado se documenta en el repositorio operativo.</p></section>
+<section><h2 className="text-xl font-semibold text-neutral-900">Cambios</h2><p>Si cambia el tratamiento o esta política, se publicará una nueva versión y se solicitará el consentimiento correspondiente cuando sea necesario.</p></section></div></main>
 }

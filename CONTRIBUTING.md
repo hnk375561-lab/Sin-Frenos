@@ -9,3 +9,7 @@ Thanks for your interest in improving this project! This document explains how t
 > llama Sin Frenos; este archivo se corrigió el 12/09/2026 para dejar de
 > ser el único lugar del repo que todavía decía "GTA6-CODEX" sin
 > aclararlo (hallazgo F-05, auditoría forense 12/09/2026).
+
+## Operación legal
+
+Antes de habilitar o ampliar el marketplace, revisar [`docs/legal-operational-todos.md`](docs/legal-operational-todos.md). El archivo registra acciones administrativas pendientes, como la evaluación de registro ante AAIP, y no constituye una certificación de cumplimiento.

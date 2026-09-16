@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { SITE_URL } from '@/config/site'
+import { recordLegalConsent } from '@/lib/legal-consent'
 
 function AuthShell({ children }: { children: React.ReactNode }) {
   return (
@@ -24,6 +25,7 @@ export default function IngresarPage() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [legalAccepted, setLegalAccepted] = useState(false)
   const [resolvingRedirect, setResolvingRedirect] = useState(() => {
     if (typeof window === 'undefined') return false
     const params = new URLSearchParams(window.location.search)
@@ -56,6 +58,16 @@ export default function IngresarPage() {
     })
   }, [])
 
+  useEffect(() => {
+    if (!user || window.localStorage.getItem('sinfrenos:pending-legal-consent') !== '1') return
+    Promise.all([
+      recordLegalConsent(supabase, user.id, 'terms', { age_represented: true }),
+      recordLegalConsent(supabase, user.id, 'privacy', { age_represented: true }),
+    ]).then(() => window.localStorage.removeItem('sinfrenos:pending-legal-consent')).catch(() => {
+      // La cuenta permanece usable, pero el consentimiento se reintenta al volver.
+    })
+  }, [user])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -63,6 +75,11 @@ export default function IngresarPage() {
       setError('Ingresá un email válido para recibir tu link de acceso.')
       return
     }
+    if (!legalAccepted) {
+      setError('Tenés que aceptar los Términos, la Política de Privacidad y declarar que sos mayor de 18 años.')
+      return
+    }
+    window.localStorage.setItem('sinfrenos:pending-legal-consent', '1')
     const { error: signInError } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: `${SITE_URL}/ingresar/` },
@@ -85,7 +102,7 @@ export default function IngresarPage() {
       {sent ? (
         <div className="marketplace-auth-sent"><div className="marketplace-auth-mail" aria-hidden="true">@</div><h2>Revisá tu bandeja de entrada</h2><p>Mandamos un link seguro a <strong>{email}</strong>. Abrilo desde cualquier dispositivo y vas a volver directo a Sin Frenos.</p><p className="marketplace-auth-muted">¿No lo ves? Revisá spam o promociones. El link puede tardar unos segundos.</p><button type="button" onClick={() => setSent(false)} className="marketplace-auth-secondary">Usar otro email</button></div>
       ) : (
-        <form onSubmit={handleSubmit} noValidate className="marketplace-auth-form"><label htmlFor="auth-email">Tu email</label><input id="auth-email" type="email" required placeholder="tu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} /><button type="submit" className="marketplace-auth-primary">Enviar link de acceso <span aria-hidden="true">↗</span></button>{error && <p role="alert" className="marketplace-auth-error">{error}</p>}</form>
+        <form onSubmit={handleSubmit} noValidate className="marketplace-auth-form"><label htmlFor="auth-email">Tu email</label><input id="auth-email" type="email" required placeholder="tu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} /><label className="flex items-start gap-2 text-sm text-neutral-600"><input type="checkbox" checked={legalAccepted} onChange={(e) => setLegalAccepted(e.target.checked)} required /><span>Acepto los <Link className="underline" href="/terminos">Términos</Link> y la <Link className="underline" href="/privacidad">Política de Privacidad</Link>, y declaro tener 18 años o más.</span></label><button type="submit" className="marketplace-auth-primary">Enviar link de acceso <span aria-hidden="true">↗</span></button>{error && <p role="alert" className="marketplace-auth-error">{error}</p>}</form>
       )}
       <p className="marketplace-auth-footer">Al entrar aceptás usar Sin Frenos para comprar, vender y comunicarte de forma directa.</p>
     </AuthShell>

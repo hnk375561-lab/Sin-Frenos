@@ -138,6 +138,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly',
       priority: 0.3,
     },
+    {
+      url: `${SITE_URL}/quienes-somos`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${SITE_URL}/reglas-de-publicacion`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
     // /mapa queda fuera a propósito: lleva `robots: { index: false }`
     // (ver src/app/mapa/page.tsx) mientras sea el stub "en construcción".
     // Agregarla acá otra vez el día que tenga contenido real.
