@@ -1,18 +1,27 @@
 /**
- * Reporte comparativo premium — primer canal de monetización del sitio
- * que cobra directo a la persona usuaria (no a un negocio/afiliado), vía
+ * Reporte comparativo — pensado originalmente como primer canal que
+ * cobra directo a la persona usuaria (no a un negocio/afiliado), vía
  * Mercado Pago Checkout Pro. Contexto completo en
  * `docs/monetizacion-plan.md` (sección "Reporte comparativo premium").
  *
- * Qué vende: el PDF de `/api/premium-report/pdf` con la comparación
- * completa (specs + evidencia citada) de 2 a 5 vehículos ya elegidos en
- * `/comparar`, para guardar/compartir/imprimir — la tabla en pantalla no
- * se puede descargar ni llevar a una concesionaria en papel.
+ * ACTUALIZADO (migración a GitHub Pages, sitio 100% estático): el cobro
+ * vía Mercado Pago Checkout Pro requería dos Route Handlers server-side
+ * (`create-preference` y `pdf`) que no pueden existir en `output: 'export'`.
+ * El PDF se genera hoy gratis, 100% client-side, con `buildPremiumReportPdf`
+ * (`src/lib/pdf/build-premium-report.ts`, pdf-lib) — ver
+ * `PremiumReportButton.tsx`. `PREMIUM_REPORT_PRICE_ARS` y
+ * `buildExternalReference` de más abajo quedan sin uso real hasta que se
+ * elija una pasarela de pago compatible con hosting estático (ej. un link
+ * de pago hosteado por Mercado Pago sin backend propio, o volver a un
+ * runtime con servidor).
+ *
+ * Qué vende hoy: el PDF con la comparación completa (specs + evidencia
+ * citada) de 2 a 5 vehículos ya elegidos en `/comparar`, para
+ * guardar/compartir/imprimir — gratis.
  *
  * Este archivo es intencionalmente el único lugar con el precio y el
  * mínimo/máximo de vehículos, para no tener el número de precio
- * duplicado entre el botón, la ruta que crea la preferencia y el
- * generador de PDF.
+ * duplicado entre el botón y el generador de PDF.
  */
 
 export const PREMIUM_REPORT_PRICE_ARS = 990
