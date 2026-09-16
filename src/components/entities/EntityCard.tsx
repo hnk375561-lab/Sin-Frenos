@@ -76,8 +76,13 @@ function vehicleShowcaseSpecs(vehicle: Vehicle): Array<{ label: string; value: s
   const hp = parsePowerHp(vehicle)
   if (hp !== null) specs.push({ label: 'Potencia', value: `${hp} HP` })
   if (vehicle.cilindrada) specs.push({ label: 'Cilindrada', value: vehicle.cilindrada })
+  const torque = vehicle.especificacionesMotor?.torque
+  if (torque != null) specs.push({ label: 'Torque', value: String(torque) })
+  if (vehicle.traccion) specs.push({ label: 'Tracción', value: vehicle.traccion })
+  if (vehicle.performance?.speed) specs.push({ label: 'Máxima', value: vehicle.performance.speed })
+  if (vehicle.performance?.acceleration) specs.push({ label: '0–100', value: vehicle.performance.acceleration })
   const transmission = shortTransmissionLabel(vehicle.transmision)
-  if (transmission) specs.push({ label: 'Caja', value: transmission })
+  if (transmission) specs.push({ label: 'Transmisión', value: transmission })
   return specs
 }
 
@@ -418,7 +423,7 @@ export function EntityCard({
           >
             {/* CANVAS — la fotografía con aspecto de documento */}
             <div
-              className={cn('relative w-full', isCompact ? 'aspect-[4/5]' : 'aspect-[3/4]')}
+              className={cn('relative w-full', isCompact ? 'aspect-[16/10]' : 'aspect-[3/2]')}
               onMouseEnter={() => setHovering(true)}
               onMouseLeave={() => setHovering(false)}
             >
