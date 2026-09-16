@@ -137,7 +137,7 @@ export function VehicleDetailLayout({
               <p className="mt-3 max-w-3xl text-base text-neutral-600 sm:text-lg">{vehicle.description}</p>
             </div>
             <div className="flex shrink-0 flex-wrap gap-2">
-              <Link prefetch={false} href={`/comparar/${vehicle.slug}`} className="rounded-md bg-auto-accent px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-auto-darker">Comparar vehículo</Link>
+              <Link prefetch={false} href={`/comparar?v=${encodeURIComponent(vehicle.slug)}`} className="rounded-md bg-auto-accent px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-auto-darker">Comparar vehículo</Link>
               <Link href="/vehiculos" className="rounded-md border border-edge-strong bg-surface-card px-4 py-2 text-sm font-semibold text-ink hover:border-auto-accent">Volver al catálogo</Link>
             </div>
           </div>

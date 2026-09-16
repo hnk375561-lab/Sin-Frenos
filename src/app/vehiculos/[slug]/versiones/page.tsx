@@ -4,6 +4,7 @@ import { Vehicle, EntityType } from '@/types'
 import { getEntity, getEntitySlugs } from '@/lib/entities'
 import { resolveEntityDisplayImage } from '@/lib/media'
 import { extractVehicleVariants, hasMultipleVariants, VehicleVariant } from '@/lib/vehicle-variants'
+import { parsePriceUsd } from '@/lib/vehicle-price'
 import { generateEntityMetadata, serializeJsonLd } from '@/lib/seo'
 import { Reveal } from '@/components/ui/Reveal'
 import Link from 'next/link'
@@ -15,6 +16,7 @@ interface VehicleVersionsProps {
 }
 
 function VehicleVersionsClient({ vehicle, variants }: VehicleVersionsProps) {
+  const canFinance = parsePriceUsd(vehicle) !== null && parsePriceUsd(vehicle)! > 0
   if (variants.length <= 1) {
     return (
       <div className="text-center py-12">
@@ -168,12 +170,14 @@ function VehicleVersionsClient({ vehicle, variants }: VehicleVersionsProps) {
                 Ver categoría {vehicle.class}
               </Link>
             )}
-            <Link
-              href={`/financiar/${vehicle.slug}`}
-              className="inline-flex items-center gap-2 rounded-lg bg-auto-accent px-4 py-2 text-sm font-semibold text-[#09090B] transition-transform hover:scale-105 active:scale-95"
-            >
-              Financiar este modelo
-            </Link>
+            {canFinance && (
+              <Link
+                href={`/financiar/${vehicle.slug}`}
+                className="inline-flex items-center gap-2 rounded-lg bg-auto-accent px-4 py-2 text-sm font-semibold text-[#09090B] transition-transform hover:scale-105 active:scale-95"
+              >
+                Financiar este modelo
+              </Link>
+            )}
           </div>
         </nav>
       </Reveal>

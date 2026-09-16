@@ -6,7 +6,7 @@ import { getEntity, getEntitySlugs, getEntitiesByType } from '@/lib/entities'
 import { resolveEntityDisplayImage, resolveEntityDisplayImages } from '@/lib/media'
 import { getBidirectionalRelatedEntitiesWithLabel } from '@/lib/relations'
 import { getSimilarVehicles } from '@/lib/vehicle-similar'
-import { getVehicleCategory, categoryPageHref, categoryToSlug } from '@/lib/vehicle-category'
+import { getVehicleCategory, categoryPageHref, categoryToSlug, computeSeoCategoryOptions } from '@/lib/vehicle-category'
 import { getManufacturerStats } from '@/lib/manufacturer-stats'
 import { SimilarVehiclesPanel } from '@/components/entities/SimilarVehiclesPanel'
 import { generateEntityMetadata, generateEntityJsonLd, generateBreadcrumbJsonLd, serializeJsonLd } from '@/lib/seo'
@@ -174,6 +174,10 @@ export default async function EntityPage({ params }: PageProps) {
     type === EntityType.MANUFACTURER
       ? getManufacturerStats(entity.slug, (await getEntitiesByType(EntityType.VEHICLE)) as Vehicle[])
       : null
+  const staticSeoCategorySlugs =
+    type === EntityType.MANUFACTURER
+      ? new Set(computeSeoCategoryOptions((await getEntitiesByType(EntityType.VEHICLE)) as Vehicle[]).map(({ group }) => categoryToSlug(group)))
+      : null
 
   const jsonLd = generateEntityJsonLd(entity, null)
   const breadcrumbLd = generateBreadcrumbJsonLd([
@@ -193,7 +197,12 @@ export default async function EntityPage({ params }: PageProps) {
   // (bucket residual sin página SEO propia), así que nunca se linkea a
   // una ruta que respondería 404.
   const vehicleCategory = type === EntityType.VEHICLE ? getVehicleCategory((entity as Vehicle).class) : null
-  const categoryHref = type === EntityType.VEHICLE ? categoryPageHref((entity as Vehicle).class) : null
+  let categoryHref: string | null = null
+  if (type === EntityType.VEHICLE && vehicleCategory) {
+    const vehicles = (await getEntitiesByType(EntityType.VEHICLE)) as Vehicle[]
+    const hasStaticCategoryPage = computeSeoCategoryOptions(vehicles).some(({ group }) => group === vehicleCategory)
+    if (hasStaticCategoryPage) categoryHref = categoryPageHref((entity as Vehicle).class)
+  }
 
   if (type === EntityType.VEHICLE) {
     return (
@@ -421,7 +430,7 @@ export default async function EntityPage({ params }: PageProps) {
                           Categorías
                         </h3>
                         <div className="flex flex-wrap gap-2">
-                          {manufacturerStats.categories.map(({ category, count }) => (
+                          {manufacturerStats.categories.filter(({ category }) => staticSeoCategorySlugs?.has(categoryToSlug(category))).map(({ category, count }) => (
                               <Link
                                 key={category}
                                 prefetch={false}

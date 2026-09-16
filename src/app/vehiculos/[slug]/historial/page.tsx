@@ -4,6 +4,8 @@ import { Vehicle, EntityType } from '@/types'
 import { getEntity, getEntitySlugs } from '@/lib/entities'
 import { resolveEntityDisplayImage } from '@/lib/media'
 import { ModelYearHistory } from '@/lib/vehicle-history'
+import { parsePriceUsd } from '@/lib/vehicle-price'
+import { slugifyManufacturer } from '@/lib/vehicle-manufacturers'
 import { generateEntityMetadata } from '@/lib/seo'
 import { Reveal } from '@/components/ui/Reveal'
 import Link from 'next/link'
@@ -16,6 +18,7 @@ interface VehicleHistoryProps {
 
 function VehicleHistoryClient({ vehicle, history }: VehicleHistoryProps) {
   const { years, generations, launchYear, currentYear, hasHistory } = history
+  const canFinance = parsePriceUsd(vehicle) !== null && parsePriceUsd(vehicle)! > 0
 
   if (!hasHistory || years.length <= 1) {
     return (
@@ -211,24 +214,28 @@ function VehicleHistoryClient({ vehicle, history }: VehicleHistoryProps) {
                 Ver categoría {vehicle.class}
               </Link>
             )}
-            <Link
-              href={`/fabricantes/${vehicle.manufacturer?.toLowerCase().replace(/\s+/g, '-')}`}
-              className="inline-flex items-center gap-2 rounded-lg border border-auto-accent/35 bg-auto-accent/15 px-3 py-2 text-sm font-semibold uppercase tracking-wide text-auto-accent-strong transition-colors hover:bg-auto-accent/25"
-            >
-              Ver fabricante {vehicle.manufacturer}
-            </Link>
+            {vehicle.manufacturer && (
+              <Link
+                href={`/fabricantes/${slugifyManufacturer(vehicle.manufacturer)}`}
+                className="inline-flex items-center gap-2 rounded-lg border border-auto-accent/35 bg-auto-accent/15 px-3 py-2 text-sm font-semibold uppercase tracking-wide text-auto-accent-strong transition-colors hover:border-auto-accent hover:bg-auto-accent/25"
+              >
+                Ver fabricante {vehicle.manufacturer}
+              </Link>
+            )}
             <Link
               href={`/comparar?v=${encodeURIComponent(vehicle.slug)}`}
               className="inline-flex items-center gap-2 rounded-lg border border-auto-accent/35 bg-auto-accent/15 px-3 py-2 text-sm font-semibold uppercase tracking-wide text-auto-accent-strong transition-colors hover:bg-auto-accent/25"
             >
               Comparar con otros
             </Link>
-            <Link
-              href={`/financiar/${vehicle.slug}`}
-              className="inline-flex items-center gap-2 rounded-lg bg-auto-accent px-4 py-2 text-sm font-semibold text-[#09090B] transition-transform hover:scale-105 active:scale-95"
-            >
-              Financiar este modelo
-            </Link>
+            {canFinance && (
+              <Link
+                href={`/financiar/${vehicle.slug}`}
+                className="inline-flex items-center gap-2 rounded-lg bg-auto-accent px-4 py-2 text-sm font-semibold text-[#09090B] transition-transform hover:scale-105 active:scale-95"
+              >
+                Financiar este modelo
+              </Link>
+            )}
           </div>
         </nav>
       </Reveal>
