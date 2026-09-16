@@ -7,6 +7,10 @@ import { NewsletterSignupForm } from '@/components/monetization/NewsletterSignup
 import { SupportButton } from '@/components/monetization/SupportButton'
 import { smoothScrollTo } from '@/lib/scroll/smooth-scroll'
 import { ProviderIdentityBlock } from '@/components/legal/ProviderIdentityBlock'
+import mediaKitData from '../../../prospeccion/media-kit-data.json'
+
+const WHATSAPP_NUMBER = mediaKitData.contacto.telefono.replace(/[^\d]/g, '')
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hola, quiero contactarme con Sin Frenos.')}`
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -64,7 +68,14 @@ export function Footer() {
             <p className="marketplace-footer-kicker">Contacto</p>
             <div className="marketplace-footer-socials">
               <a href="mailto:uruspotcdu@gmail.com">uruspotcdu@gmail.com</a>
+              <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">WhatsApp · {mediaKitData.contacto.telefono}</a>
+              <span aria-label="Redes sociales próximamente">Instagram · próximamente</span>
+              <span aria-label="Redes sociales próximamente">TikTok · próximamente</span>
             </div>
+          </div>
+          <div className="max-w-sm border border-white/15 bg-white/[.03] px-4 py-3">
+            <p className="font-mono text-[10px] uppercase tracking-[.16em] text-orange-300">✓ Evidencia citada</p>
+            <p className="mt-2 text-xs leading-relaxed text-white/60">{mediaKitData.trafico.fichasPublicadas} fichas técnicas con fuentes y nivel de confianza explícitos.</p>
           </div>
           <button type="button" onClick={() => smoothScrollTo(0)} className="marketplace-footer-top" aria-label="Volver arriba">
             Volver arriba <span aria-hidden="true">↑</span>
