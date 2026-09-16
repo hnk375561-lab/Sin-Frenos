@@ -132,45 +132,32 @@ dentro del newsletter — canal a futuro, no construido todavía.
 Botón "Invitame un cafecito" en el footer. Activar: crear cuenta en
 cafecito.app y configurar `NEXT_PUBLIC_CAFECITO_USERNAME`.
 
-### 2.13 Reporte comparativo premium (`/api/premium-report/*`) — 🔵 🟡
+### 2.13 Reporte comparativo (`PremiumReportButton.tsx`) — 🟢 (gratis), cobro sin resolver
 
-**Nuevo (03/09/2026).** Primer canal que cobra directo a la persona
-usuaria en vez de a un negocio — hasta esta ronda, todo lo demás era
-afiliado, lead o patrocinio B2B. Desde `/comparar` (comparador libre) y
-`/comparar/[pair]` (comparaciones fijas SEO), con 2 a 5 vehículos
-seleccionados, `PremiumReportButton.tsx` ofrece descargar un PDF con la
-ficha técnica completa + evidencia citada de cada vehículo comparado
-(ARS 990, precio editable en `src/lib/premium-report.ts`).
+**Actualizado (migración a GitHub Pages, 10-16/09/2026).** Se pensó
+originalmente como el primer canal que cobra directo a la persona
+usuaria (ARS 990 vía Mercado Pago Checkout Pro, con dos Route Handlers
+server-side: `create-preference` y `pdf`). El sitio migró a
+`output: 'export'` (100% estático, sin servidor), y esas dos rutas no
+pueden existir en ese modo — Next.js ni siquiera las incluye en el
+build. Cobrar así requeriría volver a un runtime con servidor (Vercel u
+otro) solo para este canal.
 
-Cómo funciona (sin base de datos ni backend propio, mismo criterio que
-el resto del sitio):
+**Estado real hoy:** el botón genera el PDF gratis, 100% en el
+navegador, con `buildPremiumReportPdf` (`src/lib/pdf/build-premium-report.ts`,
+usa `pdf-lib`, sin dependencias de Node). Es un canal de valor para
+retención/SEO, no de ingresos, hasta que se resuelva el punto siguiente.
 
-1. El botón llama a `POST /api/premium-report/create-preference`, que
-   crea una preferencia de **Mercado Pago Checkout Pro** (API REST
-   directa, sin el SDK oficial — ver comentario en `src/lib/mercadopago.ts`)
-   y redirige al checkout hosteado por Mercado Pago.
-2. Mercado Pago vuelve a `/reporte-premium/descargar` con el resultado.
-3. Esa página linkea a `GET /api/premium-report/pdf`, que **vuelve a
-   verificar el pago contra la API de Mercado Pago** (nunca confía en el
-   query param que vuelve en la URL del navegador) y solo si está
-   `approved` y corresponde exactamente a los vehículos pedidos, genera
-   el PDF al vuelo con `pdfkit` (mismo estilo visual que
-   `scripts/generate-media-kit.mjs`) y lo devuelve para descargar.
-
-**Activar:** configurar `MERCADOPAGO_ACCESS_TOKEN` (credencial de
-producción, ver `.env.example`) en Vercel. Sin esa variable, el botón
-muestra "todavía no está activo" (fail-closed, no rompe para quien
-visita el sitio). No requiere cuenta de terceros nueva más allá de
-Mercado Pago, que el sitio ya usa indirectamente vía el afiliado de
-Mercado Libre.
-
-**Nota de infraestructura:** esta es la primera funcionalidad del sitio
-que agrega Route Handlers (`route.ts`) — hasta ahora todo el sitio era
-100% estático. Son 2 Serverless Functions nuevas (`create-preference` y
-`pdf`), lejos del tope de 12 del plan Hobby de Vercel (ver el comentario
-ya existente sobre esto en `next.config.js`), pero cualquier ronda
-futura que siga sumando rutas nuevas debería revisar ese conteo antes de
-desplegar.
+**Para reactivar el cobro** hay que elegir una de estas dos vías (no es
+trabajo de una ronda chica):
+- Volver a tener un backend real para estas dos rutas puntuales
+  (Vercel Functions, o un servicio serverless aparte tipo Cloudflare
+  Workers/Netlify Functions, apuntado solo desde estas dos rutas).
+- Usar un **link de pago hosteado** de Mercado Pago (sin backend
+  propio: se genera manualmente por monto fijo desde el panel de
+  Mercado Pago) — pierde la verificación automática y la entrega
+  instantánea del PDF, pasa a ser semi-manual, pero no exige volver a
+  agregar servidor al sitio.
 
 ### 2.14 Cross-sell de accesorios (`AccessoriesAffiliateWidget`) — 🟢
 
@@ -190,19 +177,18 @@ AdSense (mezclarlos violaría las políticas de ambas redes). Activar:
 elegir una red, conseguir su aprobación (suele ser rápida) y completar
 `NEXT_PUBLIC_NATIVE_ADS_SCRIPT_SRC` / `NEXT_PUBLIC_NATIVE_ADS_CONTAINER_ID`.
 
-### 2.16 Cartel de venta en PDF (`/vender-tu-auto/cartel`) — 🔵 🟡
+### 2.16 Cartel de venta en PDF (`ForSaleFlyerForm.tsx`) — 🟢 (gratis), cobro sin resolver
 
-Segundo canal que cobra directo a la persona usuaria (no a un negocio),
-mismo mecanismo que el reporte comparativo premium (2.13): Mercado Pago
-Checkout Pro server-side, verificación del pago contra la API de Mercado
-Pago antes de generar el PDF (nunca se confía en el query param de vuelta
-del navegador), sin base de datos propia (los datos del cartel viajan
-codificados en la propia URL). Precio: ARS 690 (`FLYER_PRICE_ARS` en
-`src/lib/for-sale-flyer.ts`). Quien deja el lead gratis en
-`SellVehicleLeadForm.tsx` puede además comprar un cartel prolijo (marca,
-modelo, precio grande, contacto) para el parabrisas o para compartir en
-grupos de WhatsApp/redes. Activar: mismo `MERCADOPAGO_ACCESS_TOKEN` que
-2.13 (ya lo habilita a los dos canales a la vez).
+**Actualizado**, mismo caso que 2.13: se pensó como segundo canal de
+cobro directo (ARS 690, `FLYER_PRICE_ARS` en `src/lib/for-sale-flyer.ts`)
+vía Mercado Pago Checkout Pro server-side, pero la migración a
+`output: 'export'` lo dejó sin backend posible. Hoy `buildFlyerPdf`
+genera el cartel gratis, 100% client-side. Quien deja el lead gratis en
+`SellVehicleLeadForm.tsx` puede además generar sin costo un cartel
+prolijo (marca, modelo, precio grande, contacto) para el parabrisas o
+para compartir en grupos de WhatsApp/redes. Reactivar el cobro requiere
+la misma decisión de infraestructura que 2.13 (backend real o link de
+pago hosteado manual).
 
 ### 2.17 Afiliado fintech (`FintechAffiliateButton`) — 🔵 🟡
 
