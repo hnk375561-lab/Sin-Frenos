@@ -26,7 +26,7 @@
 ### 3. `src/lib/supabase/client.ts`
 - **Qué es**: Cliente Supabase browser-only (client-side)
 - **Contenido**: 
-  - Importa `createBrowserClient` de `@supabase/ssr`
+  - Importa `createClient` de `@supabase/supabase-js` con implicit flow para el export estático
   - Lee `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` de env
   - Exporta `supabase` (instancia del cliente)
   - Lanza error si faltan variables
