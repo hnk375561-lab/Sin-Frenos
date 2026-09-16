@@ -486,11 +486,11 @@ export function EntityCard({
               )}
 
               {/* CONTENIDO INFERIOR */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
+              <div className={cn('absolute bottom-0 left-0 right-0', isCompact ? 'p-3 pt-16 sm:p-4 sm:pt-16' : 'p-4 sm:p-5')}>
                 {/* Marca y modelo */}
                 <div className="space-y-1 mb-3">
                   {brand && (
-                    <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-ink/60">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/60">
                       {brand}
                     </p>
                   )}
@@ -498,7 +498,7 @@ export function EntityCard({
                     {model}
                   </h3>
                   {secondaryLine && (
-                    <p className="font-mono text-[10px] text-white/70">
+                    <p className={cn('font-mono text-[10px] text-white/70', isCompact && 'line-clamp-1')}>
                       {secondaryLine}
                     </p>
                   )}
@@ -511,7 +511,7 @@ export function EntityCard({
 
                 {/* Specs line */}
                 {specsLine && (
-                  <p className="font-mono text-[10px] text-ink/70 mb-1">
+                  <p className={cn('font-mono text-[10px] text-white/70 mb-1', isCompact && 'line-clamp-2')}>
                     {specsLine}
                   </p>
                 )}
