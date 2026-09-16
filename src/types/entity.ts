@@ -78,6 +78,10 @@ export type SpecBlock = Record<string, string | number | null | undefined>
 export interface VehicleSafety {
   euroNCAP?: string
   puntaje?: number
+  proteccionAdultos?: number
+  proteccionNiños?: number
+  proteccionVulnerables?: number
+  asistenciaSistemas?: number
 }
 
 export interface VehicleRegionAvailability {
@@ -94,6 +98,8 @@ export interface VehicleAvailability {
 
 export interface VehicleVariant {
   nombre?: string
+  potencia?: string
+  autonomia?: string
   precio?: string
 }
 
@@ -200,6 +206,13 @@ export interface Vehicle extends BaseEntity {
   especificacionesSuspension?: SpecBlock | null
   especificacionesRuedas?: SpecBlock | null
   especificacionesDireccion?: SpecBlock | null
+  performanceData?: {
+    aceleracion?: SpecBlock | null
+    velocidad?: SpecBlock | null
+    consumo?: SpecBlock | null
+    emisiones?: SpecBlock | null
+    autonomia?: SpecBlock | null
+  } | null
 
   /** Poblado en 155/250 fichas — cualquier UI que lo consuma debe tratarlo
    *  como opcional/condicional, igual que ya hace el resto del sitio con
