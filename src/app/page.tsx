@@ -5,10 +5,12 @@ import { generateHomepageMetadata, generateWebsiteJsonLd, serializeJsonLd } from
 import { getEntitiesByType, getEntityCountsByType, getFeaturedEntities } from '@/lib/entities'
 import { getEntityImageMap } from '@/lib/media'
 import { getVehicleCategory, computeCategoryOptions } from '@/lib/vehicle-category'
+import imageLoader from '@/lib/image-loader'
 import { HomeDiscovery } from '@/components/home/HomeDiscovery'
 import { EntityCard } from '@/components/entities/EntityCard'
 import { Reveal } from '@/components/ui/Reveal'
 import { ArchiveHero } from '@/components/home/ArchiveHero'
+import { CinematicVehicleSequence, type SequenceVehicle } from '@/components/home/CinematicVehicleSequence'
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateHomepageMetadata()
@@ -44,6 +46,25 @@ export default async function Home() {
   const featuredVehicle = featured[0] ?? vehicles.find((vehicle) => vehicle.featured) ?? vehicles[0]
   const featuredImage = featuredVehicle ? imageBySlug[`vehiculos/${featuredVehicle.slug}`] : null
   const evidenceCoveragePct = computeEvidenceCoveragePct(vehicles)
+  const cinematicVehicles: SequenceVehicle[] = categories
+    .filter(({ group }) => group !== 'Otros')
+    .flatMap(({ group }) => {
+      const candidates = vehicles
+        .filter((vehicle) => getVehicleCategory(vehicle.class) === group && imageBySlug[`vehiculos/${vehicle.slug}`])
+        .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)))
+      const vehicle = candidates[0]
+      const image = vehicle ? imageBySlug[`vehiculos/${vehicle.slug}`] : null
+      if (!vehicle || !image?.src) return []
+      return [{
+        slug: vehicle.slug,
+        title: vehicle.title,
+        manufacturer: vehicle.manufacturer ?? '',
+        category: String(group),
+        imageSrc: imageLoader({ src: image.src, width: 1024 }),
+        imageAlt: image.alt,
+      }]
+    })
+    .slice(0, 6)
   const heroCategoryChips = categories.slice(0, 4).map(({ group, count }) => ({
     label: group,
     count,
@@ -70,6 +91,8 @@ export default async function Home() {
           searchExamples={vehicles.slice(0, 4).map((vehicle) => vehicle.title)}
           categoryChips={heroCategoryChips}
         />
+
+        <CinematicVehicleSequence vehicles={cinematicVehicles} />
 
         <section className="border-b border-edge bg-surface-card py-12 sm:py-16" aria-labelledby="categories-heading">
           <div className="container-max">
