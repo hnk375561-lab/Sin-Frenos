@@ -42,7 +42,14 @@ export default async function Home() {
   const vehicles = vehiclesRaw as Vehicle[]
   const featured = featuredRaw as Vehicle[]
   const imageBySlug = getEntityImageMap(vehicles)
-  const categories = computeCategoryOptions(vehicles, 2).slice(0, 6)
+  const availableCategories = computeCategoryOptions(vehicles, 2)
+  const narrativeOrder = ['SUV', 'Deportivo', 'Sedán', 'Pickup', 'Hatchback', 'Moto']
+  const categories = [
+    ...narrativeOrder
+      .map((group) => availableCategories.find((option) => option.group === group))
+      .filter((option): option is (typeof availableCategories)[number] => Boolean(option)),
+    ...availableCategories.filter((option) => !narrativeOrder.includes(option.group)),
+  ].slice(0, 6)
   const featuredVehicle = featured[0] ?? vehicles.find((vehicle) => vehicle.featured) ?? vehicles[0]
   const featuredImage = featuredVehicle ? imageBySlug[`vehiculos/${featuredVehicle.slug}`] : null
   const evidenceCoveragePct = computeEvidenceCoveragePct(vehicles)

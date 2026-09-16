@@ -16,45 +16,191 @@ type SequenceVehicle = {
   imageAlt: string
 }
 
-type Tile = { id: string; row: number; col: number; x: number; y: number; rotation: number; scale: number; z: number }
+type Grid = { rows: number; cols: number }
+type TileMotion = { id: string; row: number; col: number; driftX: number; driftY: number; rotation: number; depth: number; release: number; settle: number }
 
-const MOBILE_BREAKPOINT = 520
-const DESKTOP_GRID = { rows: 5, cols: 7 }
-const MOBILE_GRID = { rows: 4, cols: 5 }
+type PointerApi = { x: (value: number) => void; y: (value: number) => void }
 
-function makeTiles(vehicleKey: string, rows: number, cols: number): Tile[] {
-  return Array.from({ length: rows * cols }, (_, index) => {
-    const row = Math.floor(index / cols)
-    const col = index % cols
-    return { id: `${vehicleKey}-${row}-${col}`, row, col, x: 0, y: 0, rotation: 0, scale: 1, z: 0 }
+const DESKTOP_GRID: Grid = { rows: 5, cols: 6 }
+const MOBILE_GRID: Grid = { rows: 4, cols: 5 }
+const COMPACT_BREAKPOINT = 420
+const SECTION_LABEL = '02 · Recorrido editorial'
+
+function stableHash(value: string): number {
+  let hash = 2166136261
+  for (let index = 0; index < value.length; index += 1) hash = Math.imul(hash ^ value.charCodeAt(index), 16777619)
+  return (hash >>> 0) / 4294967295
+}
+
+function createTileMotion(vehicle: SequenceVehicle, grid: Grid): TileMotion[] {
+  return Array.from({ length: grid.rows * grid.cols }, (_, index) => {
+    const row = Math.floor(index / grid.cols)
+    const col = index % grid.cols
+    const x = col / Math.max(1, grid.cols - 1) - 0.5
+    const y = row / Math.max(1, grid.rows - 1) - 0.5
+    const hash = stableHash(`${vehicle.slug}:${row}:${col}`)
+    const edgeDistance = Math.min(col, grid.cols - 1 - col, row, grid.rows - 1 - row)
+    const edgeRelease = edgeDistance / Math.max(1, Math.min(grid.rows, grid.cols) / 2)
+    const horizontalBias = x * 0.82 + (hash - 0.5) * 0.18
+    const verticalBias = y * 0.42 + (hash - 0.5) * 0.2
+    return {
+      id: `${vehicle.slug}-${row}-${col}`,
+      row,
+      col,
+      driftX: horizontalBias * (1.05 + hash * 0.35),
+      driftY: verticalBias * (0.72 + hash * 0.28),
+      rotation: (hash - 0.5) * 8,
+      depth: (hash - 0.5) * 90,
+      release: Math.min(0.3, edgeRelease * 0.22 + hash * 0.08),
+      settle: 0.8 + hash * 0.16,
+    }
   })
 }
 
-function randomScatter(tile: Tile, index: number, width: number, height: number) {
-  const edge = index % 4
-  return {
-    x: (edge === 1 ? 1 : edge === 3 ? -1 : gsap.utils.random(-0.4, 0.4)) * width * gsap.utils.random(0.55, 1.25),
-    y: (edge === 0 ? -1 : edge === 2 ? 1 : gsap.utils.random(-0.4, 0.4)) * height * gsap.utils.random(0.55, 1.2),
-    rotation: gsap.utils.random(-28, 28),
-    scale: gsap.utils.random(0.72, 1.18),
-    z: gsap.utils.random(-180, 180),
-    duration: gsap.utils.random(0.55, 1.15),
-    delay: gsap.utils.random(0, 0.2) + (Math.abs(tile.row - 2) + Math.abs(tile.col - 3)) * 0.012,
-  }
+function setTileState(element: HTMLDivElement, motion: TileMotion, progress: number, width: number, height: number, entering: boolean) {
+  const eased = entering ? gsap.parseEase('power3.out')(progress) : gsap.parseEase('power2.inOut')(progress)
+  const amount = entering ? 1 - eased : eased
+  gsap.set(element, {
+    x: motion.driftX * width * amount,
+    y: motion.driftY * height * amount,
+    rotation: motion.rotation * amount,
+    scale: 1 - amount * 0.055,
+    z: motion.depth * amount,
+    opacity: entering ? 0.88 + eased * 0.12 : 1 - eased * 0.78,
+  })
 }
 
 export function CinematicVehicleSequence({ vehicles }: { vehicles: SequenceVehicle[] }) {
   const rootRef = useRef<HTMLElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
+  const imagePlaneRef = useRef<HTMLDivElement>(null)
   const tileRefs = useRef<Record<string, HTMLDivElement | null>>({})
-  const [grid, setGrid] = useState(DESKTOP_GRID)
-  const [reducedMotion, setReducedMotion] = useState(false)
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [pointer, setPointer] = useState({ x: 0, y: 0 })
+  const pointerApi = useRef<PointerApi | null>(null)
+  const geometryRef = useRef({ width: 0, height: 0 })
+  const triggerRef = useRef<ScrollTrigger | null>(null)
   const activeIndexRef = useRef(0)
+  const [grid, setGrid] = useState<Grid>(DESKTOP_GRID)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [reducedMotion, setReducedMotion] = useState(false)
+  const [compact, setCompact] = useState(false)
 
-  const tilesByVehicle = useMemo(() => Object.fromEntries(vehicles.map((vehicle) => [vehicle.slug, makeTiles(vehicle.slug, grid.rows, grid.cols)])), [vehicles, grid])
+  const motionByVehicle = useMemo(() => Object.fromEntries(vehicles.map((vehicle) => [vehicle.slug, createTileMotion(vehicle, grid)])), [vehicles, grid])
   const mountedVehicles = vehicles.filter((_, index) => Math.abs(index - activeIndex) <= 1)
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const updateMotionPreference = () => setReducedMotion(media.matches)
+    const updateViewport = () => {
+      setCompact(window.innerWidth < COMPACT_BREAKPOINT)
+      setGrid(window.innerWidth < 768 ? MOBILE_GRID : DESKTOP_GRID)
+    }
+    updateMotionPreference()
+    updateViewport()
+    media.addEventListener('change', updateMotionPreference)
+    window.addEventListener('resize', updateViewport)
+    return () => {
+      media.removeEventListener('change', updateMotionPreference)
+      window.removeEventListener('resize', updateViewport)
+    }
+  }, [])
+
+  useEffect(() => {
+    const stage = stageRef.current
+    const imagePlane = imagePlaneRef.current
+    if (!stage || !imagePlane || reducedMotion || compact) return
+    const xTo = gsap.quickTo(imagePlane, 'rotateY', { duration: 0.7, ease: 'power3.out' })
+    const yTo = gsap.quickTo(imagePlane, 'rotateX', { duration: 0.7, ease: 'power3.out' })
+    pointerApi.current = { x: (value) => xTo(value), y: (value) => yTo(value) }
+    return () => {
+      pointerApi.current = null
+      gsap.set(imagePlane, { rotateX: 0, rotateY: 0 })
+    }
+  }, [compact, reducedMotion])
+
+  useEffect(() => {
+    const root = rootRef.current
+    const stage = stageRef.current
+    const imagePlane = imagePlaneRef.current
+    if (!root || !stage || reducedMotion || compact || vehicles.length === 0) return
+
+    const context = gsap.context(() => {
+      const measure = () => {
+        geometryRef.current = { width: stage.clientWidth, height: stage.clientHeight }
+        ScrollTrigger.refresh()
+      }
+      const resizeObserver = new ResizeObserver(measure)
+      resizeObserver.observe(stage)
+      const sequence = gsap.timeline({ paused: true })
+      const renderProgress = (progress: number) => {
+        const scaled = progress * Math.max(1, vehicles.length - 1)
+        const index = Math.min(vehicles.length - 1, Math.floor(scaled))
+        const local = scaled - index
+        if (index !== activeIndexRef.current) {
+          activeIndexRef.current = index
+          setActiveIndex(index)
+        }
+
+        const current = vehicles[index]
+        const next = vehicles[index + 1]
+        const width = geometryRef.current.width || stage.clientWidth
+        const height = geometryRef.current.height || stage.clientHeight
+        const currentMotion = current ? motionByVehicle[current.slug] ?? [] : []
+        const nextMotion = next ? motionByVehicle[next.slug] ?? [] : []
+        const assemble = Math.min(1, local / 0.2)
+        const dissolve = Math.max(0, Math.min(1, (local - 0.54) / 0.46))
+        const handoff = Math.max(0, Math.min(1, (local - 0.62) / 0.38))
+
+        currentMotion.forEach((motion) => {
+          const element = tileRefs.current[motion.id]
+          if (!element) return
+          if (dissolve > 0) setTileState(element, motion, dissolve, width, height, false)
+          else setTileState(element, motion, assemble, width, height, true)
+        })
+        nextMotion.forEach((motion) => {
+          const element = tileRefs.current[motion.id]
+          if (!element) return
+          setTileState(element, motion, handoff, width, height, true)
+        })
+
+        if (imagePlane) {
+          gsap.set(imagePlane, { translateZ: Math.sin(local * Math.PI) * 7, rotateZ: dissolve * -0.4 })
+        }
+      }
+
+      sequence.to({}, { duration: 1, ease: 'none' })
+      const trigger = ScrollTrigger.create({
+        trigger: root,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.75,
+        onUpdate: (self) => {
+          sequence.progress(self.progress)
+          renderProgress(self.progress)
+        },
+        onRefresh: (self) => renderProgress(self.progress),
+      })
+      triggerRef.current = trigger
+      measure()
+      renderProgress(0)
+      return () => {
+        resizeObserver.disconnect()
+        triggerRef.current = null
+        trigger.kill()
+        sequence.kill()
+      }
+    }, root)
+
+    return () => context.revert()
+  }, [compact, grid, imagePlaneRef, motionByVehicle, reducedMotion, vehicles])
+
+  useEffect(() => {
+    if (reducedMotion || compact) return
+    const frame = window.requestAnimationFrame(() => {
+      triggerRef.current?.refresh()
+      triggerRef.current?.update()
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [activeIndex, compact, reducedMotion])
 
   useEffect(() => {
     if (!reducedMotion) return
@@ -63,149 +209,73 @@ export function CinematicVehicleSequence({ vehicles }: { vehicles: SequenceVehic
     const update = () => {
       const range = Math.max(1, root.offsetHeight - window.innerHeight)
       const progress = Math.min(1, Math.max(0, -root.getBoundingClientRect().top / range))
-      const nextIndex = Math.min(vehicles.length - 1, Math.floor(progress * vehicles.length))
-      activeIndexRef.current = nextIndex
-      setActiveIndex(nextIndex)
+      const index = Math.min(vehicles.length - 1, Math.floor(progress * Math.max(1, vehicles.length - 1) + 0.5))
+      activeIndexRef.current = index
+      setActiveIndex(index)
     }
     update()
     window.addEventListener('scroll', update, { passive: true })
     return () => window.removeEventListener('scroll', update)
   }, [reducedMotion, vehicles.length])
 
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const update = () => setReducedMotion(media.matches || window.innerWidth < MOBILE_BREAKPOINT)
-    update()
-    media.addEventListener('change', update)
-    window.addEventListener('resize', update)
-    return () => { media.removeEventListener('change', update); window.removeEventListener('resize', update) }
-  }, [])
-
-  useEffect(() => {
-    const stage = stageRef.current
-    if (!stage) return
-    const updateGrid = () => setGrid(window.innerWidth < MOBILE_BREAKPOINT ? MOBILE_GRID : DESKTOP_GRID)
-    updateGrid()
-    const observer = new ResizeObserver(updateGrid)
-    observer.observe(stage)
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const root = rootRef.current
-    const stage = stageRef.current
-    if (!root || !stage || reducedMotion || vehicles.length < 1) return
-    const ctx = gsap.context(() => {
-      const scatterAll = (slug: string, assembled: boolean) => {
-        const tiles = tilesByVehicle[slug] ?? []
-        const width = stage.clientWidth
-        const height = stage.clientHeight
-        tiles.forEach((tile, index) => {
-          const element = tileRefs.current[tile.id]
-          if (!element) return
-          const scatter = randomScatter(tile, index, width, height)
-          gsap.set(element, assembled ? { x: 0, y: 0, rotation: 0, scale: 1, zIndex: 1, opacity: 1 } : { ...scatter, zIndex: Math.round(scatter.z), opacity: 0.86 })
-        })
-      }
-      vehicles.forEach((vehicle, index) => scatterAll(vehicle.slug, index === 0))
-      const setProgress = (progress: number) => {
-        const scaled = progress * vehicles.length
-        const index = Math.min(vehicles.length - 1, Math.floor(scaled))
-        const local = scaled - index
-        if (index !== activeIndexRef.current) {
-          activeIndexRef.current = index
-          setActiveIndex(index)
-        }
-        const current = vehicles[index]
-        const next = vehicles[index + 1]
-        if (current) {
-          const currentTiles = tilesByVehicle[current.slug] ?? []
-          const enter = Math.min(1, local / 0.22)
-          const exit = Math.max(0, (local - 0.64) / 0.36)
-          currentTiles.forEach((tile, tileIndex) => {
-            const element = tileRefs.current[tile.id]
-            if (!element) return
-            const scatter = randomScatter(tile, tileIndex, stage.clientWidth, stage.clientHeight)
-            const x = exit > 0 ? gsap.utils.interpolate(0, scatter.x, exit) : gsap.utils.interpolate(scatter.x, 0, enter)
-            const y = exit > 0 ? gsap.utils.interpolate(0, scatter.y, exit) : gsap.utils.interpolate(scatter.y, 0, enter)
-            const rotation = exit > 0 ? gsap.utils.interpolate(0, scatter.rotation, exit) : gsap.utils.interpolate(scatter.rotation, 0, enter)
-            const scale = exit > 0 ? gsap.utils.interpolate(1, scatter.scale, exit) : gsap.utils.interpolate(scatter.scale, 1, enter)
-            gsap.set(element, { x, y, rotation, scale, z: exit > 0 ? scatter.z * exit : scatter.z * (1 - enter), opacity: 1 - exit * 0.18 })
-          })
-        }
-        if (next) {
-          const nextTiles = tilesByVehicle[next.slug] ?? []
-          const nextEnter = Math.max(0, Math.min(1, (local - 0.62) / 0.38))
-          nextTiles.forEach((tile, tileIndex) => {
-            const element = tileRefs.current[tile.id]
-            if (!element) return
-            const scatter = randomScatter(tile, tileIndex, stage.clientWidth, stage.clientHeight)
-            gsap.set(element, { x: gsap.utils.interpolate(scatter.x, 0, nextEnter), y: gsap.utils.interpolate(scatter.y, 0, nextEnter), rotation: gsap.utils.interpolate(scatter.rotation, 0, nextEnter), scale: gsap.utils.interpolate(scatter.scale, 1, nextEnter), z: gsap.utils.interpolate(scatter.z, 0, nextEnter), opacity: nextEnter })
-          })
-        }
-      }
-      const trigger = ScrollTrigger.create({ trigger: root, start: 'top top', end: 'bottom bottom', scrub: 0.6, onUpdate: self => setProgress(self.progress) })
-      setProgress(0)
-      return () => trigger.kill()
-    }, root)
-    return () => ctx.revert()
-  }, [grid, reducedMotion, tilesByVehicle, vehicles])
-
-  const handlePointer = (event: React.PointerEvent<HTMLElement>) => {
-    if (event.pointerType !== 'mouse' || reducedMotion) return
-    const rect = event.currentTarget.getBoundingClientRect()
-    setPointer({ x: ((event.clientX - rect.left) / rect.width - 0.5) * 2, y: ((event.clientY - rect.top) / rect.height - 0.5) * 2 })
-  }
-
   if (vehicles.length === 0) return null
 
-  if (reducedMotion) {
-    const vehicle = vehicles[activeIndex] ?? vehicles[0]
-    return <section ref={rootRef} className="relative border-b border-edge bg-auto-dark text-auto-text" style={{ height: `${vehicles.length * 100}vh` }} aria-labelledby="sequence-heading-reduced">
-      <div className="sticky top-0 flex h-screen min-h-[620px] items-center overflow-hidden">
-        <div className="container-max grid w-full gap-8 py-16 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
-          <div className="max-w-md"><p className="eyebrow text-orange-300">02 · El archivo en movimiento</p><h2 id="sequence-heading-reduced" className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-6xl">Una máquina, una historia, pieza por pieza.</h2><p className="mt-5 text-base leading-relaxed text-zinc-300">Modo de movimiento reducido: recorremos las fichas con una transición suave y accesible.</p></div>
-          <Link href={`/vehiculos/${vehicle.slug}`} prefetch={false} className="group relative block aspect-[4/3] overflow-hidden rounded-2xl border border-white/15 bg-zinc-900"><img src={vehicle.imageSrc} alt={vehicle.imageAlt} className="h-full w-full object-cover transition-opacity duration-500" /><span className="absolute bottom-4 left-4 rounded-full bg-black/60 px-3 py-1 font-mono text-xs uppercase tracking-wider text-white">{vehicle.manufacturer} · {vehicle.category}</span></Link>
+  const activeVehicle = vehicles[activeIndex] ?? vehicles[0]
+  const firstImage = vehicles[0].imageSrc
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLElement>) => {
+    if (event.pointerType !== 'mouse' || !pointerApi.current) return
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2
+    const y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2
+    pointerApi.current.x(x * 4.5)
+    pointerApi.current.y(y * -3.5)
+  }
+
+  if (reducedMotion || compact) {
+    return <section ref={rootRef} className="relative border-b border-edge bg-auto-dark text-auto-text" style={{ height: `${Math.max(1, vehicles.length) * 82}vh` }} aria-labelledby="sequence-heading-static">
+      <div className="sticky top-0 flex min-h-[620px] h-screen items-center overflow-hidden">
+        <div className="container-max grid w-full gap-8 py-20 lg:grid-cols-[0.55fr_1.45fr] lg:items-end">
+          <div className="max-w-sm"><p className="eyebrow text-orange-300">{SECTION_LABEL}</p><h2 id="sequence-heading-static" className="mt-5 text-4xl font-bold tracking-tight text-white sm:text-5xl">El archivo también se mira.</h2><p className="mt-5 text-base leading-relaxed text-zinc-300">Una selección de vehículos reales, elegidos por categoría y fotografía.</p></div>
+          <Link href={`/vehiculos/${activeVehicle.slug}`} prefetch={false} className="group relative block overflow-hidden border border-white/15 bg-zinc-900 focus-visible:outline-white"><img src={activeVehicle.imageSrc} alt={activeVehicle.imageAlt} fetchPriority="high" decoding="async" className="aspect-[16/9] w-full object-cover transition-opacity duration-500" /><div className="flex items-baseline justify-between gap-4 border-t border-white/15 px-1 py-4 text-white"><div><p className="font-mono text-xs text-orange-300">{activeVehicle.category}</p><h3 className="mt-1 text-2xl font-bold sm:text-4xl">{activeVehicle.title}</h3></div><span className="font-mono text-xs text-zinc-400">Abrir ficha ↗</span></div></Link>
         </div>
       </div>
     </section>
   }
 
-  return (
-    <section ref={rootRef} className="relative border-b border-edge bg-auto-dark text-auto-text" style={{ height: `${Math.max(1, vehicles.length) * 100}vh` }} aria-labelledby="sequence-heading" onPointerMove={handlePointer} onPointerLeave={() => setPointer({ x: 0, y: 0 })}>
-      <div ref={stageRef} className="sticky top-0 flex h-screen min-h-[620px] items-center overflow-hidden" style={{ perspective: '1200px' }}>
-        <div className="container-max relative z-10 grid w-full gap-8 py-16 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
-          <div className="max-w-md">
-            <p className="eyebrow text-orange-300">02 · El archivo en movimiento</p>
-            <h2 id="sequence-heading" className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-6xl">Una máquina, una historia, pieza por pieza.</h2>
-            <p className="mt-5 text-base leading-relaxed text-zinc-300 sm:text-lg">Recorré categorías reales del catálogo. Cada ficha se arma frente a vos y vuelve a dispersarse cuando llega la siguiente.</p>
-            <div className="mt-8 flex items-center gap-4 font-mono text-xs uppercase tracking-[0.16em] text-zinc-400"><span>{String(activeIndex + 1).padStart(2, '0')} / {String(vehicles.length).padStart(2, '0')}</span><span className="h-px w-12 bg-orange-500" /><span>{vehicles[activeIndex]?.category}</span></div>
-          </div>
-          <div className="relative mx-auto aspect-[4/3] w-full max-w-3xl" style={{ transform: `rotateX(${pointer.y * -3}deg) rotateY(${pointer.x * 4}deg)`, transition: 'transform 180ms ease-out' }}>
+  return <section ref={rootRef} className="relative border-b border-edge bg-auto-dark text-auto-text" style={{ height: `${Math.max(1, vehicles.length) * 100}vh` }} aria-labelledby="sequence-heading" onPointerMove={handlePointerMove} onPointerLeave={() => { pointerApi.current?.x(0); pointerApi.current?.y(0) }}>
+    <div ref={stageRef} className="sticky top-0 flex h-screen min-h-[680px] items-center overflow-hidden" style={{ perspective: '1200px' }}>
+      <div className="container-max relative z-10 grid w-full gap-10 py-20 lg:grid-cols-[0.52fr_1.48fr] lg:items-end">
+        <div className="order-2 max-w-sm pb-3 lg:order-1">
+          <p className="eyebrow text-orange-300">{SECTION_LABEL}</p>
+          <h2 id="sequence-heading" className="mt-5 text-4xl font-bold tracking-tight text-white sm:text-5xl">El archivo también se mira.</h2>
+          <p className="mt-5 text-base leading-relaxed text-zinc-300">Una selección de vehículos reales, elegidos por categoría y fotografía. La imagen llega antes que la interfaz.</p>
+          <div className="mt-10 border-t border-white/20 pt-4 text-zinc-400" aria-live="polite"><p className="font-mono text-xs text-orange-300">{String(activeIndex + 1).padStart(2, '0')} / {String(vehicles.length).padStart(2, '0')} · {activeVehicle.category}</p><p className="mt-2 text-sm">{activeVehicle.manufacturer}</p></div>
+        </div>
+        <div ref={imagePlaneRef} className="order-1 relative mx-auto w-full max-w-[980px] lg:order-2" style={{ transformStyle: 'preserve-3d' }}>
+          <div className="relative aspect-[16/10] overflow-visible" aria-label="Secuencia de vehículos por categoría">
+            <img src={firstImage} alt="" aria-hidden="true" fetchPriority="high" decoding="async" className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0" />
             {mountedVehicles.map((vehicle, vehicleIndex) => {
-              const visible = vehicle.slug === vehicles[activeIndex]?.slug || vehicle.slug === vehicles[activeIndex + 1]?.slug
-              const tiles = tilesByVehicle[vehicle.slug] ?? []
-              return <div key={vehicle.slug} className="absolute inset-0" aria-hidden={!visible}>
+              const tiles = motionByVehicle[vehicle.slug] ?? []
+              const isCurrent = vehicle.slug === activeVehicle.slug
+              return <figure key={vehicle.slug} className={`absolute inset-0 ${isCurrent ? 'z-10' : 'z-0'}`} aria-hidden={!isCurrent}>
                 <Link href={`/vehiculos/${vehicle.slug}`} prefetch={false} className="absolute inset-0 z-20" aria-label={`Abrir ficha de ${vehicle.title}`} />
-                <span className="absolute bottom-3 left-3 z-10 rounded-full border border-white/20 bg-black/50 px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-white/80">{vehicle.manufacturer} · {vehicle.category}</span>
-                {vehicleIndex === 0 && <img src={vehicle.imageSrc} alt={vehicle.imageAlt} fetchPriority="high" decoding="async" className="absolute inset-0 h-full w-full rounded-2xl object-cover opacity-0" />}
-                {tiles.map((tile) => {
-                  const left = (tile.col / grid.cols) * 100
-                  const top = (tile.row / grid.rows) * 100
-                  const width = 100 / grid.cols
-                  const height = 100 / grid.rows
-                  return <div key={tile.id} ref={(node) => { tileRefs.current[tile.id] = node }} className="absolute overflow-hidden border-[0.5px] border-black/10 bg-cover bg-no-repeat shadow-black/10 [backface-visibility:hidden]" style={{ left: `${left}%`, top: `${top}%`, width: `${width}%`, height: `${height}%`, backgroundImage: `url(${vehicle.imageSrc})`, backgroundSize: `${grid.cols * 100}% ${grid.rows * 100}%`, backgroundPosition: `${grid.cols === 1 ? 0 : (tile.col / (grid.cols - 1)) * 100}% ${grid.rows === 1 ? 0 : (tile.row / (grid.rows - 1)) * 100}%` }} />
+                {tiles.map((motion) => {
+                  const left = `${(motion.col / grid.cols) * 100}%`
+                  const top = `${(motion.row / grid.rows) * 100}%`
+                  const width = `${100 / grid.cols}%`
+                  const height = `${100 / grid.rows}%`
+                  return <div key={motion.id} ref={(node) => { tileRefs.current[motion.id] = node }} className="absolute overflow-hidden bg-no-repeat" style={{ left, top, width, height, backgroundImage: `url(${vehicle.imageSrc})`, backgroundSize: `${grid.cols * 100}% ${grid.rows * 100}%`, backgroundPosition: `${grid.cols === 1 ? 0 : (motion.col / (grid.cols - 1)) * 100}% ${grid.rows === 1 ? 0 : (motion.row / (grid.rows - 1)) * 100}%`, transform: 'translate3d(0,0,0)', opacity: vehicleIndex === 0 ? 1 : 0 }} />
                 })}
-              </div>
+                <figcaption className="pointer-events-none absolute -bottom-12 left-0 z-30 flex w-full items-baseline justify-between gap-4 text-white sm:-bottom-14"><span className="text-2xl font-bold tracking-tight sm:text-4xl">{vehicle.title}</span><span className="font-mono text-xs text-zinc-400">{vehicle.category}</span></figcaption>
+              </figure>
             })}
           </div>
         </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-5 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Scroll para cambiar de categoría</div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_45%,rgba(194,65,12,0.18),transparent_42%)]" />
       </div>
-      {reducedMotion && <div className="pointer-events-none absolute inset-0 bg-auto-dark/95" />}
-    </section>
-  )
+      <div className="pointer-events-none absolute bottom-7 right-4 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 sm:right-8">Desplazá para continuar</div>
+    </div>
+  </section>
 }
 
 export type { SequenceVehicle }
