@@ -50,7 +50,7 @@ export function HomeDiscovery({ vehicles, imageBySlug }: HomeDiscoveryProps) {
             <div>
               <p className="eyebrow text-auto-accent">03 · El archivo como instrumento</p>
               <h2 id="axis-heading" className="mt-3 max-w-2xl text-3xl font-bold tracking-tight text-strong sm:text-5xl">Explorá por el dato que te importa.</h2>
-              <p className="mt-4 max-w-xl text-body">Ocho vehículos reales del catálogo, ordenados en vivo. Sin valores estimados: cuando un dato no está documentado, queda fuera.</p>
+              <p className="mt-4 max-w-xl text-body">Ocho vehículos reales del catálogo, ordenados en vivo. Potencia y precios se expresan en hp y USD de referencia internacional; cuando un dato no está documentado, queda fuera.</p>
             </div>
             <Link href="/explorar" className="link-underline shrink-0 font-semibold text-auto-accent">Abrir explorador completo →</Link>
           </div>
