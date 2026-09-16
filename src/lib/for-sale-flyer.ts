@@ -1,25 +1,22 @@
 /**
- * Cartel de venta profesional (PDF) — segundo canal que cobra directo a
- * la persona usuaria (no a un negocio/afiliado), vía Mercado Pago
- * Checkout Pro. El primero fue el reporte comparativo premium (ver
+ * Cartel de venta profesional (PDF) — pensado originalmente como segundo
+ * canal que cobra directo a la persona usuaria, vía Mercado Pago
+ * Checkout Pro (mismo mecanismo que el reporte comparativo premium, ver
  * `src/lib/premium-report.ts`). Contexto completo en
  * `docs/monetizacion-plan.md` sección 2.16.
  *
- * Qué vende: quien va a `/vender-tu-auto` deja el lead gratis (igual que
- * siempre, `SellVehicleLeadForm.tsx` no cambia), pero si además quiere un
- * cartel prolijo — precio grande y legible, datos de contacto, marca y
- * modelo — para pegar en el parabrisas o compartir en redes/grupos de
- * WhatsApp, ese PDF con diseño de marca de Sin Frenos es un producto de
- * ARS 690 (impulso, no una decisión que requiera pensar).
+ * ACTUALIZADO (migración a GitHub Pages, sitio 100% estático): igual que
+ * el reporte premium, el cobro server-side no puede vivir en
+ * `output: 'export'`. El cartel se genera hoy gratis, 100% client-side,
+ * con `buildFlyerPdf` (`src/lib/pdf/build-flyer.ts`) — ver
+ * `ForSaleFlyerForm.tsx`. `FLYER_PRICE_ARS` queda sin uso real hasta
+ * elegir una pasarela de pago compatible con hosting estático.
  *
- * Mismo criterio "sin base de datos propia" que el reporte premium: los
- * datos del cartel (marca, modelo, precio, contacto) NUNCA se guardan en
- * ningún lado del lado del servidor — viajan de ida y vuelta en la propia
- * URL (`returnUrl` con los datos codificados en base64) y se verifican
- * con un hash contra el `external_reference` que Mercado Pago devuelve,
- * exactamente el mismo mecanismo que usa `buildExternalReference` /
- * `externalReferenceMatchesSlugs` en premium-report.ts pero para un
- * payload de texto libre en vez de una lista de slugs conocidos.
+ * Qué vende hoy: quien va a `/vender-tu-auto` deja el lead gratis (igual
+ * que siempre, `SellVehicleLeadForm.tsx` no cambia), y además puede
+ * generar gratis un cartel prolijo (precio grande y legible, datos de
+ * contacto, marca y modelo) para pegar en el parabrisas o compartir en
+ * redes/grupos de WhatsApp.
  */
 
 export const FLYER_PRICE_ARS = 690
